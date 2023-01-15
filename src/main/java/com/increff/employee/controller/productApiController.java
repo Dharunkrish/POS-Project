@@ -36,6 +36,7 @@ public class productApiController {
 	@RequestMapping(path = "/api/product", method = RequestMethod.POST)
 	public void add(@RequestBody productForm form) throws ApiException {
 		int id=form.getId();
+		logger.info(id);
 		productPojo p = convert(form);
 		service.add(p,id);
 	}

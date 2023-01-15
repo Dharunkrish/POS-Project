@@ -21,9 +21,10 @@ import com.increff.employee.service.ApiException;
 
 		private static String delete_id = "delete from productPojo p where p.product_id=:product_id";
 		private static String select_id = "select new com.increff.employee.model.productDTO(pc.name, pc.barcode,pc.mrp,p.id, pc.product_id) from productPojo pc join pc.brand p where pc.product_id=:id";
-		private static String update_prod = "update productPojo set name=:name, barcode=:barcode,brand=:brand,mrp=:mrp";
+		private static String update_prod = "update productPojo pc set pc.name=:name, pc.barcode=:barcode,pc.brand=:brand,pc.mrp=:mrp where pc.product_id=:id";
 		private static String select_all = "select new com.increff.employee.model.productDTO(pc.name, pc.barcode,pc.mrp,p.id, pc.product_id) from productPojo pc join pc.brand p";
-		
+		private static String select_ba = "select new com.increff.employee.model.productDTO(pc.name, pc.barcode,pc.mrp,p.id, pc.product_id) from productPojo pc join pc.brand p where pc.barcode=:barcode";
+
 		
 		@Transactional
 		public void insert(productPojo p,int id) throws ApiException {
@@ -48,6 +49,12 @@ import com.increff.employee.service.ApiException;
 		public productDTO select(int id) {
 			TypedQuery<productDTO> query = getQuery(select_id, productDTO.class);
 			query.setParameter("id", id);
+			return getSingle(query);
+		}
+		
+		public productDTO selectbar(String barcode) {
+			TypedQuery<productDTO> query = getQuery(select_id, productDTO.class);
+			query.setParameter("barcode", barcode);
 			return getSingle(query);
 		}
 
@@ -76,6 +83,8 @@ import com.increff.employee.service.ApiException;
 			query.setParameter("barcode", p.getBarcode());
 			query.setParameter("brand", p.getBrand());
 			query.setParameter("mrp", p.getMrp());
+			query.setParameter("id",id);
+			logger.info(query.toString());
 			logger.info(query.executeUpdate());
 			}
 			catch(Exception e) {

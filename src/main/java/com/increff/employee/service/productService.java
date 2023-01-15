@@ -55,7 +55,8 @@ public class productService {
 
 	@Transactional(rollbackOn  = ApiException.class)
 	public void update(int id, productPojo p) throws ApiException {
-		normalize(p);        
+		normalize(p);   
+		bar(p.getBarcode());
 		dao.update(id,p);
 	}
 
@@ -71,6 +72,15 @@ public class productService {
 	public brandPojo ref(int id) {
 		return dao.findid(id);
 	}
+	
+	public void bar(String barcode) throws ApiException{
+		productDTO p =dao.selectbar(barcode);
+		if(p!=null) {
+			throw new ApiException("Barcode must be unique");
+		}
+	}
+	
+	
 	
 
 	protected static void normalize(productPojo p) {

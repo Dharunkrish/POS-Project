@@ -15,6 +15,11 @@ public class productDTO {
 		this.brand_id=brand_id;
 		this.product_id=product_id;
 	}
+	
+	public productDTO(String name,int product_id) {
+		this.name=name;
+		this.product_id=product_id;
+	}
 
 	public String getName() {
 		return name;
