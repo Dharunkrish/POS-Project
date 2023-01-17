@@ -18,7 +18,6 @@
 			  <div class="form-group">
 			    
 			    </div>
-			  </div>
 			  <button type="button" class="btn btn-primary mr-5" data-toggle="modal" id="add-inv">Add</button>
 			  &nbsp;
 			  <button type="button" class="btn btn-primary mr-5" id="refresh-data">Refresh</button>
@@ -61,10 +60,10 @@
         </button>
       </div>
       <div class="modal-body">
-			<form class="form-inline" id="inventory-add-form">
+			<form class="form-horizontal" id="inventory-add-form">
 				<div class="form-group">
-				    <label for="inputproductid" class="col col-form-label">Product</label>
-				    <div class="col">
+				    <label for="inputproductid" class="col-sm-2 col-form-label">Product</label>
+				    <div class="col-sm-10">
 	                <select class="form-control" name="id" id="idvalue"> </select>
 	            </div>
 			  </div>
@@ -95,12 +94,12 @@
         </button>
       </div>
       <div class="modal-body">
-			<form class="form-inline" id="inventory-edit-form">
+			<form class="form-horizontal" id="inventory-edit-form">
 				<div class="form-group">
-			    <label for="inputid" class="col-sm-2 col-form-label">Product ID</label>
-			    <div class="col-sm-10">
-			      <input type="text" class="form-control" name="id" placeholder="enter Product Id">
-			    </div>
+			   <label for="inputproductid" class="col-sm-2 col-form-label">Product</label>
+				    <div class="col-sm-10">
+                          <input type="text"  class="form-control" name="id" id="idedit">
+ 			    </div>
 			  </div>
 			  <div class="form-group">
 			    <label for="inputquantity" class="col-sm-2 col-form-label">Quantity</label>
@@ -138,6 +137,8 @@
 		  <input type="file" class="custom-file-input" id="inventoryFile">
 		  <label class="custom-file-label" for="inventoryFile" id="inventoryFileName">Choose file</label>
 		</div>
+		<a th:href="@{/sample/inventory.tsv}" target="_blank">Download Sample</a> 
+		<br>
 		Rows: <span id="rowCount">0</span>, 
 		Processed: <span id="processCount">0</span>, 
 		Errors: <span id="errorCount">0</span>

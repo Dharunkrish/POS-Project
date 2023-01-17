@@ -1,0 +1,98 @@
+<!doctype html>
+
+<html lang="en">
+
+<head th:replace="snippets.html :: name_head">
+	 <style type="text/css">
+
+    </style>
+</head>
+</head>
+
+<body>
+<nav th:replace="snippets.html :: name_app_navbar"></nav>
+
+<div class="container">
+
+<h3>Order</h3>
+<br>
+ <!-- Top row with form-->
+ <div class="row">
+	 <div class="col-12">
+			<form class="form-inline" id="order">
+			  <div class="form-group">
+			    
+			    </div>
+			  <button type="button" class="btn btn-primary mr-5" id="add-ord">Add</button>
+			  &nbsp;
+			  <button type="button" class="btn btn-primary mr-5" id="refresh-data">Refresh</button>
+			  &nbsp;
+			  <button type="button" class="btn btn-primary mr-5" id="upload-data">Upload</button>
+			</form>
+	 </div>	
+</div> 
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="add-inventory-modal">
+  <div class="modal-dialog modal-xl" role="document" style="width:69%">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add order</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+			<form class="form-inline" id="order-form">
+			  <div class="form-group">
+			    <label for="inputBarcode" class="col-m-2 col-form-label">Barcode</label>
+			      <input type="text" class="form-control" name="barcode" id="inputBarcode" placeholder="enter barcode">
+			  </div>
+			  <div class="form-group">
+			    <label for="inputQuantity" class="col-m-2">Quantity</label>
+			      <input type="text" class="form-control" name="quantity" id="inputQuantity" placeholder="enter quantity">
+			  </div>
+			  <div class="form-group">
+			    <label for="inputPrice" class="col-m-2">Price</label>
+			      <input type="text" class="form-control" name="price" id="inputPrice" placeholder="enter price">
+			  </div>
+			  <button type="button" class="btn btn-primary" id="add-items">Add</button>
+			</form>
+	 </div>	
+
+<div class="row">
+	&nbsp;
+</div>
+ <div class="col-12">
+	<table class="table table-striped" id="item-table">
+	  <thead>
+	    <tr>
+	      <th scope="col">Barcode</th>
+	      <th scope="col">Quantity</th>
+	      <th scope="col">Price</th>
+	      <th scope="col">Actions</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	  </tbody>
+	</table>
+
+</div>
+			 
+	      
+      <div class="modal-footer">
+      	<button type="button" class="btn btn-primary" id="add-inventory">Submit</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer th:replace="snippets.html :: name_footer"></footer>
+
+<script th:src="@{/static/order.js}"/></script>
+
+
+</body>	
+
+</html>

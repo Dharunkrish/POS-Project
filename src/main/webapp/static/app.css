@@ -21,3 +21,12 @@ body {
 .fas{
     font-size: 4rem;
 }
+
+form-inline .form-group {
+  margin-right:40px;
+  margin-left: 20px;
+}
+
+input{
+	margin-left: 4px;
+}
