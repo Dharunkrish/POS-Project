@@ -49,9 +49,8 @@ public class inventoryApiController {
 	
 	@ApiOperation(value = "Gets an inventory by ID")
 	@RequestMapping(path = "/api/inventory/id", method = RequestMethod.GET)
-	public List<productDTO> getid() throws Exception {
-		List<productDTO> list = service.getid();
-		List<inventoryForm> list2 = new ArrayList<inventoryForm>();
+	public List<productPojo> getid() throws Exception {
+		List<productPojo> list = service.getid();
 		return list;
 	}
 
@@ -82,6 +81,8 @@ public class inventoryApiController {
 		inventoryForm d = new inventoryForm();
 		d.setQuantity(p.getQuantity());
 		d.setId(p.getId());
+		d.setBarcode(p.getBarcode());
+		d.setName(p.getName());
 		return d;
 	}
 

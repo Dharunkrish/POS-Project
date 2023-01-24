@@ -12,6 +12,17 @@ function toJson($form){
 }
 
 
+function toJsonobject($form){
+    var serialized = $form.serializeArray();
+    var s = '';
+    var data1 = {};
+    for(s in serialized){
+        data1[serialized[s]['name']] = serialized[s]['value']
+    }
+    return data1;
+}
+
+
 function handleAjaxError(response){
 	var response = JSON.parse(response.responseText);
 	alert(response.message);

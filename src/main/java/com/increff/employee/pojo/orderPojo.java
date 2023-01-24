@@ -1,8 +1,10 @@
 package com.increff.employee.pojo;
 
-import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 
@@ -10,20 +12,29 @@ import javax.persistence.Id;
 public class orderPojo {
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
-    private Timestamp sqlTimestamp;
+    private ZonedDateTime t;
+    private boolean isInvoiceGenerated;
+	public boolean isInvoiceGenerated() {
+		return isInvoiceGenerated;
+	}
+	public void setInvoiceGenerated(boolean isInvoiceGenerated) {
+		this.isInvoiceGenerated = isInvoiceGenerated;
+	}
 	public int getId() {
 		return id;
 	}
 	public void setId(int id) {
 		this.id = id;
 	}
-	public Timestamp getSqlTimestamp() {
-		return sqlTimestamp;
+	public ZonedDateTime getT() {
+		return t;
 	}
-	public void setSqlTimestamp(Timestamp sqlTimestamp) {
-		this.sqlTimestamp = sqlTimestamp;
+	public void setT(ZonedDateTime t) {
+		this.t = t;
 	}
+	
 
 
 }

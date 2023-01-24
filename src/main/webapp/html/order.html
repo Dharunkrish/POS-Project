@@ -3,10 +3,13 @@
 <html lang="en">
 
 <head th:replace="snippets.html :: name_head">
-	 <style type="text/css">
-
-    </style>
-</head>
+	
+<style>
+	input{
+	margin-left: 6px;
+	margin-right: 40px;
+}
+</style>
 </head>
 
 <body>
@@ -23,22 +26,38 @@
 			  <div class="form-group">
 			    
 			    </div>
-			  <button type="button" class="btn btn-primary mr-5" id="add-ord">Add</button>
+			  <button type="button" class="btn btn-primary mr-5" data-toggle="modal" id="add-ord">Add</button>
 			  &nbsp;
 			  <button type="button" class="btn btn-primary mr-5" id="refresh-data">Refresh</button>
-			  &nbsp;
-			  <button type="button" class="btn btn-primary mr-5" id="upload-data">Upload</button>
 			</form>
+	<div class="row">
+	&nbsp;
+</div>
+ <div class="col-12">
+	<table class="table table-striped" id="order-table">
+	  <thead>
+	    <tr>
+	      <th scope="col">Order ID</th>
+	      <th scope="col">Created</th>
+	      <th scope="col">View</th>
+	      <th scope="col">Invoice</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	  </tbody>
+	</table>
+
+</div>
 	 </div>	
 </div> 
 </div>
 
-<div class="modal fade" tabindex="-1" role="dialog" id="add-inventory-modal">
+<div class="modal fade" tabindex="-1" role="dialog" id="add-inventory-modal" style="overflow: auto">
   <div class="modal-dialog modal-xl" role="document" style="width:69%">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add order</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-dismiss="modal" id="closesign" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -67,6 +86,7 @@
 	<table class="table table-striped" id="item-table">
 	  <thead>
 	    <tr>
+	      <th scope="col">Name</th>
 	      <th scope="col">Barcode</th>
 	      <th scope="col">Quantity</th>
 	      <th scope="col">Price</th>
@@ -81,12 +101,120 @@
 			 
 	      
       <div class="modal-footer">
-      	<button type="button" class="btn btn-primary" id="add-inventory">Submit</button>
+      	<button type="button" class="btn btn-primary" id="submit">Submit</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="view-order-modal" style="overflow: auto">
+  <div class="modal-dialog modal-xl" role="document" style="width:69%">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">View order</h5>
+        <button type="button" class="close" data-dismiss="modal" id="closesign" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+<div class="row">
+	&nbsp;
+</div>
+ <div class="col-12">
+	<table class="table table-striped" id="order-item-table">
+	  <thead>
+	    <tr>
+	      <th scope="col">Name</th>
+	      <th scope="col">Quantity</th>
+	      <th scope="col">Price</th>
+	      <th scope="col">Action</th>
+	      	    </tr>
+	  </thead>
+	  <tbody>
+	  </tbody>
+	</table>
+
+</div>
+			 
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Edit Modal-->
+<div class="modal fade" tabindex="-1" role="dialog" id="edit-modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit order item</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+			<form class="form-horizontal" id="edit-form">
+			  <div class="form-group">
+			    <label for="inputBarcode" class="col-sm-2 col-form-label">Barcode</label>
+			      <input type="text" class="form-control" name="barcode" id="inputBarcode" placeholder="enter barcode">
+			  </div>
+			  <div class="form-group">
+			    <label for="inputQuantity" class="col-sm-2">Quantity</label>
+			      <input type="text" class="form-control" name="quantity" id="inputQuantity" placeholder="enter quantity">
+			  </div>
+			  <div class="form-group">
+			    <label for="inputPrice" class="col-sm-2">Price</label>
+			      <input type="text" class="form-control" name="price" id="inputPrice" placeholder="enter price">
+			  </div>
+			  <input type="hidden" name="id" id="edit-id">
+			</form>
+	 </div>	
+	       <div class="modal-footer">
+      	<button type="button" class="btn btn-primary" id="edit-btn">Edit</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
       </div>
     </div>
   </div>
 </div>
+
+<!--Edit View Modal-->
+<div class="modal fade" tabindex="-1" role="dialog" id="view-edit-modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit order item</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+			<form class="form-horizontal" id="edit-view-form">
+			  <div class="form-group">
+			    <label for="inputBarcode" class="col-sm-2 col-form-label">Barcode</label>
+			      <input type="text" class="form-control" name="barcode" id="editBarcode" placeholder="enter barcode">
+			  </div>
+			  <div class="form-group">
+			    <label for="inputQuantity" class="col-sm-2">Quantity</label>
+			      <input type="text" class="form-control" name="quantity" id="editQuantity" placeholder="enter quantity">
+			  </div>
+			  <div class="form-group">
+			    <label for="inputPrice" class="col-sm-2">Price</label>
+			      <input type="text" class="form-control" name="price" id="editPrice" placeholder="enter price">
+			  </div>
+			  <input type="hidden" name="id" id="edit-Id">
+			</form>
+	 </div>	
+	       <div class="modal-footer">
+      	<button type="button" class="btn btn-primary" id="edit-button">Edit</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 <footer th:replace="snippets.html :: name_footer"></footer>
 

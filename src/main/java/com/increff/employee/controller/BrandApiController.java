@@ -79,6 +79,7 @@ public class BrandApiController {
 		brandPojo p = new brandPojo();
 		p.setBrand(f.getBrand());
 		p.setCategory(f.getCategory());
+		p.setBrand_category(f.getBrand()+"/"+f.getCategory());
 		return p;
 	}
 }

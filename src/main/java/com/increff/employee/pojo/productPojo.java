@@ -18,8 +18,16 @@ public class productPojo {
 	@Column(unique=true)
 	private  String barcode;
 	
-	@ManyToOne
-	private brandPojo brand;
+	private String brand_Category;
+	public String getBrand_Category() {
+		return brand_Category;
+	}
+
+
+
+	public void setBrand_Category(String brand_Category) {
+		this.brand_Category = brand_Category;
+	}
 	private String name;
 	
 	private double mrp;
@@ -29,9 +37,6 @@ public class productPojo {
 		return barcode;
 	}
 	
-	public brandPojo getBrand() {
-		return brand;
-	}
 
 	public int getProduct_id() {
 		return product_id;
@@ -41,9 +46,7 @@ public class productPojo {
 		this.product_id = product_id;
 	}
 
-	public void setBrand(brandPojo brand) {
-		this.brand = brand;
-	}
+
 
 	public void setBarcode(String barcode) {
 		this.barcode = barcode;

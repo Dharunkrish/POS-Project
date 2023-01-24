@@ -7,7 +7,7 @@ function getbrandUrl(){
 //BUTTON ACTIONS
 function addbrand(event){
 	//Set the values to update
-	var $form = $("#brand-form");
+	var $form = $("#brand-add-form");
 	console.log($("#brand-form"));
 	console.log("Hello");
 	console.log("DF");
@@ -22,10 +22,13 @@ function addbrand(event){
        	'Content-Type': 'application/json'
        },	   
 	   success: function(response) {
+	   	        $("#add-brand-modal").modal("toggle");
+
 	   		getbrandList();  
 	   },
 	   error: handleAjaxError
 	});
+    	 $('#add-brand').attr("disabled",true);
 
 	return false;
 }
@@ -100,9 +103,14 @@ function processData(){
 function readFileDataCallback(results){
 	fileData = results.data;
 	uploadRows();
+
 }
 
 function uploadRows(){
+	if (fileData.length>5000){
+		alert("File Rows should be within 5000 rows");
+		return;
+	}
 	//Update progress
 	updateUploadDialog();
 	//If everything processed then return
@@ -148,16 +156,20 @@ function displaybrandList(data){
 	$tbody.empty();
 	for(var i in data){
 		var e = data[i];
-		var buttonHtml = '<button onclick="deletebrand(' + e.id + ')">delete</button>'
-		buttonHtml += ' <button onclick="displayEditbrand(' + e.id + ')">edit</button>'
+		//var buttonHtml = '<button onclick="deletebrand(' + e.id + ')">delete</button>'
+		var buttonHtml = ' <button onclick="displayEditbrand(' + e.id + ')">edit</button>'
 		var row = '<tr>'
-		+ '<td>' + e.id + '</td>'
 		+ '<td>' + e.brand + '</td>'
 		+ '<td>'  + e.category + '</td>'
 		+ '<td>' + buttonHtml + '</td>'
 		+ '</tr>';
         $tbody.append(row);
 	}
+	$('#brand-table').DataTable({
+  columnDefs: [
+    {
+        className: 'dt-center'
+    } ] } );
 }
 
 function displayEditbrand(id){
@@ -186,6 +198,9 @@ function resetUploadDialog(){
 }
 
 function updateUploadDialog(){
+	if (errorData.length>0){
+		$("#download-errors").attr("disabled",false);
+	}
 	$('#rowCount').html("" + fileData.length);
 	$('#processCount').html("" + processCount);
 	$('#errorCount').html("" + errorData.length);
@@ -194,12 +209,17 @@ function updateUploadDialog(){
 function updateFileName(){
 	var $file = $('#brandFile');
 	var fileName = $file.val();
-	$('#brandFileName').html(fileName);
+	var f=fileName.split("\\");
+	$('#brandFilecategory').html(f[f.length-1]);
+
 }
 
 function displayUploadData(){
  	resetUploadDialog(); 	
+ 	$("#download-errors").attr("disabled",true);
+	 $('#process-data').attr("disabled",true);
 	$('#upload-brand-modal').modal('toggle');
+	  
 }
 
 function displaybrand(data){
@@ -209,16 +229,29 @@ function displaybrand(data){
 	$('#edit-brand-modal').modal('toggle');
 }
 
+function button(){
+   $('#add-brand').attr("disabled",(($('#brand-add-form input[name=brand]').val().trim()=="") || ($('#brand-add-form input[name=category]').val().trim()=="")));
+   }
 
 //INITIALIZATION CODE
 function init(){
+	 $('#add-brand').attr("disabled",true);
 	$('#add-brand').click(addbrand);
+	$('#add').click(function(){
+	document.getElementById("brand-add-form").reset();
+    $("#add-brand-modal").modal("toggle");
+	});
+	$('#upload-brand-modal').on("hide.bs.modal",function(){getbrandList();});
+    $('#brand-add-form').on("input change",button);
 	$('#update-brand').click(updatebrand);
 	$('#refresh-data').click(getbrandList);
 	$('#upload-data').click(displayUploadData);
 	$('#process-data').click(processData);
 	$('#download-errors').click(downloadErrors);
-    $('#brandFile').on('change', updateFileName)
+    $('#brandFile').on('change', function(){
+    $('#process-data').attr("disabled",false);
+    	updateFileName();});
+
 }
 
 $(document).ready(init);

@@ -20,24 +20,17 @@ import com.increff.employee.service.ApiException;
 		private Logger logger = Logger.getLogger(productDao.class);
 
 		private static String delete_id = "delete from productPojo p where p.product_id=:product_id";
-		private static String select_id = "select new com.increff.employee.model.productDTO(pc.name, pc.barcode,pc.mrp,p.id, pc.product_id) from productPojo pc join pc.brand p where pc.product_id=:id";
-		private static String update_prod = "update productPojo pc set pc.name=:name, pc.barcode=:barcode,pc.brand=:brand,pc.mrp=:mrp where pc.product_id=:id";
-		private static String select_all = "select new com.increff.employee.model.productDTO(pc.name, pc.barcode,pc.mrp,p.id, pc.product_id) from productPojo pc join pc.brand p";
-		private static String select_ba = "select new com.increff.employee.model.productDTO(pc.name, pc.barcode,pc.mrp,p.id, pc.product_id) from productPojo pc join pc.brand p where pc.barcode=:barcode";
+		private static String select_id = "select pc from productPojo pc where pc.product_id=:id";
+		private static String update_prod = "update productPojo pc set pc.name=:name, pc.barcode=:barcode,pc.brand_Category=:brand,pc.mrp=:mrp where pc.product_id=:id";
+		private static String select_all = "select pc from productPojo pc";
+		//private static String select_ba = "select new com.increff.employee.model.productDTO(pc.name, pc.barcode,pc.mrp,p.id, pc.product_id) from productPojo pc join pc.brand p where pc.barcode=:barcode";
+		private static String select_brand = "select b from brandPojo b where b.brand=:brand and b.category=:category";
+		private static String select_bar = "select pc from productPojo pc where pc.barcode=:barcode and product_id!=:id";
 
 		
 		@Transactional
-		public void insert(productPojo p,int id) throws ApiException {
-			try {
-				brandPojo b = em().getReference(brandPojo.class, id);
-				b.product.add(p);
-				p.setBrand(b);
-				em().persist(p);
-			}
-			catch(Exception e) {
-				throw new ApiException("There is no Brand id that matches your product brand id");
-			}
-			
+		public void insert(productPojo p) throws ApiException {
+				em().persist(p);	
 		}
 
 		public int delete(int product_id) {
@@ -46,54 +39,48 @@ import com.increff.employee.service.ApiException;
 			return query.executeUpdate();
 		}
 
-		public productDTO select(int id) {
-			TypedQuery<productDTO> query = getQuery(select_id, productDTO.class);
+		public productPojo select(int id) {
+			TypedQuery<productPojo> query = getQuery(select_id, productPojo.class);
 			query.setParameter("id", id);
 			return getSingle(query);
 		}
 		
-		public productDTO selectbar(String barcode) {
-			TypedQuery<productDTO> query = getQuery(select_id, productDTO.class);
+		public productPojo selectbar(String barcode,int id) {
+			TypedQuery<productPojo> query = getQuery(select_bar, productPojo.class);
 			query.setParameter("barcode", barcode);
+           logger.info(id);
+			query.setParameter("id", id);
 			return getSingle(query);
 		}
 
 
 
-		public List<productDTO> selectAll() throws ApiException{
-            TypedQuery<productDTO> query = getQuery(select_all, productDTO.class);
-			List<productDTO> p= query.getResultList();
-			for (productDTO h:p) {
-				logger.info(""+h.getBarcode()+h.getMrp()+h.getName()+h.getProduct_id()+h.getBrand_id());
+		public List<productPojo> selectAll() throws ApiException{
+            TypedQuery<productPojo> query = getQuery(select_all, productPojo.class);
+			List<productPojo> p= query.getResultList();
+			for (productPojo h:p) {
+				logger.info(""+h.getBarcode()+h.getMrp()+h.getName()+h.getProduct_id()+h.getBrand_Category());
 			}
-			//throw new ApiException("DF");
 			return p;
 		}
 		
-		public brandPojo findid(int id) {
-			return em().getReference(brandPojo.class, id);
+		public brandPojo findbrand(String brand,String category) {
+			TypedQuery<brandPojo> query = getQuery(select_brand, brandPojo.class);
+			query.setParameter("brand",brand );
+			query.setParameter("category",category );
+			return getSingle(query);
 		}
 
 
 		public void update(int id,productPojo p) throws ApiException{
-			//brandPojo b = em().getReference(brandPojo.class, id);
-			try {
 			Query query = getQuery(update_prod);
 			query.setParameter("name", p.getName());
 			query.setParameter("barcode", p.getBarcode());
-			query.setParameter("brand", p.getBrand());
+			query.setParameter("brand", p.getBrand_Category());
 			query.setParameter("mrp", p.getMrp());
 			query.setParameter("id",id);
 			logger.info(query.toString());
-			logger.info(query.executeUpdate());
-			}
-			catch(Exception e) {
-				throw new ApiException("There is no Brand id that matches your product brand id");
-			}
-			
-			
-
-			
+			logger.info(query.executeUpdate());	
 		}
 
 

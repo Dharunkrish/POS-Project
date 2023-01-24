@@ -21,8 +21,8 @@ import com.increff.employee.service.ApiException;
 
 		private static String select_id = "select pc from inventoryPojo pc where id=:id";
 		private static String select_all = "select pc from inventoryPojo pc";
-private static String update="update inventoryPojo pc set pc.id=:pid , pc.quantity=:quantity where pc.id=:id";
-		private static String select_all_id="select new com.increff.employee.model.productDTO(pc.name, pc.product_id) from productPojo pc where pc.product_id not in (select i.id from inventoryPojo i)";
+        private static String update="update inventoryPojo pc set pc.quantity=:quantity where pc.id=:id";
+		private static String select_all_id="select pc from productPojo pc where pc.product_id not in (select i.id from inventoryPojo i)";
 		@Transactional
 		public void insert(inventoryPojo p) throws ApiException {
 				em().persist(p);	
@@ -44,10 +44,10 @@ private static String update="update inventoryPojo pc set pc.id=:pid , pc.quanti
 			return p;
 		}
 		
-		public List<productDTO> selectid() throws ApiException{
+		public List<productPojo> selectid() throws ApiException{
 
-		   List<productDTO> p= em().createQuery(select_all_id).getResultList();
-		   for (productDTO l:p) {
+		   List<productPojo> p= em().createQuery(select_all_id).getResultList();
+		   for (productPojo l:p) {
 			   logger.info("HELLO");
 			   logger.info(l.getProduct_id());
 		   }
@@ -65,7 +65,6 @@ private static String update="update inventoryPojo pc set pc.id=:pid , pc.quanti
 			try {
 				logger.info(p.getId());
 				Query query = getQuery(update);
-				query.setParameter("pid", p.getId());
 				query.setParameter("quantity", p.getQuantity());
 				query.setParameter("id", id);
 				logger.info(query.executeUpdate());

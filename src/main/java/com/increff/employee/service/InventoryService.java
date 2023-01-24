@@ -22,14 +22,9 @@ public class InventoryService {
 
 	@Transactional(rollbackOn = ApiException.class)
 	public void add(inventoryPojo p) throws ApiException {
-		
-		if(p.getQuantity()==0) {
-			throw new ApiException("Quantity cannot be empty");
-		}
-		if(p.getId()==0) {
-			throw new ApiException("Quantity cannot be empty");
-		}
-		invcheck(p.getId());
+		productPojo pr=invcheck(p.getId());
+		p.setBarcode(pr.getBarcode());
+		p.setName(pr.getName());
 		dao.insert(p);
 	}
 
@@ -44,13 +39,13 @@ public class InventoryService {
 		return dao.selectAll();
 	}
 	
-	public List<productDTO> getid() throws Exception {
+	public List<productPojo> getid() throws Exception {
 		return dao.selectid();
 	}
 
 	@Transactional(rollbackOn  = ApiException.class)
 	public void update(int id, inventoryPojo p) throws ApiException {
-		invcheck(p.getId());
+		//invcheck(p.getId());
 		dao.update(id,p);
 	}
 
@@ -64,7 +59,7 @@ public class InventoryService {
 	}
 	
 	@Transactional
-	public void invcheck(int id) throws ApiException {
+	public productPojo invcheck(int id) throws ApiException {
 		productPojo pr=dao.findid(id);
 		logger.info(pr);
 		  if (pr==null) {
@@ -75,6 +70,7 @@ public class InventoryService {
 		if (i!=null) {
 			throw new ApiException("Inventory details for the given Product ID already exists");
 		}
+		return pr;
 	}
 	
 	

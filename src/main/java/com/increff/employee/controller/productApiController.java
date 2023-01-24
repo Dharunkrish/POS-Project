@@ -1,5 +1,6 @@
 package com.increff.employee.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.increff.employee.model.productDTO;
 import com.increff.employee.model.productData;
 import com.increff.employee.model.productForm;
-import com.increff.employee.pojo.brandPojo;
 import com.increff.employee.pojo.productPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.brandService;
@@ -35,10 +35,9 @@ public class productApiController {
 	@ApiOperation(value = "Adds an product")
 	@RequestMapping(path = "/api/product", method = RequestMethod.POST)
 	public void add(@RequestBody productForm form) throws ApiException {
-		int id=form.getId();
-		logger.info(id);
 		productPojo p = convert(form);
-		service.add(p,id);
+		logger.info(p.getBrand_Category());
+		service.add(p);
 	}
 
 	
@@ -53,19 +52,19 @@ public class productApiController {
 	@ApiOperation(value = "Gets an brand by ID")
 	@RequestMapping(path = "/api/product/{id}", method = RequestMethod.GET)
 	public productData get(@PathVariable int id) throws ApiException {
-		productDTO p = service.get(id);
+		productPojo p = service.get(id);
 		return convert(p);
 	}
 
 	@ApiOperation(value = "Gets list of all brands")
 	@RequestMapping(path = "/api/product", method = RequestMethod.GET)
-	public List<productDTO> getAll() throws Exception {
-		return service.getAll();
-		//List<productData> list2 = new ArrayList<productData>();
-		//for (productDTO p : list) {
-			//list2.add(convert(p));
-		//}
-		//return list2;
+	public List<productData> getAll() throws Exception {
+		 List<productPojo> list=service.getAll();
+		List<productData> list2 = new ArrayList<productData>();
+		for (productPojo p : list) {
+			list2.add(convert(p));
+		}
+		return list2;
 	}
 
 	@ApiOperation(value = "Updates an brand")
@@ -76,9 +75,9 @@ public class productApiController {
 	}
 	
 
-	private static productData convert(productDTO p) {
+	private static productData convert(productPojo p) {
 		productData d = new productData();
-		d.setBrand_id(p.getBrand_id());
+		d.setBrand_Category(p.getBrand_Category());
 		d.setName(p.getName());
 		d.setBarcode(p.getBarcode());
 		d.setMrp(p.getMrp());
@@ -91,13 +90,8 @@ public class productApiController {
 		p.setName(f.getName());
 		p.setBarcode(f.getBarcode());
 		p.setMrp(f.getMrp());
-		p.setBrand(findbrand(f.getBrand_id()));
-		logger.info(p.getBrand().getId());
+		p.setBrand_Category(f.getBrand_Category());
 		return p;
 	}
 	
-	public brandPojo  findbrand(int id) throws ApiException  {
-		logger.info(id);
-		return service.ref(id);
-	}
 }

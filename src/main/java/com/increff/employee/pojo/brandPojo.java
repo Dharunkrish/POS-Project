@@ -19,11 +19,15 @@ public class brandPojo {
 	private int id;
 	private  String brand;
 	private String category;
+	private String brand_category;
 	
-	  @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL,mappedBy = "brand",orphanRemoval=true)
-	    public List<productPojo> product = new ArrayList<>();
-
 	    
+	public String getBrand_category() {
+		return brand_category;
+	}
+	public void setBrand_category(String brand_category) {
+		this.brand_category = brand_category;
+	}
 	public int getId() {
 		return id;
 	}

@@ -14,42 +14,14 @@
  <!-- Top row with form-->
  <div class="row">
 	 <div class="col-12">
-			<form class="form-inline" id="product-form">
-			  <div class="form-group">
-			    <label for="inputCategory" class="col-sm-2 col-form-label">Name</label>
-			    <div class="col-sm-10">
-			      <input type="text" class="form-control" name="name" id="inputName" placeholder="enter name">
-			    </div>
-			  </div> <!--input name-->
 
-			  <div class="form-group">
-			    <label for="inputBarcode" class="col-sm-2 col-form-label">Bar Code</label>
-			    <div class="col-sm-10">
-			      <input type="text" class="form-control" name="barcode" id="inputBarcode" placeholder="enter Barcode">
-			    </div>
-			  </div><!--input barcode-->
 
-			  <div class="form-group">
-			    <label for="inputBrandid" class="col-sm-2 col-form-label">Brand id</label>
-			    <div class="col-sm-10">
-			      <input type="text" class="form-control" name="id" id="inputBrandid" placeholder="enter Brand-id">
-			    </div>
-			  </div><!--input brand-id-->
-
-			  <div class="form-group">
-			    <label for="inputMrp" class="col-sm-2 col-form-label">MRP</label>
-			    <div class="col-sm-10">
-			      <input type="text" class="form-control" name="mrp" id="inputMrp" placeholder="enter MRP">
-			    </div>
-			  </div>
-			  <button type="button" class="btn btn-primary" id="add-product">Add</button>
+			  <button type="button" class="btn btn-primary mr-5" id="add-pro">Add</button>
 			  &nbsp;
-			  <button type="button" class="btn btn-primary" id="refresh-data">Refresh</button>
+			  <button type="button" class="btn btn-primary mr-5" id="refresh-data">Refresh</button>
 			  &nbsp;
-			  <button type="button" class="btn btn-primary" id="upload-data">Upload</button>
-			</form>
-	 </div>	
-</div> 
+			  <button type="button" class="btn btn-primary mr-5" id="upload-data">Upload</button>
+			
 
 <div class="row">
 	&nbsp;
@@ -61,11 +33,10 @@
 	<table class="table table-striped" id="product-table">
 	  <thead>
 	    <tr>
-	      <th scope="col">ID</th>
 	      <th scope="col">Name</th>
 	      <th scope="col">Bar Code</th>
 	      <th scope="col">MRP</th>
-	      <th scope="col">Brand id</th>
+	      <th scope="col">Brand_Category</th>
 	      <th scope="col">Actions</th>
 	    </tr>
 	  </thead>
@@ -73,9 +44,52 @@
 	</table>
 </div>
 </div>
+</div>
+</div>
+
+<!-- product Add Modal -->
+<div class="modal" tabindex="-1" role="dialog" id="add-product-modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add product</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+			<form class="form-horizontal" id="product-form">
+			    <label for="inputCategory" class="col-m-2 col-form-label">Name</label>
+			    <div class="col-m-2">
+			      <input type="text" class="form-control" name="name" id="inputName" placeholder="enter name">
+			    </div> <!--input name-->
+
+			    <label for="inputBarcode" class="col-m-2 col-form-label">Bar Code</label>
+			    <div class="col-m-2">
+			      <input type="text" class="form-control" name="barcode" id="inputBarcode" placeholder="enter Barcode">
+			    </div><!--input barcode-->
+
+			    <label for="inputBrandid" class="col-m-2 col-form-label">Brand Category</label>
+			    <div class="col-m-2">
+	                <select class="form-control" name="brand_Category" id="inputBrandid"> </select>
+			    </div><!--input brand-category-->
+
+			    <label for="inputMrp" class="col-m-2 col-form-label">MRP</label>
+			    <div class="col-m-2">
+			      <input type="text" class="form-control" name="mrp" id="inputMrp" placeholder="enter MRP">
+			    </div>
+</form>
+	 </div>	
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="add-product">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
-<!-- brand Edit Modal -->
+<!-- product Edit Modal -->
 <div class="modal" tabindex="-1" role="dialog" id="edit-product-modal">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -86,30 +100,31 @@
         </button>
       </div>
       <div class="modal-body">
-			<form class="form-inline" id="product-edit-form">
+			<form class="form-horizontal" id="product-edit-form">
 			  <div class="form-group">
-			    <label for="inputname" class="col-sm-2 col-form-label">Name</label>
-			    <div class="col-sm-10">
+			    <label for="inputname" class="col-m-2 col-form-label">Name</label>
+			    <div class="col-m-2">
 			      <input type="text" class="form-control" name="name" placeholder="enter name">
 			    </div>
 			  </div>
 			  <div class="form-group">
-			    <label for="inputbarcode" class="col-sm-2 col-form-label">Bar Code</label>
-			    <div class="col-sm-10">
+			    <label for="inputbarcode" class="col-m-2 col-form-label">Bar Code</label>
+			    <div class="col-m-2">
 			      <input type="text" class="form-control" name="barcode" placeholder="enter barcode">
 			    </div>
 			  </div>
 			  <div class="form-group">
-			    <label for="inputBrandid" class="col-sm-2 col-form-label">Brand id</label>
-			    <div class="col-sm-10">
-			      <input type="text" class="form-control" name="brand_id" placeholder="enter Brand-id">
+			    <label for="inputBrandid" class="col-m-2 col-form-label">Brand id</label>
+			    <div class="col-m-2">
+	                <select class="form-control" name="brand_Category" id="editBrandid"> </select>
+
 			    </div>
-			  </div><!--input brand-id-->
+			  </div><!--input brand-category-->
 
 			  <div class="form-group">
-			    <label for="inputMrp" class="col-sm-2 col-form-label">MRP</label>
-			    <div class="col-sm-10">
-			      <input type="text" class="form-control" name="mrp" id="inputMrp" placeholder="enter MRP">
+			    <label for="inputMrp" class="col-m-2 col-form-label">MRP</label>
+			    <div class="col-m-2">
+			      <input type="number" class="form-control" name="mrp" id="inputMrp" placeholder="enter MRP">
 			    </div>
 			  </div>
  	        <input type="hidden" name="product_id" >
@@ -124,24 +139,24 @@
 </div>
 
 
-<!-- brand Edit Modal -->
-<div class="modal" tabindex="-1" role="dialog" id="upload-brand-modal">
+<!-- product Upload Modal -->
+<div class="modal" tabindex="-1" role="dialog" id="upload-product-modal">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       
       <div class="modal-header">
-        <h5 class="modal-title">Upload brand</h5>
+        <h5 class="modal-title">Upload Product</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       
       <div class="modal-body">
-      	<div class="brand-file">
-		  <input type="file" class="custom-file-input" id="brandFile">
-		  <label class="custom-file-label" for="brandFile" id="brandFilecategory">Choose file</label>
+      	<div class="product-file">
+		  <input type="file" class="custom-file-input" id="productFile">
+		  <label class="custom-file-label" for="productFile" id="productFilecategory">Choose file</label>
 		</div>
-		<a th:href="@{/sample/brand.tsv}" target="_blank">Download Sample</a> 
+		<a th:href="@{/sample/product.tsv}" target="_blank">Download Sample</a> 
 		<br>
 		Rows: <span id="rowCount">0</span>, 
 		Processed: <span id="processCount">0</span>, 

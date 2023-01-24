@@ -22,20 +22,10 @@ public class productService {
 	private Logger logger = Logger.getLogger(productDao.class);
 
 	@Transactional(rollbackOn = ApiException.class)
-	public void add(productPojo p,int id) throws ApiException {
+	public void add(productPojo p) throws ApiException {
 		normalize(p);
-		if(StringUtil.isEmpty(p.getName())) {
-			throw new ApiException("Name cannot be empty");
-		}
-		if(StringUtil.isEmpty(p.getBarcode())) {
-			throw new ApiException("Barcode cannot be empty");
-		}
-		if (p.getMrp()==0.0d) {
-			throw new ApiException("MRP cannot be empty");
-		}
-		
-		//insertCheck(p.getBrand(),p.getCategory());
-		dao.insert(p,id);
+		bar(p.getBarcode(),0);
+		dao.insert(p);
 	}
 
 	@Transactional
@@ -44,43 +34,46 @@ public class productService {
 	}
 
 	@Transactional(rollbackOn = ApiException.class)
-	public productDTO get(int id) throws ApiException {
+	public productPojo get(int id) throws ApiException {
 		return getCheck(id);
 	}
 
 	@Transactional
-	public List<productDTO> getAll() throws Exception {
+	public List<productPojo> getAll() throws Exception {
 		return dao.selectAll();
 	}
 
 	@Transactional(rollbackOn  = ApiException.class)
 	public void update(int id, productPojo p) throws ApiException {
 		normalize(p);   
-		bar(p.getBarcode());
+		bar(p.getBarcode(),id);
 		dao.update(id,p);
 	}
 
 	@Transactional
-	public productDTO getCheck(int id) throws ApiException {
-		productDTO p = dao.select(id);
+	public productPojo getCheck(int id) throws ApiException {
+		productPojo p = dao.select(id);
 		if (p == null) {
 			throw new ApiException("Product with given ID does not exit, id: " + id);
 		}
 		return p;
 	}
 	
-	public brandPojo ref(int id) {
-		return dao.findid(id);
-	}
 	
-	public void bar(String barcode) throws ApiException{
-		productDTO p =dao.selectbar(barcode);
+	
+	public void bar(String barcode,int id) throws ApiException{
+		productPojo p =dao.selectbar(barcode,id);
 		if(p!=null) {
 			throw new ApiException("Barcode must be unique");
 		}
 	}
 	
-	
+	private void insertCheck(String brand,String category) throws ApiException {
+		brandPojo b =dao.findbrand(brand,category);
+		if (b==null) {
+			throw new ApiException("Brand and Category Does not exist");
+		}
+	}
 	
 
 	protected static void normalize(productPojo p) {

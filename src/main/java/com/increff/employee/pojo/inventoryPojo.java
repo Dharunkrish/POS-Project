@@ -14,8 +14,30 @@ public class inventoryPojo {
 	@Id
 	private int id;
 	private int quantity;
+	private String barcode;
+	private String name;
 
 	
+	public String getBarcode() {
+		return barcode;
+	}
+
+
+	public void setBarcode(String barocode) {
+		this.barcode = barocode;
+	}
+
+
+	public String getName() {
+		return name;
+	}
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
 	public int getId() {
 		return id;
 	}

@@ -75,6 +75,8 @@ public class brandService {
 		}
 		return;
 	}
+	
+	
 
 	protected static void normalize(brandPojo p) {
 		p.setBrand(StringUtil.toLowerCase(p.getBrand()));

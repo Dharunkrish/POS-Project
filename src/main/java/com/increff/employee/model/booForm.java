@@ -1,35 +1,40 @@
 package com.increff.employee.model;
 
-public class inventoryForm {
 
-	private int id;
-	private int quantity;
-	private String name;
+/**
+ * @author kalai
+ *
+ */
+public class booForm {
+
+	private int is_p;
 	private String barcode;
-	
+    private String name;
+    
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getBarcode() {
 		return barcode;
 	}
+
 	public void setBarcode(String barcode) {
 		this.barcode = barcode;
 	}
-	public int getId() {
-		return id;
+
+	public int getIs_p() {
+		return is_p;
 	}
-	public void setId(int id) {
-		this.id = id;
+
+	public void setIs_p(int is_p) {
+		this.is_p = is_p;
 	}
-	public int getQuantity() {
-		return quantity;
-	}
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
-	}
+
+
 
 }

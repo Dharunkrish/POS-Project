@@ -7,6 +7,7 @@ function getinventoryUrl(){
 //BUTTON ACTIONS
 function addinventory(event){
 	//Set the values to update
+	console.log("K");
 	var $form = $("#inventory-add-form");
     $('#add-inventory-modal').modal('toggle');
 	var json = toJson($form);
@@ -139,7 +140,7 @@ function readFileDataCallback(results){
 }
 
 function uploadRows(){
-	if (fileData.length>1){
+	if (fileData.length>5000){
 		alert("File Rows should be within 5000 rows");
 		return;
 	}
@@ -193,12 +194,14 @@ function displayinventoryList(data){
 		console.log(e);
 		var buttonHtml = ' <button onclick="displayEditinventory(' + e.id + ')">edit</button>'
 		var row = '<tr>'
-		+ '<td>' + e.id + '</td>'
+		+ '<td>' + e.name + '</td>'
+		+'<td>' + e.barcode + '</td>'
 		+ '<td>' + e.quantity + '</td>'
 		+ '<td>' + buttonHtml + '</td>'
 		+ '</tr>';
         $tbody.append(row);
 	}
+	$('#inventory-table').DataTable();
 }
 
 function displaydropdown(data){
@@ -209,7 +212,8 @@ function displaydropdown(data){
     $('#idvalue').append(p);
 	for(var i in data){
 		var e = data[i];
-		var row = e.name;
+		console.log(e);
+		var row = e.barcode;
 		var p=$("<option />");
         p.html(row);
         p.val(e.product_id);
@@ -272,7 +276,6 @@ function displayinventory(data){
 
 function button(){
 	var d=$('#idvalue :selected').text();
-   console.log(($('#inventory-add-form input[name=quantity]').val().trim()==""));
    $('#add-inventory').attr("disabled",(d=="None" || ($('#inventory-add-form input[name=quantity]').val().trim()=="")));
    }
 
