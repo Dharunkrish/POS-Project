@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.increff.employee.model.inventoryForm;
 import com.increff.employee.pojo.inventoryPojo;
 import com.increff.employee.pojo.productPojo;
-import com.increff.employee.model.productDTO;
-
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.InventoryService;
 

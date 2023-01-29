@@ -9,7 +9,6 @@ import javax.transaction.Transactional;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
-import com.increff.employee.model.productDTO;
 import com.increff.employee.pojo.brandPojo;
 import com.increff.employee.pojo.productPojo;
 import com.increff.employee.service.ApiException;

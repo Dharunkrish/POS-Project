@@ -26,7 +26,4 @@ public class AboutApiController {
 		d.setVersion(service.getVersion());
 		return d;
 	}
-
-
-
 }

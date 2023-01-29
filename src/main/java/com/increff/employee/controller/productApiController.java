@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.increff.employee.model.productDTO;
 import com.increff.employee.model.productData;
 import com.increff.employee.model.productForm;
 import com.increff.employee.pojo.productPojo;

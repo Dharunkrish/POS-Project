@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.increff.employee.dao.productDao;
-import com.increff.employee.model.productDTO;
 import com.increff.employee.pojo.brandPojo;
 import com.increff.employee.pojo.productPojo;
 import com.increff.employee.util.StringUtil;

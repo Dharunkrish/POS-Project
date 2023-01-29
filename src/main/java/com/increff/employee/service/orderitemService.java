@@ -26,13 +26,32 @@ public class orderitemService {
 	private Logger logger = Logger.getLogger(orderitemDao.class);
 	
 	@Transactional(rollbackOn = ApiException.class)
-	public int check(orderitemPojo o,productPojo p) throws ApiException {
+	public productPojo checkitems(orderitemPojo o) throws ApiException {
+        productPojo p=checkprod(o);
+        logger.info(p);
+        if (p==null) {
+        	p=new productPojo();
+        	p.setProduct_id(-1);
+        	return p;
+        }
+        logger.info(p);
+        int q=check(o,p,0);
+        if (q==-1) {
+        	p=new productPojo();
+        	p.setProduct_id(-2);
+        	return p;
+        }
+		logger.info(p.getName());
+		return p;
+	}
+	@Transactional(rollbackOn = ApiException.class)
+	public int check(orderitemPojo o,productPojo p,int old_q) throws ApiException {
             	 inventoryPojo i=dao.prodquantity(p.getProduct_id());
-                 if (o.getQuantity()>i.getQuantity()) {
+                 if ((o.getQuantity()-old_q)>i.getQuantity()) {
                 	 return -1;
              }
 
-             return i.getQuantity()-o.getQuantity();
+             return i.getQuantity()-(o.getQuantity()-old_q);
 	}
 
 	public productPojo checkprod(orderitemPojo o) throws ApiException {

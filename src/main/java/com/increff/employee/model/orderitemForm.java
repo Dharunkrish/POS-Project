@@ -7,7 +7,14 @@ public class orderitemForm {
 	private int quantity;
 	private int price;
 	private String name;
+	private int old_q;
 
+	public int getOld_q() {
+		return old_q;
+	}
+	public void setOld_q(int old_q) {
+		this.old_q = old_q;
+	}
 	public String getName() {
 		return name;
 	}

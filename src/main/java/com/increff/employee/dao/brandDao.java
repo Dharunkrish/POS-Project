@@ -18,9 +18,8 @@ import com.increff.employee.service.ApiException;
 
 		private Logger logger = Logger.getLogger(productApiController.class);
 
-		//private static String delete_id = "delete from brandPojo p where p.id=:id";
 		private static String select_id = "select p from brandPojo p where p.id=:id";
-		//private static String select_brand = "select p from brandPojo p where p.brand=:brand";
+		private static String select_brand = "select p from brandPojo p where p.brand=:brand";
 		private static String select_all = "select p from brandPojo p";
 		private static String select_prod = "SELECT c FROM brandPojo c WHERE c.brand = :brand and c.category= :category";
 
@@ -47,6 +46,11 @@ import com.increff.employee.service.ApiException;
 			return getSingle(query);
 		}
 
+		public List<brandPojo> getbrand(String brand) {
+			TypedQuery<brandPojo> query = getQuery(select_brand, brandPojo.class);
+			query.setParameter("brand", brand);
+			return query.getResultList();
+		}
 
 		public List<brandPojo> selectAll() {
 			TypedQuery<brandPojo> query = getQuery(select_all, brandPojo.class);

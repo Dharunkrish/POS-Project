@@ -1,4 +1,5 @@
 var o_Id=0;
+var quantity_v=0;
 function Url(){
 	var baseUrl = $("meta[name=baseUrl]").attr("content");
 	return baseUrl + "/api/orderitem";
@@ -26,12 +27,13 @@ var $form = $("#order-form");
 var json = toJsonobject($form);
 json['id']=len();
 const items=JSON.parse(sessionStorage.getItem("itemlist"));
+ document.getElementById("order-form").reset();    
+
 for (var i in items){
 	if (items[i].barcode==json.barcode.trim()){
 		alert("Order for product already exist");
 		return;
 	}}
- document.getElementById("order-form").reset();    
 var url=Url()+ '/check';
 var data1=JSON.stringify(json);
 $.ajax({
@@ -52,7 +54,6 @@ $.ajax({
 	   	}
 	   	else{
 	   		json["name"]=data.name;
-	   		console.log(json);
 	   		items.push(json);
             sessionStorage.setItem("itemlist",JSON.stringify(items));
             showtable();
@@ -87,8 +88,7 @@ function getItem(){
 		headers: {
 			'Content-Type':'application/json'
 		},
-		success: function(data){
-			console.log(data);
+		success: function(data){;
 			displayOrderitem(data);
 		},
 	  error: handleAjaxError
@@ -96,7 +96,6 @@ function getItem(){
 }
 
 function getitemid(id){
-	console.log("Hello");
 	var url=Url()+"/"+id;
 	$.ajax({
 		url: url,
@@ -105,7 +104,6 @@ function getitemid(id){
 			'Content-Type':'application/json'
 		},
 		success: function(data){
-			console.log(data);
 			displayEditorder(data);
 		},
 	  error: handleAjaxError
@@ -149,21 +147,21 @@ $.ajax({
 
 function updateitem(){
 var $form = $("#edit-view-form");
-var json = toJson($form);
-console.log(json);
+var json = toJsonobject($form);
+json['old_q']=quantity_v;
+json1=JSON.stringify(json);
 var id=$("#edit-view-form input[name=id]").val();
 var url=Url()+ '/'+id;
-console.log(url);
 $.ajax({
 	   url: url,
 	   type: 'PUT',
-	   data: json,
+	   data: json1,
 	   headers: {
        	'Content-Type': 'application/json'
        },	   
 	   success: function(data) {
 		if (data.is_p===2){
-		   	alert("Inventory has less product than requested");
+		   	alert("Insufficient inventory for the requested product");
 		   	return;
 	   }
        else if (data.is_p===0){
@@ -171,10 +169,6 @@ $.ajax({
 		   	return;
 	   }
 	   else{
-	   		const items=JSON.parse(sessionStorage.getItem("itemlist"));
-			var d=JSON.parse(json);
-			items[parseInt(d.id)]=(d);
-			sessionStorage.setItem("itemlist",JSON.stringify(items));
 			$("#view-edit-modal").modal("toggle");
             getItem();
 	   	}
@@ -193,9 +187,7 @@ showtable();
 }
 
 function addorder(){
-	console.log("K");
 	var items=(sessionStorage.getItem("itemlist"));
-
 	var url=orderurl();
 	$.ajax({
 		url: url,
@@ -205,8 +197,13 @@ function addorder(){
 			'Content-Type':'application/json'
 		},
 		success: function(data){
-			console.log(data);
+			if (data.is_p===2){
+				alert("Insufficient inventory for the requested product");
+				return;}
+			else{
 			getorder();
+			$('#add-inventory-modal').modal("toggle");
+		}
 		},
 	  error: handleAjaxError
 	});
@@ -221,7 +218,6 @@ function getorder(){
 			'Content-Type':'application/json'
 		},
 		success: function(data){
-			console.log(data);
 			displayOrder(data);
 		},
 	  error: handleAjaxError
@@ -241,23 +237,21 @@ var data=(item[i]);
 }
 
 function displayEditorder(data){
-console.log(data);
  $("#edit-view-form input[name=barcode]").val(data.barcode);
   $("#edit-view-form input[name=quantity]").val(data.quantity);
  $("#edit-view-form input[name=price]").val(data.price);
  $("#edit-view-form input[name=id]").val(data.id);
+ quantity_v=data.quantity;
  $("#view-edit-modal").modal("toggle");
 }
 
 function showtable(){
 	var data=JSON.parse(sessionStorage.getItem("itemlist"));
 	var $tbody = $('#item-table').find('tbody');
-	console.log("H");
 	$tbody.empty();
 	var j=0;
 	for(var i in data){
 		var e = (data[i]);
-		console.log(e.price*e.quantity);
 		var buttonHtml = ' <button onclick="displayEdititem(' + i + ')">edit</button>'
 		buttonHtml+=' <button onclick="deleteitem(' + i + ')">delete</button>'
 		var row = '<tr>'
@@ -271,13 +265,13 @@ function showtable(){
 }
 
 function displayOrder(data){
+	$('#order-table').dataTable().fnClearTable();
+    $('#order-table').dataTable().fnDestroy();
 	var $tbody = $('#order-table').find('tbody');
-	console.log("H");
 	$tbody.empty();
 	for(var i in data){
 		var e = (data[i]);
-		e.time=e.time.replace('T'," ");
-		console.log(e.time[11]);
+		e.time=e.time.replace('T',"   ");
 		var buttonHtml1 = ' <button type="button" class="btn-sm btn-primary" onclick="getitem(' + e.id + ')">view</button>'
 		var buttonHtml2=' <button type="button" class="btn-sm btn-primary" onclick="downloadPDF(' + e.id + ')">Invoice Generation</button>'
 		var row = '<tr>'
@@ -287,8 +281,15 @@ function displayOrder(data){
 		+ '<td>' + buttonHtml2 +'</td>';
         $tbody.append(row);
 	}
-	$('#order-table').DataTable();
+	$('#order-table').DataTable({"columnDefs": [
+        { "targets": [0,2,3], "searchable": false },
+        { "width": "10%", "targets": 0 },
+        { "width": "20%", "targets": [2,3] }
+    ],
+pageLength : 8,
+    lengthMenu: [[8, 10, 20, -1], [8, 10, 20, 'All']]});
 }
+
 
 function displayOrderitem(data){
     var $tbody = $('#order-item-table').find('tbody');
@@ -298,7 +299,6 @@ function displayOrderitem(data){
 		var e = (data[i]);
 
 		var buttonHtml = ' <button onclick="getitemid(' + data[i].id + ')">edit</button>'
-		console.log(e.price*e.quantity);
 		var row = '<tr>'
 		+ '<td>' + e.name + '</td>'
 		+ '<td>' + e.quantity + '</td>'
@@ -318,8 +318,7 @@ function downloadPDF(id) {
         responseType: 'blob'
      },
 	   success: function(blob) {
-	   	console.log(blob);
-		console.log(blob.size);
+
       	var link=document.createElement('a');
       	link.href=window.URL.createObjectURL(blob);
       	link.download="Invoice_" + id +"_"+ new Date() + ".pdf";
@@ -355,8 +354,8 @@ function init(){
     $('#submit').click(addorder)
     $("#clear").click(clearstorage);
     $("#closesign").click(clearstorage);
+     $("#refresh-data").click(getorder);
     $("#submit").click(function(){
-    	$('#add-inventory-modal').modal("toggle");
     	clearstorage();
 
     })

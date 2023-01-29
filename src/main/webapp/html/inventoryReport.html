@@ -1,0 +1,44 @@
+<!doctype html>
+
+<html lang="en">
+
+<head th:replace="snippets.html :: name_head"></head>
+
+<body>
+
+<nav th:replace="snippets.html :: name_app_navbar"></nav>
+
+<div class="container">
+
+    <h3>Inventory Report</h3>
+
+ 
+ 
+<div class="row">
+    <!-- Table -->
+    <div class="col-12">
+        <table class="table table-striped" id="SalesReport-table">
+            <thead>
+            <tr>
+                <th scope="col">Brand</th>
+                <th scope="col">Category</th>
+                <th scope="col">Quantity</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+
+<footer th:replace="snippets.html :: name_footer"></footer>
+
+
+<script th:src="@{/static/inventoryReport.js}"/>
+</script>
+
+</body>
+
+</html>

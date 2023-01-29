@@ -3,6 +3,7 @@ package com.increff.employee.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +27,8 @@ public class BrandApiController {
 	@Autowired
 	private brandService service;
 
+	private Logger logger = Logger.getLogger(BrandApiController.class);
+
 	@ApiOperation(value = "Adds an product")
 	@RequestMapping(path = "/api/brand", method = RequestMethod.POST)
 	public void add(@RequestBody brandForm form) throws ApiException {
@@ -47,7 +50,19 @@ public class BrandApiController {
 		brandPojo p = service.get(id);
 		return convert(p);
 	}
+	
 
+	@ApiOperation(value = "Gets list of all brands")
+	@RequestMapping(path = "/api/brand/category/{brand}", method = RequestMethod.GET)
+	public List<brandData> getbrand(@PathVariable String brand) throws ApiException {
+		List<brandPojo> list = service.getbrand(brand);
+		List<brandData> list2 = new ArrayList<brandData>();
+		for (brandPojo p : list) {
+			list2.add(convert(p));
+		}
+		return list2;
+	}
+	
 	@ApiOperation(value = "Gets list of all brands")
 	@RequestMapping(path = "/api/brand", method = RequestMethod.GET)
 	public List<brandData> getAll() {

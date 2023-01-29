@@ -38,7 +38,7 @@ public class orderApiController {
 		for(orderitemForm f:form) {
 			orderitemPojo o=convert(f);
 			productPojo p=service.checkprod(o);
-			int q=service.check(o, p);
+			int q=service.check(o, p,0);
 			if (q==-1) {
 				return convert(2,o.getBarcode());
 			}	
@@ -72,7 +72,6 @@ public class orderApiController {
 	@RequestMapping(path = "/api/order/{id}", method = RequestMethod.GET)
 	public List<orderitemPojo> get(@PathVariable int id) throws ApiException {
 		return service.get(id);
-		
 	}
 	
 	/*@ApiOperation(value = "Gets an inventory by ID")
@@ -110,6 +109,7 @@ public class orderApiController {
 		d.setQuantity(p.getQuantity());
 		d.setBarcode(p.getBarcode());
 		d.setPrice(d.getPrice());
+		d.setName(p.getName());
 		return d;
 	}
 	

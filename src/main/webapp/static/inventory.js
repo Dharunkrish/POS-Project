@@ -210,6 +210,7 @@ function displaydropdown(data){
     p.html("Select");
     p.val("none");
     $('#idvalue').append(p);
+
 	for(var i in data){
 		var e = data[i];
 		console.log(e);
@@ -219,6 +220,9 @@ function displaydropdown(data){
         p.val(e.product_id);
       $("#idvalue").append(p);
 }
+$("#idvalue").selectpicker('refresh');
+$("#idvalue").val($('#idvalue option:first').val());
+$("#idvalue").selectpicker('refresh');
 }
 
 function displayEditinventory(id){
@@ -285,6 +289,7 @@ function init(){
 	$('#add-inv').click(function(){
 		$('#add-inventory-modal').modal({backdrop: 'static', keyboard: false});
         showdropdown();
+
     });
 	$('#update-inventory').click(updateinventory);
 	$('#add-inventory').click(addinventory);

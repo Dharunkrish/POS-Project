@@ -1,0 +1,67 @@
+<!doctype html>
+
+<html lang="en">
+
+<head th:replace="snippets.html :: name_head"></head>
+
+<body>
+
+<nav th:replace="snippets.html :: name_app_navbar"></nav>
+
+<div class="container">
+
+    <h3>Day to Day Sales Report</h3>
+
+    <!-- Blank Row -->
+    <div class="row">
+        &nbsp;
+    </div>
+
+    <!-- Top row with form-->
+    <div class="row">
+        <div class="col">
+            <label for="fromDate">From</label>
+            <input type="date" class="form-control" placeholder="Date" id="fromDate">
+        </div>
+        <div class="col">
+            <label for="toDate">To</label>
+            <input type="date" class="form-control" id="toDate" placeholder="Date">
+        </div>
+    </div>
+
+    <div class="row">
+        &nbsp;<button type="button" class="btn btn-primary" data-dismiss="modal" id="salesReportBtn"
+                      style="margin:5px;width:216px">Generate Sales Report
+        </button>
+    </div>
+
+    <!-- Table -->
+    <div class="col-12">
+        <table class="table table-striped" id="SalesReport-table">
+            <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Total Orders</th>
+                <th scope="col">Total Items</th>
+                <th scope="col">Revenue</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+
+<footer th:replace="snippets.html :: name_footer"></footer>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.css">
+
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.js"></script>
+
+<script th:src="@{/static/daySalesreports.js}"/>
+</script>
+
+</body>
+
+</html>

@@ -32,18 +32,14 @@ public class orderitemApiController {
 	@RequestMapping(path = "/api/orderitem/check", method = RequestMethod.POST)
 	public booForm add(@RequestBody orderitemForm form) throws ApiException {
         orderitemPojo o=convert(form);
-        productPojo p=service.checkprod(o);
-        if (p==null) {
-        	p=new productPojo();
+        productPojo p=service.checkitems(o);
+        if (p.getProduct_id()==-1) {
         	return convert(0,p);
         }
-        int q=service.check(o,p);
-        if (q==-1) {
-        	p=new productPojo();
+        else if (p.getProduct_id()==-2) {
         	return convert(2,p);
         }
-		logger.info(p.getName());
-		return convert(1,p);
+        return convert(1,p);
 	}
 
 	
@@ -67,11 +63,13 @@ public class orderitemApiController {
         	p=new productPojo();
         	return convert(0,p);
         }
-        int q=service.check(o,p);
+        int q=service.check(o,p,f.getOld_q());
+        logger.info(q);
         if (q==-1) {
         	p=new productPojo();
         	return convert(2,p);
         }
+        o.setName(p.getName());
 		service.update(id, o,q,p);
 		return convert(1,p);
 	}
@@ -106,6 +104,7 @@ public class orderitemApiController {
 		o.setQuantity(f.getQuantity());
 		o.setBarcode(f.getBarcode());
 		o.setPrice(f.getPrice());
+		o.setName(f.getName());
 		return o;
 	}
 	

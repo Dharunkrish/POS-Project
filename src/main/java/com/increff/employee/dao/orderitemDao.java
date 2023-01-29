@@ -31,6 +31,8 @@ import com.increff.employee.service.ApiException;
         private static String select_item="select i from orderitemPojo i where order_id=:id";
         private static String select_id="select i from orderitemPojo i where id=:id";
         private static String select_order_id="select i from orderPojo i where id=:id";
+		private static String update_order = "update orderPojo pc set pc.isInvoiceGenerated=:i where id=:id";
+
 
 
 
@@ -118,6 +120,12 @@ import com.increff.employee.service.ApiException;
 		
 
 		public void update(int id,orderPojo o) throws ApiException{
+			Query query = getQuery(update_order);
+			query.setParameter("i",true);
+			query.setParameter("id",id);
+			logger.info(query.executeUpdate());
+
+
 			}
 		
 		public void update(int id,orderitemPojo o) throws ApiException{
