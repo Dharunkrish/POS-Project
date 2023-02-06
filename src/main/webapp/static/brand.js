@@ -157,7 +157,7 @@ function displaybrandList(data){
 	for(var i in data){
 		var e = data[i];
 		//var buttonHtml = '<button onclick="deletebrand(' + e.id + ')">delete</button>'
-		var buttonHtml = ' <button onclick="displayEditbrand(' + e.id + ')">edit</button>'
+		var buttonHtml = ' <button type="button" class="btn-sm btn-outline-info" onclick="displayEditbrand(' + e.id + ')"><i class="fa-solid fa-pen-to-square"></button>'
 		var row = '<tr>'
 		+ '<td>' + e.brand + '</td>'
 		+ '<td>'  + e.category + '</td>'
@@ -256,4 +256,8 @@ function init(){
 
 $(document).ready(init);
 $(document).ready(getbrandList);
+$(document).ready(function(){
+   $(".active").removeClass("active");
+   $("#brand-nav").addClass("active");
+});
 

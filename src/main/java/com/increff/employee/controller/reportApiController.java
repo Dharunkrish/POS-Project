@@ -51,9 +51,9 @@ public class reportApiController {
 	@RequestMapping(path = "/api/reports/salesReport", method = RequestMethod.POST)
 	public List<daySalesReportForm> getsales(@RequestBody reportForm r) throws Exception {
 		 Map<String,orderitemPojo> o=service.getorder(r);
-		 Map<String,List<Object>> m=service.getsales(r,o);
+		 Map<Integer,List<Object>> m=service.getsales(r,o);
 		 List<daySalesReportForm> report=new ArrayList<>();
-		 for (String b:m.keySet()) {
+		 for (int b:m.keySet()) {
 			 report.add(convert(m.get(b)));
 		 }
 		 return report;
@@ -63,9 +63,9 @@ public class reportApiController {
 	@RequestMapping(path = "/api/reports/inventoryReport", method = RequestMethod.GET)
 	public List<daySalesReportForm> getinventory() throws Exception {
 		 Map<String,inventoryPojo> i=service.getinventory();
-		 Map<String,List<Object>> m=service.getinventoryReport(i);
+		 Map<Integer,List<Object>> m=service.getinventoryReport(i);
 		 List<daySalesReportForm> report=new ArrayList<>();
-		 for (String b:m.keySet()) {
+		 for (int b:m.keySet()) {
 			 report.add(convert1(m.get(b)));
 		 }
 		 return report;

@@ -60,11 +60,12 @@ function displayUserList(data){
 	$tbody.empty();
 	for(var i in data){
 		var e = data[i];
-		var buttonHtml = '<button onclick="deleteUser(' + e.id + ')">delete</button>'
-		buttonHtml += ' <button onclick="displayEditUser(' + e.id + ')">edit</button>'
+		var buttonHtml = '<button type="button" class="btn-sm btn-outline-info" onclick="deleteUser(' + e.id + ')"><i class="fa fa-trash" aria-hidden="true"></i></button>'
+		buttonHtml += ' <button type="button" class="btn-sm btn-outline-info" onclick="displayEditUser(' + e.id + ')"><i class="fa-solid fa-pen-to-square"></i></button>'
 		var row = '<tr>'
 		+ '<td>' + e.id + '</td>'
 		+ '<td>' + e.email + '</td>'
+		+ '<td>' +e.role  + '</td>'
 		+ '<td>' + buttonHtml + '</td>'
 		+ '</tr>';
         $tbody.append(row);
@@ -80,4 +81,8 @@ function init(){
 
 $(document).ready(init);
 $(document).ready(getUserList);
+$(document).ready(function(){
+   $(".active").removeClass("active");
+   $("#admin-nav").addClass("active");
+});
 

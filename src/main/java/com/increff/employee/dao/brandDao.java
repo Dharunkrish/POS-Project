@@ -22,6 +22,8 @@ import com.increff.employee.service.ApiException;
 		private static String select_brand = "select p from brandPojo p where p.brand=:brand";
 		private static String select_all = "select p from brandPojo p";
 		private static String select_prod = "SELECT c FROM brandPojo c WHERE c.brand = :brand and c.category= :category";
+		private static String update_id = "update brandPojo c set c.brand = :brand, c.category= :category WHERE c.id= :id";
+
 
 
 		
@@ -66,7 +68,11 @@ import com.increff.employee.service.ApiException;
 		}
 
 		public void update(brandPojo p) {
-			
+			Query query = getQuery(update_id);
+			query.setParameter("brand",p.getBrand());
+			query.setParameter("category",p.getCategory());
+			query.setParameter("id",p.getId());
+			query.executeUpdate();
 		}
 
 

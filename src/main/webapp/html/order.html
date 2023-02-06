@@ -15,10 +15,20 @@
 <body>
 <nav th:replace="snippets.html :: name_app_navbar"></nav>
 
+<div class="alert alert-success" id="add-success-alert" style="width:20%">
+  Order created <strong>Successfully!</strong> 
+</div>
+
+
+<div class="alert alert-success" id="add-success-alert" style="width:20%">
+  Order edited <strong>Successfully!</strong> 
+</div>
+
 <div class="container">
 
 <h3>Order</h3>
 <br>
+
  <!-- Top row with form-->
  <div class="row">
 	 <div class="col-12">
@@ -33,13 +43,29 @@
 	<div class="row">
 	&nbsp;
 </div>
- <div class="col-12">
-	<table class="table table-striped" id="order-table">
+<div class="row input-daterange">
+	<div class="col-md-4">
+		<input type="date" name="from_date" id="from_date" class="form-control" />
+	</div>
+	<div class="col-md-4">
+		<input type="date" name="to_date" id="to_date" class="form-control" />
+	</div>
+	<div class="col-md-4">
+		<button type="button" name="filter" id="filter" class="btn btn-primary" style="width:150px;margin-right:10px">Filter</button>
+		<button type="button" name="refresh" id="refresh" class="btn btn-primary" style="width:150px;">Clear</button>
+	</div>
+</div>
+    <div class="row">
+	&nbsp;
+</div>
+ <div class="col-12" style="padding-left: 0px;padding-left: 0px;">
+	<table class="content-table" id="order-table">
 	  <thead>
 	    <tr>
 	      <th scope="col">Order ID</th>
 	      <th scope="col">Created</th>
 	      <th scope="col">View</th>
+	      <th scope="col">Edit</th>
 	      <th scope="col">Invoice</th>
 	    </tr>
 	  </thead>
@@ -60,30 +86,36 @@
         <button type="button" class="close" data-dismiss="modal" id="closesign" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
+        <div class="alert alert-danger" id="inventory-less-alert">
+  Insufficient inventory for the requested product 
+</div>
+
+<div class="alert alert-danger" id="no-product-alert">
+Product with given barcode does not exist
+</div>
       </div>
       <div class="modal-body">
-			<form class="form-inline" id="order-form">
+      	<div id="add-div">
+			<form class="form-inline" id="order-form" style="margin-left: 15px">
 			  <div class="form-group">
 			    <label for="inputBarcode" class="col-m-2 col-form-label">Barcode</label>
-			      <input type="text" class="form-control" name="barcode" id="inputBarcode" placeholder="enter barcode">
+			      <input type="text" class="form-control" name="barcode" id="inputBarcode" placeholder="enter barcode" style="margin-left: 15px;margin-right: 15px">
 			  </div>
 			  <div class="form-group">
 			    <label for="inputQuantity" class="col-m-2">Quantity</label>
-			      <input type="text" class="form-control" name="quantity" id="inputQuantity" placeholder="enter quantity">
+			      <input type="text" class="form-control" name="quantity" id="inputQuantity" placeholder="enter quantity" style="margin-left: 15px;margin-right: 15px">
 			  </div>
 			  <div class="form-group">
 			    <label for="inputPrice" class="col-m-2">Price</label>
-			      <input type="text" class="form-control" name="price" id="inputPrice" placeholder="enter price">
+			      <input type="text" class="form-control" name="price" id="inputPrice" placeholder="enter price" style="margin-left: 15px;margin-right: 15px">
 			  </div>
 			  <button type="button" class="btn btn-primary" id="add-items">Add</button>
 			</form>
-	 </div>	
-
 <div class="row">
 	&nbsp;
 </div>
  <div class="col-12">
-	<table class="table table-striped" id="item-table">
+	<table class="content-table" id="item-table">
 	  <thead>
 	    <tr>
 	      <th scope="col">Name</th>
@@ -98,14 +130,39 @@
 	</table>
 
 </div>
+</div>
+     <div id="beditdiv">
+			<form class="form-horizontal" id="edit-form" style="margin-left: 15px">
+			  <div class="form-group">
+			    <label for="inputBarcode" class="col-sm-2 col-form-label">Barcode</label>
+			      <input type="text" class="form-control" name="barcode" id="inputBarcode" placeholder="enter barcode" >
+			  </div>
+			  <div class="form-group">
+			    <label for="inputQuantity" class="col-sm-2">Quantity</label>
+			      <input type="text" class="form-control" name="quantity" id="inputQuantity" placeholder="enter quantity">
+			  </div>
+			  <div class="form-group">
+			    <label for="inputPrice" class="col-sm-2">Price</label>
+			      <input type="text" class="form-control" name="price" id="inputPrice" placeholder="enter price">
+			  </div>
+			  <input type="hidden" name="id" id="edit-id">
+			</form>
+	 </div>	
+</div>
 			 
 	      
       <div class="modal-footer">
+      	<div id="addfooter">
       	<button type="button" class="btn btn-primary" id="submit">Submit</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancel">Cancel</button>
       </div>
+       <div id="editfooter">
+      	<button type="button" class="btn btn-primary" id="edit-btn">Edit</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
     </div>
   </div>
+</div>
 </div>
 
 <div class="modal fade" tabindex="-1" role="dialog" id="view-order-modal" style="overflow: auto">
@@ -122,13 +179,12 @@
 	&nbsp;
 </div>
  <div class="col-12">
-	<table class="table table-striped" id="order-item-table">
+	<table class="content-table" id="order-item-table" style="width:90%">
 	  <thead>
 	    <tr>
 	      <th scope="col">Name</th>
 	      <th scope="col">Quantity</th>
 	      <th scope="col">Price</th>
-	      <th scope="col">Action</th>
 	      	    </tr>
 	  </thead>
 	  <tbody>
@@ -137,59 +193,67 @@
 
 </div>
 			 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancel">Cancel</button>
-      </div>
     </div>
   </div>
 </div>
 
-<!--Edit Modal-->
-<div class="modal fade" tabindex="-1" role="dialog" id="edit-modal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Edit order item</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-			<form class="form-horizontal" id="edit-form">
-			  <div class="form-group">
-			    <label for="inputBarcode" class="col-sm-2 col-form-label">Barcode</label>
-			      <input type="text" class="form-control" name="barcode" id="inputBarcode" placeholder="enter barcode">
-			  </div>
-			  <div class="form-group">
-			    <label for="inputQuantity" class="col-sm-2">Quantity</label>
-			      <input type="text" class="form-control" name="quantity" id="inputQuantity" placeholder="enter quantity">
-			  </div>
-			  <div class="form-group">
-			    <label for="inputPrice" class="col-sm-2">Price</label>
-			      <input type="text" class="form-control" name="price" id="inputPrice" placeholder="enter price">
-			  </div>
-			  <input type="hidden" name="id" id="edit-id">
-			</form>
-	 </div>	
-	       <div class="modal-footer">
-      	<button type="button" class="btn btn-primary" id="edit-btn">Edit</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!--Edit View Modal-->
 <div class="modal fade" tabindex="-1" role="dialog" id="view-edit-modal">
-  <div class="modal-dialog" role="document">
+<div class="modal-dialog modal-xl" role="document" style="width:69%">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Edit order item</h5>
+        <h5 class="modal-title">Edit Order </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
+        <div class="alert alert-danger" id="edit-inventory-less-edit-alert" style="width: 36%;">
+  Insufficient inventory for the requested product 
+</div>
+
+<div class="alert alert-danger" id="edit-no-product-edit-alert" style="width: 36%;">
+	Product with given barcode does not exist
+</div>
       </div>
       <div class="modal-body">
+   <div id="whole">
+			<form class="form-inline" id="add-order-form">
+			  <div class="form-group">
+			    <label for="inputBarcode" class="col-m-2 col-form-label">Barcode</label>
+			      <input type="text" class="form-control" name="barcode" id="inputBarcode" placeholder="enter barcode" style="margin-left: 15px;margin-right: 15px">
+			  </div>
+			  <div class="form-group">
+			    <label for="inputQuantity" class="col-m-2">Quantity</label>
+			      <input type="text" class="form-control" name="quantity" id="inputQuantity" placeholder="enter quantity"  style="margin-left: 15px;margin-right: 15px">
+			  </div>
+			  <div class="form-group">
+			    <label for="inputPrice" class="col-m-2">Price</label>
+			      <input type="text" class="form-control" name="price" id="inputPrice" placeholder="enter price" style="margin-left: 15px;margin-right: 15px">
+			  </div>
+			  <button type="button" class="btn btn-primary" id="add-edit-items">Add</button>
+			</form>
+
+<div class="row">
+	&nbsp;
+</div>
+ <div class="col-12">
+	<table class="content-table" id="edit-item-table" style="width:90%">
+	  <thead>
+	    <tr>
+	      <th scope="col">Name</th>
+	      <th scope="col">Barcode</th>
+	      <th scope="col">Quantity</th>
+	      <th scope="col">Price</th>
+	      <th scope="col">Actions</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	  </tbody>
+	</table>
+
+</div>
+</div>
+      	<div id="editdiv">
 			<form class="form-horizontal" id="edit-view-form">
 			  <div class="form-group">
 			    <label for="inputBarcode" class="col-sm-2 col-form-label">Barcode</label>
@@ -206,10 +270,13 @@
 			  <input type="hidden" name="id" id="edit-Id">
 			</form>
 	 </div>	
-	       <div class="modal-footer">
+	</div>
+	     <div class="modal-footer">
+       <div id="aftereditfooter">
       	<button type="button" class="btn btn-primary" id="edit-button">Edit</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
       </div>
+    </div>
     </div>
   </div>
 </div>

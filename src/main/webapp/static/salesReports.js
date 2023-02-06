@@ -21,77 +21,60 @@ function showdropdown(){
        url: url,
        type: 'GET',
        success: function(data) {
-        console.log(data);
         displaydropdown(data);
        },
        error: handleAjaxError
     });
 }
 
-function showcategorydd(){
-      var brand=$('#brandInputReports :selected').text();
-       console.log("showing");
-       var url=getbrandUrl()+'/category/'+brand;
-       console.log(url);
-       $.ajax({
-       url: url,
-       type: 'GET',
-       success: function(data) {
-        console.log(data);
-        displaycategorydd(data);
-       },
-       error: handleAjaxError
-    });
-}
-
 function displaydropdown(data){
+    var b=new Set();
+    var c=new Set();
     $('#brandInputReports').empty();
+    $('#categoryInputReports').empty();
     var p=$("<option />");
     p.html("Select");
     p.val("none");
+        var q=$("<option />");
+    q.html("Select");
+    q.val("none");
+    $('#categoryInputReports').append(q);
     $('#brandInputReports').append(p);
     for(var i in data){
         var e = data[i];
-        console.log(e);
-        var row = e.brand;
-        var p=$("<option />");
-        p.html(row);
-        p.val(row);
-      $("#brandInputReports").append(p);
+        if (!b.has(e.brand)){
+                  var br = e.brand;
+                  var p=$("<option />");
+                  p.html(br);
+                  p.val(br);
+                  $("#brandInputReports").append(p);
+                  b.add(e.brand);
+        }
+        if (!c.has(e.category)){
+                  var cat = e.category;
+                  var q=$("<option />")
+                  q.html(cat);
+                  q.val(cat)
+                  $("#categoryInputReports").append(q);
+                  c.add(e.category);
+        }
 }
       $("#brandInputReports").selectpicker('refresh');
       $("#brandInputReports").val($('#brandInputReports option:first').val());
       $("#brandInputReports").selectpicker('refresh');
-}
-
-function displaycategorydd(data){
-    $('#categoryInputReports').empty();
-    console.log(data);
-    var p=$("<option />");
-    p.html("Select");
-    p.val("none");
-    $('#categoryInputReports').append(p);
-    for(var i in data){
-        var e = data[i];
-        console.log(e);
-        var row = e.category;
-        var p=$("<option />");
-        p.html(row);
-        p.val(row);
-      $("#categoryInputReports").append(p);
-}
       $("#categoryInputReports").selectpicker('refresh');
       $("#categoryInputReports").val($('#categoryInputReports option:first').val());
       $("#categoryInputReports").selectpicker('refresh');
 }
+
 
 function salesReport(){
     let toDate = new Date(document.getElementById("toDate").value.trim());
     let fromDate = new Date(document.getElementById("fromDate").value.trim());
     let brand = document.getElementById("brandInputReports").value.trim();
     let category = document.getElementById("categoryInputReports").value.trim();
-    console.log(toDate);
-    console.log(fromDate);
+    console.log(brand);
+    console.log(category);
     var url = getReportsUrl() + "/salesReport";
     var json=JSON.stringify({"to": toDate.toISOString(),"from": fromDate.toISOString(), "brand":brand, "category":category})
     $.ajax({
@@ -147,13 +130,8 @@ function displaySalesReport(data) {
 
 function init() {
     $('#salesReportBtn').click(function(){salesReport(); });
-    $('#brandInputReports').on('change',
-        function(){
-            console.log("q");
-            showcategorydd();
-        });
     var date = new Date();
-    var today = new Date(new Date().setDate(date.getDate() + 1));
+    var today = new Date(new Date().setDate(date.getDate() ));
     var last = new Date(new Date().setDate(date.getDate() - 30));
     var dd = String(today.getDate()).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
@@ -167,11 +145,18 @@ function init() {
 
     $('#toDate').val(today);
     $('#fromDate').val(last);
+    document.getElementById("fromDate").max=(today);
+    $('#fromDate').on("change",function(){document.getElementById("toDate").min=$('#fromDate').val()
+})
     $('#salesbutton').click(salesReport);
 }
 
 
 
 $(document).ready(init);
-$(document).ready(salesReport);
 $(document).ready(showdropdown);
+$(document).ready(salesReport);
+$(document).ready(function(){
+   $(".active").removeClass("active");
+   $("#rep-nav").addClass("active");
+});

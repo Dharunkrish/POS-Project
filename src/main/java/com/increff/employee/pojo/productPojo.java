@@ -18,15 +18,15 @@ public class productPojo {
 	@Column(unique=true)
 	private  String barcode;
 	
-	private String brand_Category;
-	public String getBrand_Category() {
-		return brand_Category;
+	private int brand_Category_id;
+	
+	public int getBrand_Category_id() {
+		return brand_Category_id;
 	}
 
 
-
-	public void setBrand_Category(String brand_Category) {
-		this.brand_Category = brand_Category;
+	public void setBrand_Category_id(int brand_Category_id) {
+		this.brand_Category_id = brand_Category_id;
 	}
 	private String name;
 	

@@ -2,37 +2,47 @@
 
 <html lang="en">
 
-<head th:replace="snippets.html :: name_head"></head>
+<head th:replace="snippets.html :: name_head">
+
+</head>
 
 <body>
 
 <nav th:replace="snippets.html :: name_app_navbar"></nav>
+	<link rel="stylesheet" th:href="@{/static/home.css}">
+
 
 <div class="container">
 
-<h3>Home</h3>
+<h3>Increff Point Of Sale</h3>
 
- <!-- Top row with form-->
 <div class="row">
-	 <div class="col-2">
-	 	<a th:href="@{/ui/employee}" title="Employees"> <i class="fas fa-users"></i> </a>
+	 <div class="col-3">
+	 	<a th:href="@{/ui/admin}" title="Admin"> <img th:src="@{/static/7.png}">   <p>Admin</p>
+</a>
 	 </div>	
-	 <div class="col-2">
-	 	<a th:href="@{/ui/admin}" title="Admin"> <i class="fas fa-cog"></i> </a>
+	 <div class="col-3">
+	 	<a th:href="@{/ui/brand}" title="Brand"> <img th:src="@{/static/4.png}"> <p>Brand</p>
+</a>
 	 </div>	
-	 <div class="col-2">
-	 	<a th:href="@{/ui/brand}" title="Brand Category"> <i class="fas fa-tags" style="font-size:72px"></i> </a>
+ <div class="col-3">
+	 	<a th:href="@{/ui/product}" title="Product"> <img th:src="@{/static/3.png}"></i> <p>Products</p></a>
+	    
 	 </div>	
- <div class="col-2">
-	 	<a th:href="@{/ui/product}" title="Product"> <i class="fa fa-dolly" style="font-size:72px"></i> </a>
+	 <div class="col-3">
+	 	<a th:href="@{/ui/inventory}" title="Inventory"><img th:src="@{/static/5.png}"> <p>Inventory</p></a>
+	 
 	 </div>	
-	 <div class="col-2">
-	 	<a th:href="@{/ui/inventory}" title="Inventory"> <i class="fa fa-warehouse" style="font-size:72px"></i> </a>
-	 </div>	
-	 	 <div class="col-2">
-	 	<a th:href="@{/ui/order}" title="Order"> <i class="fa fa-cart-plus" style="font-size:72px"></i> </a>
-	 </div>	
+	 	 <div class="col-3">
+	 	<a th:href="@{/ui/order}" title="Order"> <img th:src="@{/static/1.png}"> <p>Orders</p></a>
+	 
+	 </div>
+	 <div class="col-3">
+	 	<a th:href="@{/ui/daySalesReport}" title="Report"> <img th:src="@{/static/6.png}"><p>Reports</p></a>
+	 
+	 </div>
 </div> 
+ 
 
 
 
@@ -42,5 +52,10 @@
 
 
 </body>	
-
+<script type="text/javascript">
+	$(document).ready(function(){
+   $(".active").removeClass("active");
+   $("#home-nav").addClass("active");
+});
+</script>
 </html>

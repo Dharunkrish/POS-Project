@@ -1,7 +1,4 @@
-package com.increff.employee.spring;
-
-import java.time.Period;
-import java.time.ZonedDateTime;
+package com.increff.employee.controller;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +10,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import com.increff.employee.model.reportForm;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.reportService;
 
@@ -22,12 +18,12 @@ import com.increff.employee.service.reportService;
 
 public class Scheduler extends WebMvcConfigurerAdapter {
 	
-	private static Logger logger = Logger.getLogger(SecurityConfig.class); 
+	private static Logger logger = Logger.getLogger(Scheduler.class); 
 	
 	@Autowired
 	private reportService service;
 	
-	@Scheduled(cron = "40 43 10 * * *")
+	@Scheduled(cron = "10 0 0 * * *")
 	public void scheduleTaskUsingCronExpression() throws ApiException{
 		logger.info("hello");
 		service.add();

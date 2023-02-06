@@ -21,7 +21,9 @@ public class InventoryService {
 
 	@Transactional(rollbackOn = ApiException.class)
 	public void add(inventoryPojo p) throws ApiException {
-		productPojo pr=invcheck(p.getId());
+		QuantityCheck(p);
+		productPojo pr=ProductCheck(p.getId());
+		InvCheck(p.getId());
 		p.setBarcode(pr.getBarcode());
 		p.setName(pr.getName());
 		dao.insert(p);
@@ -56,23 +58,26 @@ public class InventoryService {
 		}
 		return p;
 	}
-	
 	@Transactional
-	public productPojo invcheck(int id) throws ApiException {
+	public void QuantityCheck(inventoryPojo i) throws ApiException {
+		if (i.getQuantity()<0){
+			throw new ApiException("Quantity should not be negative");
+		}
+	}
+
+	@Transactional
+	public productPojo ProductCheck(int id) throws ApiException {
 		productPojo pr=dao.findid(id);
-		logger.info(pr);
 		  if (pr==null) {
-				logger.info("delete_id");
 				throw new ApiException("Product with given Product ID does not exit, id: "+ id);
-			}	
-		inventoryPojo i=dao.select(id);
-		if (i!=null) {
+			}
+			return pr;
+		}	
+	@Transactional
+	public void InvCheck(int id) throws ApiException {
+		inventoryPojo ip=dao.select(id);
+		if (ip!=null) {
 			throw new ApiException("Inventory details for the given Product ID already exists");
 		}
-		return pr;
 	}
-	
-	
-	
-
 }

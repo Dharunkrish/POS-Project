@@ -23,14 +23,14 @@ import com.increff.employee.service.ApiException;
 
 		private Logger logger = Logger.getLogger(productDao.class);
 
-		private static String cal_item = "select new com.increff.employee.model.daySalesReportForm(sum(oi.quantity*oi.price),count(oi.id)) from orderitemPojo oi inner join orderPojo o on oi.order_id=o.id where o.t>=:date1 and o.t<:date2";
-		private static String sel_ord = "select oi from orderitemPojo oi inner join orderPojo o on oi.order_id=o.id where o.t>=:date1 and o.t<:date2";
- 
-		private static String cal_count = "select count(pc.id) from orderPojo pc where pc.t>=:date1 and pc.t<:date2";
+		private static String cal_item = "select new com.increff.employee.model.daySalesReportForm(sum(oi.quantity*oi.price),count(oi.id)) from orderitemPojo oi inner join orderPojo o on oi.order_id=o.id where o.t>=:date1 and o.t<=:date2";
+		private static String sel_ord = "select oi from orderitemPojo oi inner join orderPojo o on oi.order_id=o.id where o.t>=:date1 and o.t<=:date2";
+		private static String cal_count = "select count(pc.id) from orderPojo pc where pc.t>=:date1 and pc.t<=:date2";
 		private static String select_day = "select d from daySalesReportPojo d where d.date>=:date1 and d.date<=:date2";
-		private static String select_order = "select  new com.increff.employee.model.daysalesData(b.brand,b.category,p.barcode,p.brand_Category) from productPojo p join brandPojo b on p.brand_Category=b.brand_category";
-		private static String select_orderwbc = "select  new com.increff.employee.model.daysalesData(b.brand,b.category,p.barcode,p.brand_Category) from productPojo p join brandPojo b on p.brand_Category=b.brand_category where b.brand=:brand and b.category=:category";
-		private static String select_orderwb = "select  new com.increff.employee.model.daysalesData(b.brand,b.category,p.barcode,p.brand_Category) from productPojo p join brandPojo b on p.brand_Category=b.brand_category where b.brand=:brand";
+		private static String select_order = "select  new com.increff.employee.model.daysalesData(b.brand,b.category,p.barcode,p.brand_Category_id) from productPojo p join brandPojo b on p.brand_Category_id=b.id";
+		private static String select_orderwbc = "select  new com.increff.employee.model.daysalesData(b.brand,b.category,p.barcode,p.brand_Category_id) from productPojo p join brandPojo b on p.brand_Category_id=b.id where b.brand=:brand and b.category=:category";
+		private static String select_orderwb = "select  new com.increff.employee.model.daysalesData(b.brand,b.category,p.barcode,p.brand_Category_id) from productPojo p join brandPojo b on p.brand_Category_id=b.id where b.brand=:brand";
+		private static String select_orderwc = "select  new com.increff.employee.model.daysalesData(b.brand,b.category,p.barcode,p.brand_Category_id) from productPojo p join brandPojo b on p.brand_Category=b.brand_category where b.category=:category";
 
 		@Transactional 
 		public int getCount(ZonedDateTime d) {
@@ -88,6 +88,13 @@ import com.increff.employee.service.ApiException;
 		public List<daysalesData> getsaleswb(reportForm r) throws ApiException {
 			 TypedQuery<daysalesData> query = getQuery(select_orderwb, daysalesData.class);
 			    query.setParameter("brand",r.getBrand());
+			    return query.getResultList();
+		}
+		
+		@Transactional
+		public List<daysalesData> getsaleswc(reportForm r) throws ApiException {
+			 TypedQuery<daysalesData> query = getQuery(select_orderwc, daysalesData.class);
+			    query.setParameter("category",r.getCategory());
 			    return query.getResultList();
 		}
 		

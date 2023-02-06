@@ -35,18 +35,10 @@ public class productApiController {
 	@RequestMapping(path = "/api/product", method = RequestMethod.POST)
 	public void add(@RequestBody productForm form) throws ApiException {
 		productPojo p = convert(form);
-		logger.info(p.getBrand_Category());
 		service.add(p);
 	}
 
 	
-	@ApiOperation(value = "Deletes and brand")
-	@RequestMapping(path = "/api/product/{product_id}", method = RequestMethod.DELETE)
-	// /api/1
-	public void delete(@PathVariable int product_id) {
-		logger.info(product_id);
-		service.delete(product_id);
-	}
 
 	@ApiOperation(value = "Gets an brand by ID")
 	@RequestMapping(path = "/api/product/{id}", method = RequestMethod.GET)
@@ -76,7 +68,7 @@ public class productApiController {
 
 	private static productData convert(productPojo p) {
 		productData d = new productData();
-		d.setBrand_Category(p.getBrand_Category());
+		d.setBrand_Category_id(p.getBrand_Category_id());
 		d.setName(p.getName());
 		d.setBarcode(p.getBarcode());
 		d.setMrp(p.getMrp());
@@ -89,7 +81,7 @@ public class productApiController {
 		p.setName(f.getName());
 		p.setBarcode(f.getBarcode());
 		p.setMrp(f.getMrp());
-		p.setBrand_Category(f.getBrand_Category());
+		p.setBrand_Category_id(f.getBrand_Category_id());
 		return p;
 	}
 	

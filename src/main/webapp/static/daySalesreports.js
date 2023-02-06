@@ -165,7 +165,7 @@ function init() {
     mm = String(last.getMonth() + 1).padStart(2, '0'); //January is 0!
     yyyy = last.getFullYear();
     last = yyyy + "-" + mm + "-" + dd;
-
+    console.log(today);
     $('#toDate').val(today);
     $('#fromDate').val(last);
 }
@@ -174,3 +174,7 @@ function init() {
 $(document).ready(init);
 $(document).ready(salesReport);
 $(document).ready(showdropdown);
+$(document).ready(function(){
+   $(".active").removeClass("active");
+   $("#rep-nav").addClass("active");
+});

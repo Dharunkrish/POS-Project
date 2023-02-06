@@ -36,13 +36,7 @@ public class BrandApiController {
 		service.add(p);
 	}
 
-	
-	@ApiOperation(value = "Deletes and brand")
-	@RequestMapping(path = "/api/brand/{id}", method = RequestMethod.DELETE)
-	// /api/1
-	public void delete(@PathVariable int id) {
-		service.delete(id);
-	}
+
 
 	@ApiOperation(value = "Gets an brand by ID")
 	@RequestMapping(path = "/api/brand/{id}", method = RequestMethod.GET)
@@ -52,16 +46,6 @@ public class BrandApiController {
 	}
 	
 
-	@ApiOperation(value = "Gets list of all brands")
-	@RequestMapping(path = "/api/brand/category/{brand}", method = RequestMethod.GET)
-	public List<brandData> getbrand(@PathVariable String brand) throws ApiException {
-		List<brandPojo> list = service.getbrand(brand);
-		List<brandData> list2 = new ArrayList<brandData>();
-		for (brandPojo p : list) {
-			list2.add(convert(p));
-		}
-		return list2;
-	}
 	
 	@ApiOperation(value = "Gets list of all brands")
 	@RequestMapping(path = "/api/brand", method = RequestMethod.GET)
@@ -94,7 +78,6 @@ public class BrandApiController {
 		brandPojo p = new brandPojo();
 		p.setBrand(f.getBrand());
 		p.setCategory(f.getCategory());
-		p.setBrand_category(f.getBrand()+"/"+f.getCategory());
 		return p;
 	}
 }

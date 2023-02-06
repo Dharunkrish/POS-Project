@@ -39,7 +39,6 @@ public class reportService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         ZonedDateTime now = ZonedDateTime.now();
         now=now.minus(Period.ofDays(1));
-        logger.info(formatter.format(now));
         s.setDate(now); 
         s.setTotal_orders(dao.getCount(now));
         logger.info(s.getTotal_orders());
@@ -74,41 +73,38 @@ public class reportService {
        return m;
 	}
 	
-	public Map<String,List<Object>> getsales(reportForm s,Map<String,orderitemPojo> o) throws ApiException {
+	public Map<Integer,List<Object>> getsales(reportForm s,Map<String,orderitemPojo> o) throws ApiException {
 		List<daysalesData> p=new ArrayList<>();
-		logger.info(s.getCategory());
-		if (s.getBrand()=="") {
+		logger.info(s.getBrand()+" "+s.getCategory());
+		if ((s.getBrand()=="" && s.getCategory()=="") || (s.getBrand()=="none" && s.getCategory()=="none")) {
 			p= dao.getsales();
 		}
 		else if (s.getCategory().equals("none")) {
 			logger.info("K");
 			p= dao.getsaleswb(s);
 		}
+		else if (s.getBrand().equals("none")) {
+			logger.info("K");
+			p= dao.getsaleswc(s);
+		}
 		else {
 			p= dao.getsaleswbc(s);
 		}
-		logger.info("K");
-		Map<String,List<Object>> m=new HashMap<String,List<Object>>();
+		Map<Integer,List<Object>> m=new HashMap<Integer,List<Object>>();
 		for (daysalesData d:p) {
 			if (!o.containsKey(d.getBarcode())) {
 				continue;
 			}
 			orderitemPojo oi=o.get(d.getBarcode()); 
-			logger.info(oi.getQuantity());
-		    if (m.containsKey(d.getBrand_category())){
-		    	logger.info(d.getBarcode());
-		    	List<Object> ds=m.get(d.getBrand_category());
+		    if (m.containsKey(d.getBrand_Category_id())){
+		    	List<Object> ds=m.get(d.getBrand_Category_id());
 		    	int i=(Integer) ds.get(0);
-		    	logger.info(oi.getQuantity());
 		    	i=i+oi.getQuantity();
-		    	logger.info(i);
 		    	ds.set(0,i);
-		    	logger.info(ds.get(1));
 		    	double j=(double) ds.get(1);
 		    	j=j+(oi.getQuantity()*oi.getPrice());
 		    	ds.set(1, j);
-		    	logger.info(j);
-			    m.put(d.getBrand_category(), ds);
+			    m.put(d.getBrand_Category_id(), ds);
 		    }
 		    else {
 		    	List<Object> ds=new ArrayList<>();
@@ -116,40 +112,34 @@ public class reportService {
 		    	ds.add(oi.getPrice()*oi.getQuantity());
 		    	ds.add(d.getBrand());
 		    	ds.add(d.getCategory());
-		    	logger.info(d.getBarcode());
-			    m.put(d.getBrand_category(), ds);
+			    m.put(d.getBrand_Category_id(), ds);
 		    }
 		}
 		logger.info("k");
 		return m;
 	}
 	
-	public Map<String,List<Object>> getinventoryReport(Map<String,inventoryPojo> o) throws ApiException {
+	public Map<Integer,List<Object>> getinventoryReport(Map<String,inventoryPojo> o) throws ApiException {
 		List<daysalesData> p=dao.getsales();
-		Map<String,List<Object>> m=new HashMap<String,List<Object>>();
+		Map<Integer,List<Object>> m=new HashMap<Integer,List<Object>>();
 		for (daysalesData d:p) {
 			if (!o.containsKey(d.getBarcode())) {
 				continue;
 			}
 			inventoryPojo oi=o.get(d.getBarcode()); 
-			logger.info(oi.getQuantity());
-		    if (m.containsKey(d.getBrand_category())){
-		    	logger.info(d.getBarcode());
-		    	List<Object> ds=m.get(d.getBrand_category());
+		    if (m.containsKey(d.getBrand_Category_id())){
+		    	List<Object> ds=m.get(d.getBrand_Category_id());
 		    	int i=(Integer) ds.get(0);
-		    	logger.info(oi.getQuantity());
 		    	i=i+oi.getQuantity();
-		    	logger.info(i);
 		    	ds.set(0,i);
-			    m.put(d.getBrand_category(), ds);
+			    m.put(d.getBrand_Category_id(), ds);
 		    }
 		    else {
 		    	List<Object> ds=new ArrayList<>();
 		    	ds.add(oi.getQuantity());
 		    	ds.add(d.getBrand());
 		    	ds.add(d.getCategory());
-		    	logger.info(d.getBarcode());
-			    m.put(d.getBrand_category(), ds);
+			    m.put(d.getBrand_Category_id(), ds);
 		    }
 		}
 		return m;

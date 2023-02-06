@@ -25,13 +25,14 @@ import com.increff.employee.service.ApiException;
 		private static String select_all = "select o from orderPojo o";
         private static String select_prod="select pc from productPojo pc where barcode=:barcode";
         private static String select_inv="select i from inventoryPojo i where id=:id";
-		private static String update_inv = "update inventoryPojo pc set pc.quantity=:quantity where id=:id";
+		private static String update_inv = "update inventoryPojo pc set pc.quantity=:quantity where pc.barcode=:barcode";
 		private static String update_orderitem = "update orderitemPojo pc set pc.name=:name, pc.barcode=:barcode , pc.price=:price , pc.quantity=:quantity where id=:id";
 		private static String delete_inv = "delete inventoryPojo pc where id=:id";
         private static String select_item="select i from orderitemPojo i where order_id=:id";
         private static String select_id="select i from orderitemPojo i where id=:id";
         private static String select_order_id="select i from orderPojo i where id=:id";
 		private static String update_order = "update orderPojo pc set pc.isInvoiceGenerated=:i where id=:id";
+		private static String delete_order_item = "delete orderitemPojo pc where pc.id=:id";
 
 
 
@@ -42,25 +43,25 @@ import com.increff.employee.service.ApiException;
 				em().persist(o);
 		}
 		
-		public void upd(int quantity,int id) {
+		public int upd(int quantity,String barcode) {
 			Query query=getQuery(update_inv);
 			query.setParameter("quantity",quantity);
-			query.setParameter("id", id);
-			query.executeUpdate();
+			query.setParameter("barcode", barcode);
+			return query.executeUpdate();
 		}
 		
-        public void del_inv(int id) {
+       /* public void del_inv(int id) {
         	Query query = em().createQuery(delete_inv);
 			query.setParameter("id", id);
 			query.executeUpdate();
-        }
+        }*/
 		
-		public int create() {
+		public orderPojo create() {
 			orderPojo o=new orderPojo();
 			o.setT(ZonedDateTime.now(ZoneId.systemDefault()));
 			o.setInvoiceGenerated(false);
 			em().persist(o);
-			return o.getId();
+			return o;
 		}
 		
 		public productPojo check(String barcode) {
@@ -91,24 +92,7 @@ import com.increff.employee.service.ApiException;
 			query.setParameter("id", id);
 			return getSingle(query);
 		}
-/*
- *  
-		public int delete(int product_id) {
-			Query query = em().createQuery(delete_id);
-			query.setParameter("product_id", product_id);
-			return query.executeUpdate();
-		}
-
 		
-		
-		public productDTO selectbar(String barcode) {
-			TypedQuery<productDTO> query = getQuery(select_id, productDTO.class);
-			query.setParameter("barcode", barcode);
-			return getSingle(query);
-		}
-
-
-*/
 		public List<orderPojo> selectAll() throws ApiException{
             TypedQuery<orderPojo> query = getQuery(select_all, orderPojo.class);
 			List<orderPojo> p= query.getResultList();
@@ -124,8 +108,6 @@ import com.increff.employee.service.ApiException;
 			query.setParameter("i",true);
 			query.setParameter("id",id);
 			logger.info(query.executeUpdate());
-
-
 			}
 		
 		public void update(int id,orderitemPojo o) throws ApiException{
@@ -140,6 +122,11 @@ import com.increff.employee.service.ApiException;
 			
 		}
 			
+		public void delete(int id) throws ApiException{
+			Query query = getQuery(delete_order_item);
+			query.setParameter("id",id);
+			logger.info(query.executeUpdate());
+			}
 			
 
 			

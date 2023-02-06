@@ -62,3 +62,7 @@ function init() {
 
 $(document).ready(init);
 $(document).ready(salesReport);
+$(document).ready(function(){
+   $(".active").removeClass("active");
+   $("#rep-nav").addClass("active");
+});

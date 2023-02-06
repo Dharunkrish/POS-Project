@@ -6,20 +6,25 @@ public class productForm {
 	private String name;
 	private String barcode;
 	private double mrp;
-	private String brand_Category;
+	private int brand_Category_id;
 	public String getName() {
 		return name;
 	}
 
-	public String getBrand_Category() {
-		return brand_Category;
+	
+
+
+	public int getBrand_Category_id() {
+		return brand_Category_id;
 	}
 
 
 
-	public void setBrand_Category(String brand_Category) {
-		this.brand_Category = brand_Category;
+
+	public void setBrand_Category_id(int brand_Category_id) {
+		this.brand_Category_id = brand_Category_id;
 	}
+
 
 
 

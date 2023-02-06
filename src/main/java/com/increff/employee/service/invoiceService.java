@@ -23,31 +23,21 @@ public class invoiceService {
 	private pdfconversionUtil util;
 	private Logger logger = Logger.getLogger(orderitemDao.class);
 
-public String hello() {
-	return "HEllo World";
-}
+
 public byte[] generatePdf(orderxmlForm orderxml) throws Exception{
-	logger.info("order");
 	orderxmlForm orderInvoiceXmlList = generateInvoiceList(orderxml);
     pdfconversionUtil.generateXml(new File("invoice.xml"), orderInvoiceXmlList, orderxmlForm.class);
     return pdfconversionUtil.generatethePDF(new File("invoice.xml"), new StreamSource("invoice.xsl"));
 }
 
 public orderxmlForm generateInvoiceList(orderxmlForm orderxmlList) throws Exception {
-	    logger.info("k");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         orderPojo order=orderService.getorder(orderxmlList.getOrder_id());
         orderxmlList.setDatetime(order.getT().format(formatter));
         double total = calculateTotal(orderxmlList);
-        logger.info(total);
         orderxmlList.setTotal(total);
-        logger.info(orderxmlList.getTotal());
         order.setInvoiceGenerated(true);
         orderService.update(order.getId(),order);
-        logger.info(orderxmlList.getTotal());
-        for (orderData x:orderxmlList.getOrderInvoiceData()) {
-        	logger.info(x.getName());
-        }
         return orderxmlList;
     }
 

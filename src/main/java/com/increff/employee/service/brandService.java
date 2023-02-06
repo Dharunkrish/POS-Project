@@ -23,20 +23,10 @@ public class brandService {
 	@Transactional(rollbackOn = ApiException.class)
 	public void add(brandPojo p) throws ApiException {
 		normalize(p);
-		if(StringUtil.isEmpty(p.getBrand())) {
-			throw new ApiException("Brand cannot be empty"+p.getBrand()+p.getCategory());
-		}
-		if(StringUtil.isEmpty(p.getCategory())) {
-			throw new ApiException("Category cannot be empty");
-		}
 		insertCheck(p.getBrand(),p.getCategory());
 		dao.insert(p);
 	}
 
-	@Transactional
-	public void delete(int id) {
-		dao.delete(id);
-	}
 
 	@Transactional(rollbackOn = ApiException.class)
 	public brandPojo get(int id) throws ApiException {
@@ -44,10 +34,7 @@ public class brandService {
 		return getCheck(id);
 	}
 	
-	@Transactional(rollbackOn = ApiException.class)
-	public List<brandPojo> getbrand(String brand) throws ApiException {
-		return dao.getbrand(brand);
-	}
+
 
 	@Transactional
 	public List<brandPojo> getAll() {
@@ -57,6 +44,7 @@ public class brandService {
 	@Transactional(rollbackOn  = ApiException.class)
 	public void update(int id, brandPojo p) throws ApiException {
 		normalize(p);
+		logger.info(p.getBrand());
 		insertCheck(p.getBrand(),p.getCategory());
 		brandPojo ex = getCheck(id);
 		ex.setBrand(p.getBrand());
@@ -68,7 +56,7 @@ public class brandService {
 	public brandPojo getCheck(int id) throws ApiException {
 		brandPojo p = dao.select(id);
 		if (p == null) {
-			throw new ApiException("Employee with given ID does not exit, id: " + id);
+			throw new ApiException("Brand and Category with given ID does not exist, id: " + id);
 		}
 		return p;
 	}
@@ -76,7 +64,7 @@ public class brandService {
 	public void insertCheck(String brand,String category) throws ApiException {
 		brandPojo p = dao.selectProduct(brand,category);
 		if (p!=null) {
-			throw new ApiException("Product with given Brand "+p.getBrand()+" and Category "+p.getCategory()+" exist");
+			throw new ApiException("Brand "+p.getBrand()+" and Category "+p.getCategory()+" combination already exist");
 		}
 		return;
 	}

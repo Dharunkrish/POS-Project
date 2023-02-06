@@ -192,7 +192,7 @@ function displayinventoryList(data){
 	for(var i in data){
 		var e = data[i];
 		console.log(e);
-		var buttonHtml = ' <button onclick="displayEditinventory(' + e.id + ')">edit</button>'
+		var buttonHtml = ' <button type="button" class="btn-sm btn-outline-info" onclick="displayEditinventory(' + e.id + ')"><i class="fa-solid fa-pen-to-square"></button>'
 		var row = '<tr>'
 		+ '<td>' + e.name + '</td>'
 		+'<td>' + e.barcode + '</td>'
@@ -307,4 +307,8 @@ function init(){
 
 $(document).ready(init);
 $(document).ready(getinventoryList);
+$(document).ready(function(){
+   $(".active").removeClass("active");
+   $("#inv-nav").addClass("active");
+});
 

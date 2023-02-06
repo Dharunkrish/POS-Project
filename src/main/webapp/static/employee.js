@@ -218,4 +218,7 @@ function init(){
 
 $(document).ready(init);
 $(document).ready(getEmployeeList);
-
+$(document).ready(function(){
+   $(".active").removeClass("active");
+   $("#emp-nav").addClass("active");
+});

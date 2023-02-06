@@ -1,5 +1,6 @@
 package com.increff.employee.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -9,14 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.increff.employee.dao.orderitemDao;
-import com.increff.employee.model.booForm;
 import com.increff.employee.pojo.inventoryPojo;
 import com.increff.employee.pojo.orderPojo;
 import com.increff.employee.pojo.orderitemPojo;
 import com.increff.employee.pojo.productPojo;
 import com.increff.employee.util.StringUtil;
 
-import javassist.compiler.ast.Pair;;
 
 @Service
 public class orderitemService {
@@ -26,24 +25,59 @@ public class orderitemService {
 	private Logger logger = Logger.getLogger(orderitemDao.class);
 	
 	@Transactional(rollbackOn = ApiException.class)
-	public productPojo checkitems(orderitemPojo o) throws ApiException {
+	public productPojo checkitems(orderitemPojo o,int old_q) throws ApiException {
+		normalize(o);
         productPojo p=checkprod(o);
-        logger.info(p);
         if (p==null) {
         	p=new productPojo();
         	p.setProduct_id(-1);
         	return p;
         }
-        logger.info(p);
-        int q=check(o,p,0);
+        int q=check(o,p,old_q);
         if (q==-1) {
         	p=new productPojo();
         	p.setProduct_id(-2);
         	return p;
         }
-		logger.info(p.getName());
+		p.setMrp(q);
 		return p;
 	}
+
+	@Transactional(rollbackOn = ApiException.class)
+	public int AddItems(List<orderitemPojo> item) throws ApiException {
+		List<productPojo> inv_q=new ArrayList<productPojo>();
+		for (orderitemPojo o:item){
+		productPojo p=checkitems(o,0);
+			if (p.getProduct_id()==-2){
+				return 2;
+			}
+			inv_q.add(p);
+		}
+		int id=create().getId();
+		for(int i=0;i<item.size();i++) {
+			orderitemPojo order=item.get(i);
+			productPojo p=inv_q.get(i);
+			order.setOrder_id(id);
+			dao.upd((int)p.getMrp(),p.getBarcode());
+		    order.setName(p.getName());
+			add(order);
+		}
+		return 1;
+	}
+
+	@Transactional(rollbackOn = ApiException.class)
+	public int AddSingleItem(orderitemPojo o,int id) throws ApiException {
+		productPojo p=checkitems(o,0);
+		if (p.getProduct_id()==-1) {
+			return 2;
+		}	
+		dao.upd((int) p.getMrp(),p.getBarcode());
+	    o.setName(p.getName());
+		o.setOrder_id(id);
+		add(o);
+		return 1;
+	}
+
 	@Transactional(rollbackOn = ApiException.class)
 	public int check(orderitemPojo o,productPojo p,int old_q) throws ApiException {
             	 inventoryPojo i=dao.prodquantity(p.getProduct_id());
@@ -55,24 +89,19 @@ public class orderitemService {
 	}
 
 	public productPojo checkprod(orderitemPojo o) throws ApiException {
-	     normalize(o);
         return dao.check(o.getBarcode());
         }
 	
 	@Transactional(rollbackOn = ApiException.class)
 	public void add(orderitemPojo o) throws ApiException {
-		productPojo p=dao.check(o.getBarcode());
-		inventoryPojo i=dao.prodquantity(p.getProduct_id());
-		int quantity=i.getQuantity()-o.getQuantity();
-		if (quantity==0) {
+		/*if (quantity==0) {
 			dao.del_inv(p.getProduct_id());
-		}
-		dao.upd(quantity,p.getProduct_id());
+		}*/
 		dao.insert(o);
 	}
 
 	@Transactional
-	public int create() {
+	public orderPojo create() {
 		return dao.create();
 	}
 	
@@ -85,7 +114,6 @@ public class orderitemService {
 	public orderPojo getorder(int id) throws Exception {
 		return dao.selectid(id);
 	}
-	
 	
 	@Transactional(rollbackOn = ApiException.class)
 	public List<orderitemPojo> get(int id) throws ApiException {
@@ -100,47 +128,33 @@ public class orderitemService {
 	public void update(int id, orderPojo o) throws ApiException {
 		dao.update(id,o);
 	}
-	
+
 	@Transactional(rollbackOn  = ApiException.class)
-	public void update(int id, orderitemPojo o, int quantity,productPojo p) throws ApiException {
-		dao.upd(quantity,p.getProduct_id());
-
+	public int update(int id, orderitemPojo o, int quantity) throws ApiException {
+		productPojo p=checkprod(o);
+        if (p==null) {
+        	return 0;
+        }
+        int q=check(o,p,quantity);
+        if (q==-1) {
+        	return 2;
+        }
+        o.setName(p.getName());
+		dao.upd(q,o.getBarcode());
 		dao.update(id,o);
+		return 1;
 	}
 
-	
-	/*@Transactional
-	public void delete(int product_id) {
-		dao.delete(product_id);
-	}
-
-	
-
-
-	
-	@Transactional
-	public productDTO getCheck(int id) throws ApiException {
-		productDTO p = dao.select(id);
-		if (p == null) {
-			throw new ApiException("Product with given ID does not exit, id: " + id);
-		}
-		return p;
+	@Transactional(rollbackOn  = ApiException.class)
+	public void delete(int id) throws ApiException {
+		orderitemPojo oi=getid(id);
+		productPojo p=dao.check(oi.getBarcode());
+		inventoryPojo i=dao.prodquantity(p.getProduct_id());
+		int quantity=i.getQuantity()+oi.getQuantity();
+		dao.upd(quantity,oi.getBarcode());
+		dao.delete(id);
 	}
 	
-	public brandPojo ref(int id) {
-		return dao.findid(id);
-	}
-	
-	public void bar(String barcode) throws ApiException{
-		productDTO p =dao.selectbar(barcode);
-		if(p!=null) {
-			throw new ApiException("Barcode must be unique");
-		}
-	}*/
-	
-
-	
-
 	protected static void normalize(orderitemPojo p) {
 		p.setBarcode(StringUtil.toLowerCase(p.getBarcode()));
 	}

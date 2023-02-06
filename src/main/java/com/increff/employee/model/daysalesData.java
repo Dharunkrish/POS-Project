@@ -21,13 +21,14 @@ public class daysalesData {
    
 	private String barcode;
 
-	private String brand_category;
+	private int brand_Category_id;
 
-	public String getBrand_category() {
-		return brand_category;
+	
+	public int getBrand_Category_id() {
+		return brand_Category_id;
 	}
-	public void setBrand_category(String brand_category) {
-		this.brand_category = brand_category;
+	public void setBrand_Category_id(int brand_Category_id) {
+		this.brand_Category_id = brand_Category_id;
 	}
 	public String getBarcode() {
 		return barcode;
@@ -37,11 +38,11 @@ public class daysalesData {
 		this.barcode = barcode;
 	}
  
-	public daysalesData(String brand,String category,String barcode,String brand_category) {
+	public daysalesData(String brand,String category,String barcode,int brand_category) {
 		this.Brand=brand;
 		this.Category=category;
 		this.barcode=barcode;
-		this.brand_category=brand_category;
+		this.brand_Category_id=brand_category;
 	}
 
 }

@@ -7,11 +7,15 @@
 <body>
 
 <nav th:replace="snippets.html :: name_app_navbar"></nav>
-
+<link rel="stylesheet" th:ref="@{/static/employee.css}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <div class="container">
 
 <h3>Admin > Users</h3>
 
+<div class="row">
+	&nbsp;
+</div>
  <!-- Top row with form-->
  <div class="row">
 	 <div class="col-12">
@@ -50,12 +54,12 @@
 
  <!-- Table -->
  <div class="col-12">
-	<table class="table table-striped" id="user-table">
+	<table class="content-table" id="user-table">
 	  <thead>
 	    <tr>
 	      <th scope="col">ID</th>
 	      <th scope="col">Email</th>
-	      <th scope="col">Romil</th>
+	      <th scope="col">Role</th>
 	      <th scope="col">Actions</th>
 	    </tr>
 	  </thead>

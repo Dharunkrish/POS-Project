@@ -27,11 +27,6 @@ public class productService {
 		dao.insert(p);
 	}
 
-	@Transactional
-	public void delete(int product_id) {
-		dao.delete(product_id);
-	}
-
 	@Transactional(rollbackOn = ApiException.class)
 	public productPojo get(int id) throws ApiException {
 		return getCheck(id);
@@ -53,7 +48,7 @@ public class productService {
 	public productPojo getCheck(int id) throws ApiException {
 		productPojo p = dao.select(id);
 		if (p == null) {
-			throw new ApiException("Product with given ID does not exit, id: " + id);
+			throw new ApiException("Product with given ID does not exist, id: " + id);
 		}
 		return p;
 	}
@@ -64,13 +59,6 @@ public class productService {
 		productPojo p =dao.selectbar(barcode,id);
 		if(p!=null) {
 			throw new ApiException("Barcode must be unique");
-		}
-	}
-	
-	private void insertCheck(String brand,String category) throws ApiException {
-		brandPojo b =dao.findbrand(brand,category);
-		if (b==null) {
-			throw new ApiException("Brand and Category Does not exist");
 		}
 	}
 	
