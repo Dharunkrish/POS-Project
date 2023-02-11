@@ -47,35 +47,41 @@ table.dataTable thead tr {
   border-radius: 5px 5px 0 0;
   overflow: hidden;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  text-align: center;
 }
 
 .content-table thead tr {
   background-color: #009879;
   color: #ffffff;
-  text-align: left;
+  text-align: center;
   font-weight: bold;
 }
 
 .content-table th,
 .content-table td {
   padding: 12px 15px;
+  text-align: center;
 }
 
 .content-table tbody tr {
   border-bottom: 1px solid #dddddd;
+  text-align: center;
 }
 
 .content-table tbody tr:nth-of-type(even) {
   background-color: #f3f3f3;
+  text-align: center;
 }
 
 .content-table tbody tr:last-of-type {
   border-bottom: 2px solid #009879;
+  text-align: center;
 }
 
 .content-table tbody tr.active-row {
   font-weight: bold;
   color: #009879;
+  text-align: center;
 }
 
 .alert {display:inline-block;
@@ -88,3 +94,62 @@ top: 0px;
   text-align: center;}
 
 
+  li {
+  list-style-type: none;
+  position: relative;
+  margin-right: 20px;
+  padding: 0.625rem 0 0.5rem;
+}
+
+li ul{
+  margin-right: 10px;
+}
+
+ul li:hover> ul {
+   display: block;
+  opacity: 1;
+
+}
+#logOut{
+    position: relative;
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-right: 10px;
+}
+#username{
+  position: relative
+    margin-top: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin-right: 20px;
+          left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+
+
+#logOut p:hover {
+    color: #000;
+  cursor: pointer;
+}
+
+#logOut p {
+  font-size: 0.98rem;
+  text-align: center;
+  color: #888888;
+  font-weight: 500;
+  margin: 0.4rem 0;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  flex: 1;
+}
+
+table.dataTable thead .sorting{
+  text-align: center;
+}
+
+.form-group .control-label:after, .form-horizontal .control-label:after,.form-inline .control-label:after {
+  content:"*";
+  color:red;
+  margin-left: 4px;
+}

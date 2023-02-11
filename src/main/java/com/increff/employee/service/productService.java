@@ -18,12 +18,20 @@ public class productService {
 
 	@Autowired
 	private productDao dao;
+
+
+	@Autowired
+	private brandService brandService;
 	private Logger logger = Logger.getLogger(productDao.class);
 
 	@Transactional(rollbackOn = ApiException.class)
 	public void add(productPojo p) throws ApiException {
 		normalize(p);
+		if (p.getMrp()<0){
+			throw new ApiException("MRP cannot be negative"); 
+		}
 		bar(p.getBarcode(),0);
+		brandService.getCheck(p.getBrand_Category_id());
 		dao.insert(p);
 	}
 
@@ -39,9 +47,19 @@ public class productService {
 
 	@Transactional(rollbackOn  = ApiException.class)
 	public void update(int id, productPojo p) throws ApiException {
-		normalize(p);   
+		normalize(p); 
+		if (p.getMrp()<0){
+			throw new ApiException("MRP cannot be negative"); 
+		}  
 		bar(p.getBarcode(),id);
-		dao.update(id,p);
+		brandService.getCheck(p.getBrand_Category_id());
+		productPojo p1=getCheck(id);
+		p1.setBarcode(p.getBarcode());
+		p1.setBrand_Category_id(p.getBrand_Category_id());
+		p1.setMrp(p.getMrp());
+		p1.setName(p.getName());
+		dao.update(p1);
+
 	}
 
 	@Transactional

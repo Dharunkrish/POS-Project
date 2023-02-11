@@ -1,5 +1,6 @@
 package com.increff.employee.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -30,8 +31,23 @@ public class brandService {
 
 	@Transactional(rollbackOn = ApiException.class)
 	public brandPojo get(int id) throws ApiException {
-		logger.info(id);
 		return getCheck(id);
+	}
+	
+	@Transactional(rollbackOn = ApiException.class)
+	public List<brandPojo> getbrand(brandPojo b) throws ApiException {
+		List<brandPojo> br=new ArrayList<brandPojo>();
+		if ((b.getBrand()==null || b.getBrand()=="") && (b.getCategory()==null || b.getCategory()=="")) {
+			br= getAll();
+		}
+		else if ((b.getBrand()==null || b.getBrand()=="")) {
+			br= dao.getcategory(b);
+		}
+		else if((b.getCategory()==null || b.getCategory()=="")) {
+			br= dao.getbrand(b);
+
+		}
+		return br;
 	}
 	
 

@@ -4,6 +4,11 @@ function getReportsUrl(){
 	return baseUrl + "/api/reports";
 }
 
+function invoiceUrl(){
+var baseUrl = $("meta[name=baseUrl]").attr("content")
+    return baseUrl + "/api/inventory-report/pdf";
+}
+
 
 function salesReport(){
     var url = getReportsUrl() + "/inventoryReport";
@@ -53,9 +58,29 @@ function displaySalesReport(data) {
     $tbody.append(row);
 }
 
+function downloadPdf() {
+    var url = invoiceUrl();
+    $.ajax({
+       url: url,
+       type: 'POST',
+        xhrFields: {
+        responseType: 'blob'
+     },
+       success: function(blob) {
+        var link=document.createElement('a');
+        link.href=window.URL.createObjectURL(blob);
+        link.download="Inventory_Report_" + new Date() + ".pdf";
+        link.click();
+       },
+       error: function(response){
+            handleAjaxError(response);
+       }
+    });
+}
 
 function init() {
     $('#salesReportBtn').click(function(){salesReport(); });
+    $("#download").click(downloadPdf);
 }
 
 

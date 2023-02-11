@@ -4,6 +4,15 @@ public class UserPrincipal {
 
 	private int id;
 	private String email;
+	private String Role;
+
+	public String getRole() {
+		return Role;
+	}
+
+	public void setRole(String role) {
+		Role = role;
+	}
 
 	public String getEmail() {
 		return email;

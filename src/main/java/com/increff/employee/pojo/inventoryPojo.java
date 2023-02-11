@@ -1,5 +1,6 @@
 package com.increff.employee.pojo;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,8 +13,11 @@ import javax.persistence.OneToOne;
 public class inventoryPojo {
 
 	@Id
+	@Column(nullable=false)
 	private int id;
+	@Column(nullable=false)
 	private int quantity;
+	@Column(nullable=false)
 	private String barcode;
 	private String name;
 

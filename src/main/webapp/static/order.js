@@ -5,6 +5,8 @@ function Url(){
 	return baseUrl + "/api/orderitem";
 }
 
+
+
 function orderurl(){
 	var baseUrl = $("meta[name=baseUrl]").attr("content");
 	return baseUrl + "/api/order"
@@ -27,10 +29,10 @@ const items=JSON.parse(sessionStorage.getItem("itemlist"));
  document.getElementById("order-form").reset();    
 for (var i in items){
 	if (items[i].barcode==json.barcode.trim()){
-		alert("Order for product already exist");
+		toastr.error("Order for product already exist");
 		return;
 	}}
-var url=Url()+ '/check';
+var url=Url()+ '/supervisor/check';
 var data1=JSON.stringify(json);
 $.ajax({
 	   url: url,
@@ -41,12 +43,11 @@ $.ajax({
        },	   
 	   success: function(data) {
 	   	if (data.is_p===2){
-			$('#inventory-less-alert').css('display', 'block'); 
-			$("#inventory-less-alert").fadeOut(3000);	   	
+			   			   	toastr.error("Inventory has less product than requested");
+
 	   }
        else if (data.is_p===0){
-       	$('#no-product-alert').css('display', 'block'); 
-			$("#no-product-alert").fadeOut(3000);	
+       	toastr.error("Product with given barcode does not exist");
 	   	}
 	   	else{
 	   		json["name"]=data.name;
@@ -124,7 +125,7 @@ function getitemid(id){
 
 function edititem(){
 var $form = $("#edit-form");
-var url=Url()+ '/check';
+var url=Url()+ '/supervisor/check';
 var json = toJson($form);
 $.ajax({
 	   url: url,
@@ -135,11 +136,11 @@ $.ajax({
        },	   
 	   success: function(data) {
 		   	if (data.is_p===2){
-		   	alert("Inventory has less product than requested");
+		   	toastr.error("Inventory has less product than requested");
 		   	return;
 	   }
        else if (data.is_p===0){
-		   	alert("Product with given barcode does not exist");
+		   	toastr.error("Product with given barcode does not exist");
 		   	return;
 	   	}
 	   	else{
@@ -150,6 +151,12 @@ $.ajax({
 			sessionStorage.setItem("itemlist",JSON.stringify(items));
 			$("#edit-modal").modal("toggle");
 			showtable();
+				 $('#add-div').css("display", "block");
+ $('#beditdiv').css("display", "none");
+   $('#addfooter').css("display", "block");
+  $('#editfooter').css("display", "none");
+   		$('#add-inventory-modal').find('.modal-title').text("Add Order")
+
 	   	}
 	   },
 	   error: handleAjaxError
@@ -162,7 +169,7 @@ var json = toJsonobject($form);
 json['old_q']=quantity_v;
 json1=JSON.stringify(json);
 var id=$("#edit-view-form input[name=id]").val();
-var url=Url()+ '/'+id;
+var url=Url()+ '/supervisor/'+id;
 $.ajax({
 	   url: url,
 	   type: 'PUT',
@@ -172,11 +179,11 @@ $.ajax({
        },	   
 	   success: function(data) {
 		if (data.is_p===2){
-		   	alert("Insufficient inventory for the requested product");
+		   	toastr.error("Insufficient inventory for the requested product");
 		   	return;
 	   }
        else if (data.is_p===0){
-		   	alert("Product with given barcode does not exist");
+		   	toastr.error("Product with given barcode does not exist");
 		   	return;
 	   }
 	   else{
@@ -196,7 +203,7 @@ showtable();
 }
 
 function deleteitemid(id){
-var url = Url() + "/" + id;
+var url = Url() + "/supervisor/" + id;
 	$.ajax({
 	   url: url,
 	   type: 'DELETE',
@@ -209,7 +216,7 @@ var url = Url() + "/" + id;
 
 function addorder(){
 	var items=(sessionStorage.getItem("itemlist"));
-	var url=orderurl();
+	var url=orderurl()+"/supervisor";
 	$.ajax({
 		url: url,
 		type: 'POST',
@@ -219,7 +226,7 @@ function addorder(){
 		},
 		success: function(data){
 			if (data.is_p===2){
-				alert("Insufficient inventory for the requested product");
+				toastr.error("Insufficient inventory for the requested product");
 				return;}
 			else{
 			getorder();
@@ -252,7 +259,7 @@ function getorder(){
 function addedititem(){
 	var $form = $("#add-order-form");
     var items = toJson($form);
-	var url=orderurl()+"/"+o_Id;
+	var url=orderurl()+"/supervisor/"+o_Id;
 	$.ajax({
 		url: url,
 		type: 'POST',
@@ -262,10 +269,10 @@ function addedititem(){
 		},
 		success: function(data){
 			if (data.is_p===0){
-
+                 toastr.error("Product with given barcode does not exist")
 			}
 			if (data.is_p===2){
-				alert("Insufficient inventory for the requested product");
+				toastr.error("Insufficient inventory for the requested product");
 				return;}
 			else{
 			getedititem(o_Id);
@@ -282,6 +289,8 @@ var data=(item[i]);
   $("#edit-form input[name=quantity]").val(data.quantity);
  $("#edit-form input[name=price]").val(data.price);
  $("#edit-form input[name=id]").val(i);
+ 		$('#add-inventory-modal').find('.modal-title').text("Edit Order")
+
  $('#add-div').css("display", "none");
  $('#beditdiv').css("display", "block");
    $('#addfooter').css("display", "none");
@@ -307,8 +316,8 @@ function showtable(){
 	var j=0;
 	for(var i in data){
 		var e = (data[i]);
-		var buttonHtml = ' <button button="button" class="btn-sm btn-primary" onclick="displayEdititem(' + i + ')"><i class="fa-solid fa-pen-to-square"></i></button>'
-		buttonHtml+=' <button button="button" class="btn-sm btn-primary" onclick="deleteitem(' + i + ')"><i class="fa fa-trash" aria-hidden="true"></button>'
+		var buttonHtml = ' <button button="button" class="btn-sm btn-outline-info" onclick="displayEdititem(' + i + ')"><i class="fa-solid fa-pen-to-square"></i></button>'
+		buttonHtml+=' <button button="button" class="btn-sm btn-outline-info" onclick="deleteitem(' + i + ')"><i class="fa fa-trash" aria-hidden="true"></button>'
 		var row = '<tr>'
 		+ '<td>' + e.name + '</td>'
 		+ '<td>' + e.barcode + '</td>'
@@ -325,20 +334,19 @@ function displayOrder(data){
 	var $tbody = $('#order-table').find('tbody');
 	$tbody.empty();
 	$('#from_date').val(data[0].time.slice(0,11))
-	console.log(data[0].time.slice(0,11))
 	for(var i in data){
 		var e = (data[i]);
 		e.time=e.time.replace('T',"   ");
 		if (e.invoiceGenerated===true){
-            var buttonHtml3=' <button type="button" id="orderedit'+e.id+'" onclick="gm(' + e.id + ')" class="btn btn-primary" disabled='+ e.invoiceGenerated +'><i class="fa-solid fa-pen-to-square"></i></button>'
-            var buttonHtml2=' <button type="button" class="btn btn-primary" onclick="downloadPDF(' + e.id + ')">Download Invoice</button>'
+            var buttonHtml3=' <button type="button" id="orderedit'+e.id+'" onclick="gm(' + e.id + ')" class="btn btn-primary btn-sm" disabled='+ e.invoiceGenerated +'><i class="fa-solid fa-pen-to-square"></i></button>'
+            var buttonHtml2=' <button type="button" class="btn btn-outline-info btn-sm" onclick="downloadPDF(' + e.id + ')">Download Invoice</button>'
 
 		}
 		else{
-			var buttonHtml3=' <button type="button" id="orderedit'+e.id+'" onclick="gm(' + e.id + ')" class="btn btn-primary"><i class="fa-solid fa-pen-to-square"></i></button>'
-			var buttonHtml2=' <button type="button" class="btn btn-primary" onclick="downloadPDF(' + e.id + ')">Invoice Generation</button>'
+			var buttonHtml3=' <button type="button" id="orderedit'+e.id+'" onclick="gm(' + e.id + ')" class="btn btn-primary btn-sm"><i class="fa-solid fa-pen-to-square"></i></button>'
+			var buttonHtml2=' <button type="button" class="btn btn-outline-info btn-sm" onclick="downloadPDF(' + e.id + ')">Invoice Generation</button>'
 		}
-		var buttonHtml1 = ' <button type="button" class="btn btn-primary" onclick="getitem(' + e.id +')">view</button>'
+		var buttonHtml1 = ' <button type="button" class="btn btn-outline-info btn-sm" onclick="getitem(' + e.id +')">view</button>'
 		var row = '<tr>'
 		+ '<td>' + e.id + '</td>'
 		+ '<td>' + e.time + '</td>'
@@ -347,18 +355,28 @@ function displayOrder(data){
 		+ '<td>' + buttonHtml2 +'</td>';
         $tbody.append(row);
 	}
-	 	$tableSel=$('#order-table').DataTable({"columnDefs": [
-        { "targets": [0,2,3], "searchable": false }
+	   
+	    if (getRole()==="operator"){
+	    	 $('#order-table').DataTable({"columnDefs": [
+        { "targets": [1,2,3], "searchable": false },
+                { 'visible': false, 'targets': [3] }
     ],
-        pageLength : 8,
+        pageLength : 7,
         autoWidth: true,
 
-    lengthMenu: [[8, 10, 20, -1], [8, 10, 20, 'All']]});
-	 $("#order-table_wrapper").css("padding-left","0");
-	 $("#order-table_wrapper").css("margin-left","0");
+    lengthMenu: [[7, 10, 20, -1], [7, 10, 20, 'All']]});
+	    }
+	    else{
+ $('#order-table').DataTable({"columnDefs": [
+        { "targets": [1,2,3], "searchable": false }    ],
+        pageLength : 7,
+        autoWidth: true,
 
+    lengthMenu: [[7, 10, 20, -1], [7, 10, 20, 'All']]});
+	    }
 }
 
+	 	
 function displayOrderitem(data){
     var $tbody = $('#order-item-table').find('tbody');
 	$tbody.empty();
@@ -374,7 +392,6 @@ function displayOrderitem(data){
 }
 
 function displayeditOrderitem(data){
-	console.log(data);
     var $tbody = $('#edit-item-table').find('tbody');
 	$tbody.empty();
 	var j=0;
@@ -460,7 +477,6 @@ var filterByDate = function(column, startDate, endDate) {
 var normalizeDate = function(dateString) {
   var date = new Date(dateString);
   var normalized = date.getFullYear() + '-' + (("0" + (date.getMonth() + 1)).slice(-2)) + '-' + ("0" + date.getDate()).slice(-2);
-  console.log(normalized);
   return normalized;
 }
 
@@ -474,7 +490,6 @@ function init(){
 	clearstorage();
 	$("#add-ord").click(function(){
 		$('#add-div').css("display", "block");
-		console.log("h");
         $('#beditdiv').css("display", "none");
         $('#addfooter').css("display", "block");
         $('#editfooter').css("display", "none");
@@ -482,10 +497,27 @@ function init(){
 		$('#add-inventory-modal').modal({backdrop: 'static', keyboard: false});
 		showtable();
 	});
+
+	 $("#order-table_wrapper").css("padding-left","0");
+	 $("#order-table_wrapper").css("margin-left","0");
+
 	$("#add-items").click(additems);
 	$("#edit-button").click(function(){
          updateitem();
 	});
+	$("#cancel").click(function(){
+		    console.log("d");
+			$('#add-div').css("display", "block");
+		    $('#beditdiv').css("display", "none");
+		    $('#addfooter').css("display", "block");
+		    $('#editfooter').css("display", "none");
+		    $('#add-inventory-modal').find('.modal-title').text("Add Order")
+	});
+	$("#editcancel").click(function(){
+		$('#whole').css("display", "block");
+        $('#editdiv').css("display", "none"); 
+        $('#aftereditfooter').css("display", "none"); 
+	})
     $("#add-edit-items").click(addedititem)
 	$("#edit-btn").click(edititem);
 	$('#add-items').attr("disabled",true);
@@ -494,7 +526,9 @@ function init(){
     $("#clear").click(clearstorage);
     $("#closesign").click(clearstorage);
      $("#refresh-data").click(getorder);
-
+    if (getRole()==="operator"){
+    	$("#add-ord").css("display","none");
+    }
 }
 $(document).ready(init);
 $(document).ready(getorder);

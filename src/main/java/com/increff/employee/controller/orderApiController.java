@@ -35,7 +35,7 @@ public class orderApiController {
 	private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 	
 	@ApiOperation(value = "Creating a order")
-	@RequestMapping(path = "/api/order", method = RequestMethod.POST)
+	@RequestMapping(path = "/api/order/supervisor", method = RequestMethod.POST)
 	public booForm add(@RequestBody List<orderitemForm> form) throws ApiException {
 		List <orderitemPojo> item=new ArrayList<orderitemPojo>();
 		for(orderitemForm f:form) {
@@ -45,7 +45,7 @@ public class orderApiController {
 	}
 	
 	@ApiOperation(value = "Creating a order")
-	@RequestMapping(path = "/api/order/{id}", method = RequestMethod.POST)
+	@RequestMapping(path = "/api/order/supervisor/{id}", method = RequestMethod.POST)
 	public booForm AddToExistingOrder(@PathVariable int id,@RequestBody orderitemForm form) throws ApiException {
 			int q=service.AddSingleItem(convert(form),id);
 		    return convert(q);

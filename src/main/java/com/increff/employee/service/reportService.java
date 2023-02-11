@@ -1,8 +1,12 @@
 package com.increff.employee.service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.Period;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.increff.employee.dao.brandDao;
 import com.increff.employee.dao.reportDao;
 import com.increff.employee.model.daySalesReportForm;
 import com.increff.employee.model.daysalesData;
@@ -27,6 +32,9 @@ public class reportService {
 
 	@Autowired
 	private reportDao dao;
+
+	@Autowired
+	private brandDao bdao;
 	
 	@Autowired
 	private InventoryService s;
@@ -37,25 +45,24 @@ public class reportService {
 	public void add() throws ApiException {
 		daySalesReportPojo s=new daySalesReportPojo();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime now = LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault());
         now=now.minus(Period.ofDays(1));
         s.setDate(now); 
         s.setTotal_orders(dao.getCount(now));
-        logger.info(s.getTotal_orders());
         daySalesReportForm r = dao.getitemCount(now);
         s.setTotal_items(r.getCount());
         s.setRevenue(r.getRevenue());
-        logger.info(s.getTotal_items());
-        logger.info(s.getRevenue());
         dao.insert(s);
 	}
 	
 	@Transactional(rollbackOn = ApiException.class)
 	public List<daySalesReportPojo> get(reportForm s) throws ApiException {
+		CheckDateRange(s);
 		return dao.get(s);
 	}
 	
 	public Map<String,orderitemPojo> getorder(reportForm s) throws ApiException{
+		CheckDateRange(s);
 		List<orderitemPojo> o= dao.getOrder(s.getFrom(),s.getTo());
 		Map<String ,orderitemPojo> m=new HashMap<String,orderitemPojo>();
 		for (orderitemPojo oi:o) {
@@ -74,20 +81,22 @@ public class reportService {
 	}
 	
 	public Map<Integer,List<Object>> getsales(reportForm s,Map<String,orderitemPojo> o) throws ApiException {
+		logger.info(o.size());
+		logger.info(s.getBrand()+s.getCategory()+s.getFrom()+s.getTo());
 		List<daysalesData> p=new ArrayList<>();
-		logger.info(s.getBrand()+" "+s.getCategory());
-		if ((s.getBrand()=="" && s.getCategory()=="") || (s.getBrand()=="none" && s.getCategory()=="none")) {
+		if ((s.getBrand()=="" && s.getCategory()=="") || (s.getBrand().equals("none") && s.getCategory().equals("none"))) {
 			p= dao.getsales();
 		}
 		else if (s.getCategory().equals("none")) {
-			logger.info("K");
 			p= dao.getsaleswb(s);
 		}
 		else if (s.getBrand().equals("none")) {
-			logger.info("K");
 			p= dao.getsaleswc(s);
 		}
 		else {
+			if (bdao.selectProduct(s.getBrand(),s.getCategory())==null){
+                      throw new ApiException("Brand "+s.getBrand()+" and Category "+s.getCategory()+" combination does not exist");
+			}
 			p= dao.getsaleswbc(s);
 		}
 		Map<Integer,List<Object>> m=new HashMap<Integer,List<Object>>();
@@ -115,7 +124,6 @@ public class reportService {
 			    m.put(d.getBrand_Category_id(), ds);
 		    }
 		}
-		logger.info("k");
 		return m;
 	}
 	
@@ -145,6 +153,18 @@ public class reportService {
 		return m;
 
 		
+	}
+
+	protected static void CheckDateRange(reportForm s) throws ApiException{
+		if (s.getFrom() == null) {
+            throw new ApiException("Please enter valid from date");
+        }
+        if (s.getTo() == null) {
+            throw new ApiException("Please enter valid to date");
+        }
+       if (ChronoUnit.DAYS.between(s.getFrom(), s.getTo()) <= 0) {
+            throw new ApiException("From date is greater than to date");
+        }
 	}
 }
 	

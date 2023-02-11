@@ -7,10 +7,14 @@ function getbrandUrl(){
 
 
 function getReportsUrl(){
-	var baseUrl = $("meta[name=baseUrl]").attr("content")
-	return baseUrl + "/api/reports";
+  var baseUrl = $("meta[name=baseUrl]").attr("content")
+  return baseUrl + "/api/reports";
 }
 
+function invoiceUrl(){
+var baseUrl = $("meta[name=baseUrl]").attr("content");
+return baseUrl + "/api/sales-report/pdf"
+}
 
 
 function showdropdown(){
@@ -73,10 +77,8 @@ function salesReport(){
     let fromDate = new Date(document.getElementById("fromDate").value.trim());
     let brand = document.getElementById("brandInputReports").value.trim();
     let category = document.getElementById("categoryInputReports").value.trim();
-    console.log(brand);
-    console.log(category);
-    var url = getReportsUrl() + "/salesReport";
     var json=JSON.stringify({"to": toDate.toISOString(),"from": fromDate.toISOString(), "brand":brand, "category":category})
+    var url = getReportsUrl() + "/salesReport";
     $.ajax({
         contentType: 'application/json',
         url: url,
@@ -127,6 +129,35 @@ function displaySalesReport(data) {
     $tbody.append(row);
 }
 
+function downloadPDF() {
+    var url = invoiceUrl();
+    let toDate = new Date(document.getElementById("toDate").value.trim());
+    let fromDate = new Date(document.getElementById("fromDate").value.trim());
+    let brand = document.getElementById("brandInputReports").value.trim();
+    let category = document.getElementById("categoryInputReports").value.trim();
+    var json=JSON.stringify({"to": toDate.toISOString(),"from": fromDate.toISOString(), "brand":brand, "category":category})
+    $.ajax({
+       url: url,
+       type: 'POST',
+        data:json,
+         headers: {
+                'Content-Type': 'application/json'
+               },
+        xhrFields: {
+        responseType: 'blob'
+     },
+       success: function(blob) {
+        var link=document.createElement('a');
+        link.href=window.URL.createObjectURL(blob);
+        link.download="Sales_Report_" + new Date() + ".pdf";
+        link.click();
+       },
+       error: function(response){
+         toastr.options.timeOut = 0;
+    toastr.error("Brand "+brand+" and Category "+category+" combination does not exist");    
+       }
+    });
+}
 
 function init() {
     $('#salesReportBtn').click(function(){salesReport(); });
@@ -149,6 +180,7 @@ function init() {
     $('#fromDate').on("change",function(){document.getElementById("toDate").min=$('#fromDate').val()
 })
     $('#salesbutton').click(salesReport);
+    $("#download").click(downloadPDF);
 }
 
 

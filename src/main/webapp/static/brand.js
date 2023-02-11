@@ -8,11 +8,8 @@ function getbrandUrl(){
 function addbrand(event){
 	//Set the values to update
 	var $form = $("#brand-add-form");
-	console.log($("#brand-form"));
-	console.log("Hello");
-	console.log("DF");
 	var json = toJson($form);
-	var url = getbrandUrl();
+	var url = getbrandUrl()+"/supervisor";
 
 	$.ajax({
 	   url: url,
@@ -23,13 +20,13 @@ function addbrand(event){
        },	   
 	   success: function(response) {
 	   	        $("#add-brand-modal").modal("toggle");
-
-	   		getbrandList();  
+	   		getbrandList();
+	   		toastr.options.timeOut = 2000;
+	   		toastr.success("Brand added successfully");
 	   },
 	   error: handleAjaxError
 	});
-    	 $('#add-brand').attr("disabled",true);
-
+    $('#add-brand').attr("disabled",true);
 	return false;
 }
 
@@ -39,9 +36,7 @@ function updatebrand(event){
 	var id = $("#brand-edit-form input[name=id]").val();	
 	var b = $("#brand-edit-form input[name=brand]").val();	
 	var c = $("#brand-edit-form input[name=category]").val();	
-	console.log("d");
-	console.log(id,b,c);
-	var url = getbrandUrl() + "/" + id;
+	var url = getbrandUrl() + "/supervisor/" + id;
 
 	//Set the values to update
 	var $form = $("#brand-edit-form");
@@ -55,7 +50,9 @@ function updatebrand(event){
        	'Content-Type': 'application/json'
        },	   
 	   success: function(response) {
-	   		getbrandList();   
+	   		getbrandList();  
+	   		toastr.options.timeOut = 2000;
+	   		toastr.success("Brand updated successfully"); 
 	   },
 	   error: handleAjaxError
 	});
@@ -96,6 +93,9 @@ var processCount = 0;
 
 
 function processData(){
+		   		toastr.options.timeOut = 2000;
+	   		toastr.success("File uploaded successfully");
+
 	var file = $('#brandFile')[0].files[0];
 	readFileData(file, readFileDataCallback);
 }
@@ -107,6 +107,7 @@ function readFileDataCallback(results){
 }
 
 function uploadRows(){
+	
 	if (fileData.length>5000){
 		alert("File Rows should be within 5000 rows");
 		return;
@@ -123,7 +124,7 @@ function uploadRows(){
 	processCount++;
 	
 	var json = JSON.stringify(row);
-	var url = getbrandUrl();
+	var url = getbrandUrl()+"/supervisor";
 
 	//Make ajax call
 	$.ajax({
@@ -152,6 +153,8 @@ function downloadErrors(){
 //UI DISPLAY METHODS
 
 function displaybrandList(data){
+	$('#brand-table').dataTable().fnClearTable();
+    $('#brand-table').dataTable().fnDestroy();
 	var $tbody = $('#brand-table').find('tbody');
 	$tbody.empty();
 	for(var i in data){
@@ -165,11 +168,23 @@ function displaybrandList(data){
 		+ '</tr>';
         $tbody.append(row);
 	}
+	if (getRole()==="operator"){
 	$('#brand-table').DataTable({
+  columnDefs: [
+            {"className": "dt-center", "targets": "_all"},
+                { 'visible': false, 'targets': [2] },
+] } );
+}
+else{
+		$('#brand-table').DataTable({
   columnDefs: [
     {
         className: 'dt-center'
-    } ] } );
+    }
+],   "info":false
+ } );
+}
+
 }
 
 function displayEditbrand(id){
@@ -251,7 +266,10 @@ function init(){
     $('#brandFile').on('change', function(){
     $('#process-data').attr("disabled",false);
     	updateFileName();});
-
+        if (getRole()==="operator"){
+    	$("#add").css("display","none");
+    	 $("#upload-data").css("display","none");
+    }
 }
 
 $(document).ready(init);

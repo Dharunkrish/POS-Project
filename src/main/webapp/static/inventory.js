@@ -7,12 +7,11 @@ function getinventoryUrl(){
 //BUTTON ACTIONS
 function addinventory(event){
 	//Set the values to update
-	console.log("K");
 	var $form = $("#inventory-add-form");
     $('#add-inventory-modal').modal('toggle');
 	var json = toJson($form);
     document.getElementById("inventory-add-form").reset();    
-	var url = getinventoryUrl();
+	var url = getinventoryUrl()+"/supervisor";
 	$.ajax({
 	   url: url,
 	   type: 'POST',
@@ -31,16 +30,13 @@ function addinventory(event){
 function updateinventory(event){
 	$('#edit-inventory-modal').modal('toggle');
 	//Get the ID
-	var id = $("#inventory-edit-form input[name=id]").val();	
+	var id = $("#inventory-edit-form input[name=productid]").val();	
 	var b = $("#inventory-edit-form input[name=quantity]").val();	
-	console.log("d");
-	console.log(id,b);
-	var url = getinventoryUrl() + "/" + id;
+	var url = getinventoryUrl() + "/supervisor/" + id;
 
 	//Set the values to update
 	var $form = $("#inventory-edit-form");
 	var json = toJson($form);
-    console.log(json);
 	$.ajax({
 	   url: url,
 	   type: 'PUT',
@@ -58,17 +54,11 @@ function updateinventory(event){
 }
 
 function showdropdown(){
-	   //var d1=$("#id");
-	   //$("#idvalue").find('option').remove();
-	   //document.getElementById("idvalue").innerHTML = "";
-	   console.log("show");
 	   var url=getinventoryUrl()+"/id"
-	   console.log(url);
 	   $.ajax({
 	   url: url,
 	   type: 'GET',
 	   success: function(data) {
-	   	console.log(data);
 	   	displaydropdown(data);
 	   },
 	   error: handleAjaxError
@@ -76,17 +66,11 @@ function showdropdown(){
 }
 
 function showdropdown_edit(){
-	   //var d1=$("#id");
-	   //$("#idvalue").find('option').remove();
-	   //document.getElementById("idvalue").innerHTML = "";
-	   console.log("show");
 	   var url=getinventoryUrl()+"/id"
-	   console.log(url);
 	   $.ajax({
 	   url: url,
 	   type: 'GET',
 	   success: function(data) {
-	   	console.log(data);
 	   	displaydropdown(data);
 	   },
 	   error: handleAjaxError
@@ -107,7 +91,7 @@ function getinventoryList(){
 }
 
 function deleteinventory(id){
-	var url = getinventoryUrl() + "/" + id;
+	var url = getinventoryUrl() + "/supervisor/" + id;
 
 	$.ajax({
 	   url: url,
@@ -134,9 +118,7 @@ function processData(){
 function readFileDataCallback(results){
 	fileData = results.data;
 	uploadRows();
-	console.log("H");
-		getinventoryList();
-
+	getinventoryList();
 }
 
 function uploadRows(){
@@ -144,7 +126,6 @@ function uploadRows(){
 		alert("File Rows should be within 5000 rows");
 		return;
 	}
-	console.log(fileData.length);
 	//Update progress
 	updateUploadDialog();
 	//If everything processed then return
@@ -186,12 +167,13 @@ function downloadErrors(){
 //UI DISPLAY METHODS
 
 function displayinventoryList(data){
+	$('#inventory-table').dataTable().fnClearTable();
+    $('#inventory-table').dataTable().fnDestroy();
 	var $tbody = $('#inventory-table').find('tbody');
 
 	$tbody.empty();
 	for(var i in data){
 		var e = data[i];
-		console.log(e);
 		var buttonHtml = ' <button type="button" class="btn-sm btn-outline-info" onclick="displayEditinventory(' + e.id + ')"><i class="fa-solid fa-pen-to-square"></button>'
 		var row = '<tr>'
 		+ '<td>' + e.name + '</td>'
@@ -201,7 +183,17 @@ function displayinventoryList(data){
 		+ '</tr>';
         $tbody.append(row);
 	}
+	if (getRole()==="operator"){
+	$('#inventory-table').DataTable({
+  columnDefs: [
+    {
+        className: 'dt-center'
+    },                 { 'visible': false, 'targets': [3] }
+] } );
+}
+else{
 	$('#inventory-table').DataTable();
+}
 }
 
 function displaydropdown(data){
@@ -213,7 +205,6 @@ function displaydropdown(data){
 
 	for(var i in data){
 		var e = data[i];
-		console.log(e);
 		var row = e.barcode;
 		var p=$("<option />");
         p.html(row);
@@ -227,7 +218,6 @@ $("#idvalue").selectpicker('refresh');
 
 function displayEditinventory(id){
 	var url = getinventoryUrl() + "/" + id;
-	console.log(url,id);
 	$.ajax({
 	   url: url,
 	   type: 'GET',
@@ -261,7 +251,6 @@ function updateUploadDialog(){
 function updateFileName(){
 	var $file = $('#inventoryFile');
 	var fileName = $file.val();
-	console.log(fileName);
     var f=fileName.split("\\");
 	$('#inventoryFileName').html(f[f.length-1]);
 }
@@ -272,8 +261,9 @@ function displayUploadData(){
 }
 
 function displayinventory(data){
-	$("#idedit").attr("disabled","true");
-	$("#idedit").val(data.id);
+	$("#barcodeedit").attr("disabled","true");
+	$("#barcodeedit").val(data.barcode);
+	$("#inventory-edit-form input[name=productid]").val(data.id);
     $("#inventory-edit-form input[name=quantity]").val(data.quantity);	
 	$('#edit-inventory-modal').modal('toggle');
 }
@@ -289,20 +279,21 @@ function init(){
 	$('#add-inv').click(function(){
 		$('#add-inventory-modal').modal({backdrop: 'static', keyboard: false});
         showdropdown();
-
     });
 	$('#update-inventory').click(updateinventory);
 	$('#add-inventory').click(addinventory);
 	$('#refresh-data').click(getinventoryList);
-	$('#upload-inventory-modal').on("hide.bs.modal",function(){getinventoryList();
-		console.log("FSF");});
+	$('#upload-inventory-modal').on("hide.bs.modal",function(){getinventoryList()});
 	$('#upload-data').click(displayUploadData);
 	$('#process-data').click(processData);
 	$('#download-errors').click(downloadErrors);
 	$('#add-inventory').attr("disabled",true);
 	$('#inventory-add-form').on('input change',button);
     $('#inventoryFile').on('change', updateFileName)  
-
+    if (getRole()==="operator"){
+    	$("#add-inv").css("display","none");
+    	$("#upload-data").css("display","none");
+    }
 }
 
 $(document).ready(init);

@@ -29,17 +29,17 @@ public class orderitemApiController {
 	private orderitemService service;
 
 	@ApiOperation(value = "Checks a orderItem")
-	@RequestMapping(path = "/api/orderitem/check", method = RequestMethod.POST)
+	@RequestMapping(path = "/api/orderitem/supervisor/check", method = RequestMethod.POST)
 	public booForm Add(@RequestBody orderitemForm form) throws ApiException {
         orderitemPojo o=convert(form);
         productPojo p=service.checkitems(o,0);
         if (p.getProduct_id()==-1) {
-        	return convert(0);
+        	return convert(0,"");
         }
         else if (p.getProduct_id()==-2) {
-        	return convert(2);
+        	return convert(2,"");
         }
-        return convert(1);
+        return convert(1,p.getName());
 	}
 
 	
@@ -53,14 +53,14 @@ public class orderitemApiController {
 	}
 	
 	@ApiOperation(value = "Updates an orderitem")
-	@RequestMapping(path = "/api/orderitem/{id}", method = RequestMethod.PUT)
+	@RequestMapping(path = "/api/orderitem/supervisor/{id}", method = RequestMethod.PUT)
 	public booForm Update(@PathVariable int id, @RequestBody orderitemForm f) throws ApiException {
         orderitemPojo o=convert(f);    
-		return convert(service.update(id, o,f.getOld_q()));
+		return convert(service.update(id, o,f.getOld_q()),"");
 	}
 	
 	@ApiOperation(value = "Gets an orderitem by ID")
-	@RequestMapping(path = "/api/orderitem/{id}", method = RequestMethod.DELETE)
+	@RequestMapping(path = "/api/orderitem/supervisor/{id}", method = RequestMethod.DELETE)
 	public void delete(@PathVariable int id) throws ApiException {
 		service.delete(id);
 	}
@@ -76,9 +76,10 @@ public class orderitemApiController {
 		return o;
 	}
 	
-	private static booForm convert(int is_p) {
+	private static booForm convert(int is_p,String name) {
 		booForm form=new booForm();
 		form.setIs_p(is_p);
+		form.setName(name);
 		return form;
 	}
 }

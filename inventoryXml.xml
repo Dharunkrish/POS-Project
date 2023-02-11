@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<items>
+    <data>
+        <quantity>230</quantity>
+        <category>soap</category>
+        <brand>cinthol</brand>
+    </data>
+    <data>
+        <quantity>1</quantity>
+        <category>maggi</category>
+        <brand>nestle</brand>
+    </data>
+    <data>
+        <quantity>11</quantity>
+        <category>coffee</category>
+        <brand>bru</brand>
+    </data>
+    <data>
+        <quantity>0</quantity>
+        <category>coffee</category>
+        <brand>nek</brand>
+    </data>
+</items>

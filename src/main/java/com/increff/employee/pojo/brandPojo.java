@@ -1,15 +1,10 @@
 package com.increff.employee.pojo;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
 @Entity
 public class brandPojo {
@@ -17,7 +12,10 @@ public class brandPojo {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
+	@Column(nullable=false)
 	private  String brand;
+	
+	@Column(nullable=false)
 	private String category;
 
 	public int getId() {

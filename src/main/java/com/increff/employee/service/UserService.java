@@ -23,6 +23,9 @@ public class UserService {
 		if (existing != null) {
 			throw new ApiException("User with given email already exists");
 		}
+		if (p.getRole()!="supervisor" && p.getRole()!="operator"){
+			throw new ApiException("Role must be Supervisor or Operator");
+		}
 		dao.insert(p);
 	}
 
@@ -39,6 +42,22 @@ public class UserService {
 	@Transactional
 	public void delete(int id) {
 		dao.delete(id);
+	}
+	
+	@Transactional
+	public void update(UserPojo u,int id) throws ApiException {
+		if (u.getRole()!="supervisor" && u.getRole()!="operator"){
+			throw new ApiException("Role must be Supervisor or Operator");
+		}
+		UserPojo v=get(u.getEmail());
+		System.err.print(id);
+		System.err.print(v.getId());
+		if (v==null || v.getId()==id ) {
+			dao.update(u);
+		}
+		else {
+			throw new ApiException("User with Email already Present");
+		}
 	}
 
 	protected static void normalize(UserPojo p) {

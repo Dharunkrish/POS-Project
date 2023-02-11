@@ -14,7 +14,9 @@ import java.time.format.DateTimeFormatter;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.increff.employee.dao.inventoryDao;
 import com.increff.employee.dao.orderitemDao;
+import com.increff.employee.pojo.brandPojo;
 import com.increff.employee.pojo.inventoryPojo;
 import com.increff.employee.pojo.productPojo;
 import com.increff.employee.pojo.orderPojo;
@@ -26,6 +28,9 @@ import com.increff.employee.pojo.orderitemPojo;
 public class OrderItemServiceTest extends AbstractUnitTest {
 
 	@Autowired
+	private brandService brandservice;
+
+	@Autowired
 	private orderitemService service;
 
 	@Autowired
@@ -34,29 +39,52 @@ public class OrderItemServiceTest extends AbstractUnitTest {
 	@Autowired
 	private productService prodservice;
 
+	@Autowired
+	private orderitemDao idao;
 
-
+	@Autowired
+	private inventoryDao indao;
 
 
 	@Rule
 	public ExpectedException exceptionRule = ExpectedException.none();
     
-	public  productPojo prodInitialise1()  throws ApiException {
+	public brandPojo BrandInitialise1()  throws ApiException {
+		brandPojo p = new brandPojo();
+        p.setBrand("nestle");
+        p.setCategory("maggi");
+		brandservice.add(p);
+		return p;
+	}
+
+	public brandPojo BrandInitialise2()  throws ApiException {
+		brandPojo p = new brandPojo();
+        p.setBrand("bru1");
+        p.setCategory("coffee");
+		brandservice.add(p);
+		return p;
+	}
+
+	//Initialise Product 1
+	public productPojo prodInitialise1()  throws ApiException {
+		brandPojo b=BrandInitialise1();
 		productPojo p = new productPojo();
         p.setName("150 g");
 		p.setBarcode("1");
 		p.setMrp(10.0);
-		p.setBrand_Category_id(1);
+		p.setBrand_Category_id(b.getId());
 		prodservice.add(p);
 		return p;
 	}
 
-	public  productPojo prodInitialise2()  throws ApiException {
+	//Initialise Product 2
+	public productPojo prodInitialise2()  throws ApiException {
+		brandPojo b=BrandInitialise2();
 		productPojo p = new productPojo();
         p.setName("1 Liter");
-		p.setBarcode("12");
+		p.setBarcode("2");
 		p.setMrp(20.0);
-		p.setBrand_Category_id(1);
+		p.setBrand_Category_id(b.getId());
 		prodservice.add(p);
 		return p;
 	}
@@ -98,7 +126,7 @@ public class OrderItemServiceTest extends AbstractUnitTest {
 	public void TestOrderCreate(){
 		   DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
            orderPojo o=service.create();
-		   assertEquals(5, o.getId());
+		   assertEquals(19, o.getId());
 		   assertEquals(false, o.isInvoiceGenerated());
 		   assertEquals( ZonedDateTime.now().format(formatter),o.getT().format(formatter));
 	}
@@ -146,6 +174,7 @@ public class OrderItemServiceTest extends AbstractUnitTest {
 
 	@Test
 	public void TestAddOrderItem() throws Exception{
+		//Initialise
 		List<orderitemPojo> item=new ArrayList<orderitemPojo>();
 		inventoryPojo i1=InvInitialise1();
 		inventoryPojo i2=InvInitialise2();
@@ -153,14 +182,17 @@ public class OrderItemServiceTest extends AbstractUnitTest {
 		orderitemPojo oi2=new orderitemPojo();
 		oi1.setBarcode(i1.getBarcode());
 		oi1.setPrice(1);
-		oi1.setQuantity(i1.getQuantity());
+		oi1.setQuantity(i1.getQuantity()-1);
 		item.add(oi1);
 		oi2.setBarcode(i2.getBarcode());
 		oi2.setPrice(2);
-		oi2.setQuantity(i2.getQuantity());
+		oi2.setQuantity(i2.getQuantity()-2);
 		item.add(oi2);
+
+		//order add
 		service.AddItems(item);
-		System.err.print(invservice.getAll().get(0).getQuantity());
+		
+		//checking added order
 		List<orderPojo> order=service.getAll();
 		assertEquals(order.size(), 1);
 		int order_id=order.get(0).getId();
@@ -177,6 +209,46 @@ public class OrderItemServiceTest extends AbstractUnitTest {
 		assertEquals(item2.getName(), i2.getName());
 		assertEquals(item2.getPrice(), oi2.getPrice(),0.01);
 		assertEquals(item2.getQuantity(), oi2.getQuantity());
+        assertEquals(indao.select(indao.selectAll().get(0).getId()).getQuantity(), 1);
+		assertEquals(indao.select(indao.selectAll().get(1).getId()).getQuantity(), 2);
+	}
+
+	@Test
+	public void TestAddOrderItemInvDel() throws Exception{
+		//Initialise
+		List<orderitemPojo> item=new ArrayList<orderitemPojo>();
+		inventoryPojo i1=InvInitialise1();
+		inventoryPojo i2=InvInitialise2();
+		orderitemPojo oi1=new orderitemPojo();
+		orderitemPojo oi2=new orderitemPojo();
+		int inv_id1=(indao.selectAll().get(0).getId());
+		oi1.setBarcode(i1.getBarcode());
+		oi1.setPrice(1);
+		oi1.setQuantity(i1.getQuantity());
+		item.add(oi1);
+		oi2.setBarcode(i2.getBarcode());
+		oi2.setPrice(2);
+		oi2.setQuantity(i2.getQuantity()-2);
+		item.add(oi2);
+
+		//order add
+		service.AddItems(item);
+
+		//checking added order
+        assertEquals(indao.select(inv_id1), null);
+	}
+
+
+	@Test
+	public void TestAddWrongOrderItem() throws Exception{
+		List<orderitemPojo> item=new ArrayList<orderitemPojo>();
+		inventoryPojo i1=InvInitialise1();
+		orderitemPojo oi1=new orderitemPojo();
+		oi1.setBarcode(i1.getBarcode());
+		oi1.setPrice(1);
+		oi1.setQuantity(i1.getQuantity()+2);
+		item.add(oi1);
+		assertEquals(2,service.AddItems(item));
 	}
 
 	@Test
@@ -194,6 +266,17 @@ public class OrderItemServiceTest extends AbstractUnitTest {
 		assertEquals(item.getName(), i.getName());
 		assertEquals(item.getPrice(), oi.getPrice(),0.01);
 		assertEquals(item.getQuantity(), oi.getQuantity());
+	}
+
+	@Test
+	public void TestAddSingleWrongOrderItem() throws Exception{
+		inventoryPojo i=InvInitialise1();
+		orderitemPojo oi=new orderitemPojo();
+		oi.setBarcode(i.getBarcode());
+		oi.setPrice(1);
+		oi.setQuantity(i.getQuantity()+5);
+		orderPojo o=service.create();
+		assertEquals(2,service.AddSingleItem(oi, o.getId()));
 	}
 
 	@Test
@@ -285,14 +368,14 @@ public class OrderItemServiceTest extends AbstractUnitTest {
 		orderitemPojo oi1=new orderitemPojo();
 		oi1.setBarcode(i2.getBarcode());
 		oi1.setPrice(1);
-		oi1.setQuantity(i2.getQuantity());
+		oi1.setQuantity(i2.getQuantity()-2);
 		item.add(oi1);
 		service.AddItems(item);
 		int order_id=service.getAll().get(0).getId();
 		orderitemPojo oi2=service.get(order_id).get(0);
 		int quantity=oi2.getQuantity();
 		oi2.setPrice(10);
-		oi2.setQuantity(i1.getQuantity());
+		oi2.setQuantity(i1.getQuantity()-1);
         service.update(order_id, oi2,quantity);		
 		orderitemPojo item1=service.getid(oi2.getId());
 		assertEquals(item1.getBarcode(), i2.getBarcode());
@@ -300,6 +383,8 @@ public class OrderItemServiceTest extends AbstractUnitTest {
 		assertEquals(item1.getName(), i2.getName());
 		assertEquals(item1.getPrice(), oi2.getPrice(),0.01);
 		assertEquals(item1.getQuantity(), oi1.getQuantity());
+		assertEquals(indao.select(indao.selectAll().get(0).getId()).getQuantity(), 2);
+		assertEquals(indao.select(indao.selectAll().get(1).getId()).getQuantity(), 1);
 	}
 
 	@Test
@@ -326,4 +411,5 @@ public class OrderItemServiceTest extends AbstractUnitTest {
 		List<orderitemPojo> items=service.get(order_id);
 		assertEquals(0, items.size());
 	}
+
 }

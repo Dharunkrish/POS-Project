@@ -1,7 +1,7 @@
 
 function getUserUrl(){
 	var baseUrl = $("meta[name=baseUrl]").attr("content")
-	return baseUrl + "/api/admin/user";
+	return baseUrl + "/api/supervisor/user";
 }
 
 //BUTTON ACTIONS
@@ -60,8 +60,14 @@ function displayUserList(data){
 	$tbody.empty();
 	for(var i in data){
 		var e = data[i];
-		var buttonHtml = '<button type="button" class="btn-sm btn-outline-info" onclick="deleteUser(' + e.id + ')"><i class="fa fa-trash" aria-hidden="true"></i></button>'
-		buttonHtml += ' <button type="button" class="btn-sm btn-outline-info" onclick="displayEditUser(' + e.id + ')"><i class="fa-solid fa-pen-to-square"></i></button>'
+		if (e.role==="supervisor"){
+			var buttonHtml = ' <button type="button" class="btn-sm btn-outline-info" onclick="displayEditUser(' + e.id + ')"><i class="fa-solid fa-pen-to-square"></i></button>';
+		}
+		else{
+		var buttonHtml = ' <button type="button" class="btn-sm btn-outline-info" onclick="displayEditUser(' + e.id + ')" style="margin-right:5px"><i class="fa-solid fa-pen-to-square"></i></button>'
+		buttonHtml += '<button type="button" class="btn-sm btn-outline-info" onclick="deleteUser(' + e.id + ')" ><i class="fa fa-trash" aria-hidden="true"></i></button>'
+
+	}
 		var row = '<tr>'
 		+ '<td>' + e.id + '</td>'
 		+ '<td>' + e.email + '</td>'
@@ -70,6 +76,7 @@ function displayUserList(data){
 		+ '</tr>';
         $tbody.append(row);
 	}
+
 }
 
 

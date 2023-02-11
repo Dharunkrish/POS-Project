@@ -1,5 +1,14 @@
 
 //HELPER METHOD
+
+function getRole(){
+    var role= $("meta[name=Role]").attr("content");
+    if (role==="operator"){
+        $("#admin-nav").hide();
+        return role;
+    }
+}
+
 function toJson($form){
     var serialized = $form.serializeArray();
     var s = '';
@@ -24,22 +33,24 @@ function toJsonobject($form){
 
 
 function handleAjaxError(response){
+  console.log(response)
 	var response = JSON.parse(response.responseText);
-	alert(response.message);
+    toastr.options.timeOut = 0;
+    console.log(response.message);
+    toastr.error(response.message);
 }
 
 function readFileData(file, callback){
-	var config = {
-		header: true,
-		delimiter: "\t",
-		skipEmptyLines: "greedy",
-		complete: function(results) {
-			callback(results);
-	  	}	
-	}
-	Papa.parse(file, config);
+  var config = {
+    header: true,
+    delimiter: "\t",
+    skipEmptyLines: "greedy",
+    complete: function(results) {
+      callback(results);
+      } 
+  }
+  Papa.parse(file, config);
 }
-
 
 function writeFileData(arr){
 	var config = {
@@ -62,3 +73,20 @@ function writeFileData(arr){
     tempLink.setAttribute('download', 'download.tsv');
     tempLink.click(); 
 }
+
+
+toastr.options = {
+  "closeButton": true,
+  "debug": false,
+  "progressBar": true,
+  "positionClass": "toast-top-full-width",
+  "showDuration": "none",
+  "hideDuration": "none",
+  "timeOut": "none",
+  "extendedTimeOut": "none",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut",
+  "font-size":  "15px"
+};

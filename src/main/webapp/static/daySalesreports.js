@@ -8,6 +8,11 @@ function getbrandUrl(){
     return baseUrl + "/api/brand";
 }
 
+function invoiceUrl(){
+var baseUrl = $("meta[name=baseUrl]").attr("content");
+return baseUrl + "/api/report/pdf"
+}
+
 
 
 
@@ -30,14 +35,11 @@ function getInventoryReport(){
 
 
 function showdropdown(){
-       console.log("show");
        var url=getbrandUrl();
-       console.log(url);
        $.ajax({
        url: url,
        type: 'GET',
        success: function(data) {
-        console.log(data);
         displaydropdown(data);
        },
        error: handleAjaxError
@@ -45,14 +47,11 @@ function showdropdown(){
 }
 
 function showcategorydd(){
-       console.log("show");
        var url=getbrandUrl()+'/category/'+brand;
-       console.log(url);
        $.ajax({
        url: url,
        type: 'GET',
        success: function(data) {
-        console.log(data);
         displaycategorydd(data);
        },
        error: handleAjaxError
@@ -67,7 +66,6 @@ function displaydropdown(data){
     $('#idbrand').append(p);
     for(var i in data){
         var e = data[i];
-        console.log(e);
         var row = e.brand;
         var p=$("<option />");
         p.html(row);
@@ -84,7 +82,6 @@ function displaycategorydd(data){
     $('#idcategory').append(p);
     for(var i in data){
         var e = data[i];
-        console.log(e);
         var row = e.category;
         var p=$("<option />");
         p.html(row);
@@ -96,10 +93,9 @@ function displaycategorydd(data){
 function salesReport(){
     let toDate = new Date(document.getElementById("toDate").value.trim());
     let fromDate = new Date(document.getElementById("fromDate").value.trim());
-    console.log(toDate);
-    console.log(fromDate);
-    var url = getReportsUrl() + "/daySalesReport";
     var json=JSON.stringify({"to": toDate.toISOString(),"from": fromDate.toISOString()})
+        var url = getReportsUrl() + "/daySalesReport";
+
     $.ajax({
         contentType: 'application/json',
         url: url,
@@ -149,6 +145,32 @@ function displaySalesReport(data) {
     $tbody.append(row);
 }
 
+function downloadPDF() {
+    var url = invoiceUrl();
+    let toDate = new Date(document.getElementById("toDate").value.trim());
+    let fromDate = new Date(document.getElementById("fromDate").value.trim());
+    var json=JSON.stringify({"to": toDate.toISOString(),"from": fromDate.toISOString()})
+    $.ajax({
+       url: url,
+       type: 'POST',
+        data:json,
+         headers: {
+                'Content-Type': 'application/json'
+               },
+        xhrFields: {
+        responseType: 'blob'
+     },
+       success: function(blob) {
+        var link=document.createElement('a');
+        link.href=window.URL.createObjectURL(blob);
+        link.download="Report_" + new Date() + ".pdf";
+        link.click();
+       },
+       error: function(response){
+            handleAjaxError(response);
+       }
+    });
+}
 
 function init() {
     $('#salesReportBtn').click(function(){salesReport(); });
@@ -165,9 +187,9 @@ function init() {
     mm = String(last.getMonth() + 1).padStart(2, '0'); //January is 0!
     yyyy = last.getFullYear();
     last = yyyy + "-" + mm + "-" + dd;
-    console.log(today);
     $('#toDate').val(today);
     $('#fromDate').val(last);
+    $("#download").click(downloadPDF);
 }
 
 

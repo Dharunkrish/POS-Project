@@ -47,19 +47,16 @@ import com.increff.employee.service.ApiException;
 			Query query=getQuery(update_inv);
 			query.setParameter("quantity",quantity);
 			query.setParameter("barcode", barcode);
-			return query.executeUpdate();
+			query.executeUpdate();
+			return 1;
 		}
-		
-       /* public void del_inv(int id) {
+       public void del_inv(int id) {
         	Query query = em().createQuery(delete_inv);
 			query.setParameter("id", id);
 			query.executeUpdate();
-        }*/
+        }
 		
-		public orderPojo create() {
-			orderPojo o=new orderPojo();
-			o.setT(ZonedDateTime.now(ZoneId.systemDefault()));
-			o.setInvoiceGenerated(false);
+		public orderPojo create(orderPojo o) {
 			em().persist(o);
 			return o;
 		}
@@ -96,9 +93,6 @@ import com.increff.employee.service.ApiException;
 		public List<orderPojo> selectAll() throws ApiException{
             TypedQuery<orderPojo> query = getQuery(select_all, orderPojo.class);
 			List<orderPojo> p= query.getResultList();
-			for (orderPojo h:p) {
-				logger.info(""+h.getId());
-			}
 			return p;
 		}
 		
@@ -107,7 +101,6 @@ import com.increff.employee.service.ApiException;
 			Query query = getQuery(update_order);
 			query.setParameter("i",true);
 			query.setParameter("id",id);
-			logger.info(query.executeUpdate());
 			}
 		
 		public void update(int id,orderitemPojo o) throws ApiException{
@@ -117,17 +110,15 @@ import com.increff.employee.service.ApiException;
 			query.setParameter("price", o.getPrice());
 			query.setParameter("quantity", o.getQuantity());
 			query.setParameter("id",id);
-			logger.info(query.toString());
-			logger.info(query.executeUpdate());
+			query.executeUpdate();
 			
 		}
 			
 		public void delete(int id) throws ApiException{
 			Query query = getQuery(delete_order_item);
 			query.setParameter("id",id);
-			logger.info(query.executeUpdate());
+			query.executeUpdate();
 			}
-			
 
 			
 		}

@@ -22,7 +22,7 @@ import com.increff.employee.controller.InvoiceApiController;
 
 public class pdfconversionUtil {
 
-	private Logger logger = Logger.getLogger(pdfconversionUtil.class);
+	private static Logger logger = Logger.getLogger(pdfconversionUtil.class);
 
     //Generate PDF
     public static byte[] generatethePDF(File xml_file, StreamSource xsl_source) throws Exception {
@@ -35,7 +35,7 @@ public class pdfconversionUtil {
         Transformer transformer = factory.newTransformer(xsl_source);
         // Make sure the XSL transformation's result is piped through to FOP
         Result res = new SAXResult(fop.getDefaultHandler());
-
+        logger.info("hello");
         // Setup input
         Source src = new StreamSource(xml_file);
 

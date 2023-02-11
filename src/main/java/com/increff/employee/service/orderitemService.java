@@ -1,5 +1,7 @@
 package com.increff.employee.service;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.increff.employee.dao.inventoryDao;
 import com.increff.employee.dao.orderitemDao;
 import com.increff.employee.pojo.inventoryPojo;
 import com.increff.employee.pojo.orderPojo;
@@ -22,6 +25,10 @@ public class orderitemService {
 
 	@Autowired
 	private orderitemDao dao;
+	
+	@Autowired
+	private inventoryDao idao;
+	
 	private Logger logger = Logger.getLogger(orderitemDao.class);
 	
 	@Transactional(rollbackOn = ApiException.class)
@@ -33,6 +40,9 @@ public class orderitemService {
         	p.setProduct_id(-1);
         	return p;
         }
+		if (p.getMrp()<=o.getPrice()){
+			throw new ApiException("Selling Price should not be greater than MRP");
+		}
         int q=check(o,p,old_q);
         if (q==-1) {
         	p=new productPojo();
@@ -48,6 +58,9 @@ public class orderitemService {
 		List<productPojo> inv_q=new ArrayList<productPojo>();
 		for (orderitemPojo o:item){
 		productPojo p=checkitems(o,0);
+		    if (p.getProduct_id()==-1) {
+		    	return 0;
+		    }
 			if (p.getProduct_id()==-2){
 				return 2;
 			}
@@ -58,7 +71,14 @@ public class orderitemService {
 			orderitemPojo order=item.get(i);
 			productPojo p=inv_q.get(i);
 			order.setOrder_id(id);
-			dao.upd((int)p.getMrp(),p.getBarcode());
+			if (p.getMrp()==0){
+				dao.del_inv(p.getProduct_id());
+		}
+		else{
+		inventoryPojo q=idao.select(p.getProduct_id());
+		q.setQuantity((int)p.getMrp());
+		idao.update(q);
+		}
 		    order.setName(p.getName());
 			add(order);
 		}
@@ -69,9 +89,19 @@ public class orderitemService {
 	public int AddSingleItem(orderitemPojo o,int id) throws ApiException {
 		productPojo p=checkitems(o,0);
 		if (p.getProduct_id()==-1) {
+			return 0;
+		}
+		if (p.getProduct_id()==-2) {
 			return 2;
 		}	
-		dao.upd((int) p.getMrp(),p.getBarcode());
+        if (p.getMrp()==0){
+				dao.del_inv(p.getProduct_id());
+		}
+		else{
+		inventoryPojo i=idao.select(p.getProduct_id());
+		i.setQuantity((int)p.getMrp());
+		idao.update(i);
+		}
 	    o.setName(p.getName());
 		o.setOrder_id(id);
 		add(o);
@@ -88,21 +118,43 @@ public class orderitemService {
              return i.getQuantity()-(o.getQuantity()-old_q);
 	}
 
+	@Transactional(rollbackOn = ApiException.class)
+	public int editcheck(orderitemPojo o,productPojo p,int old_q) throws ApiException {
+            	 inventoryPojo i=dao.prodquantity(p.getProduct_id());
+				 int value=o.getQuantity()-old_q;
+				 logger.info(i);
+				 if (i==null){
+                           if (value>0){
+							return -1;
+						   }
+						   else{
+							return Math.abs(o.getQuantity()-old_q);
+						   }
+				 }
+                 else if ((o.getQuantity()-old_q)>i.getQuantity()) {
+                	 return -1;
+             }
+
+             return i.getQuantity()-(o.getQuantity()-old_q);
+	}
+
+
+
 	public productPojo checkprod(orderitemPojo o) throws ApiException {
         return dao.check(o.getBarcode());
         }
 	
 	@Transactional(rollbackOn = ApiException.class)
 	public void add(orderitemPojo o) throws ApiException {
-		/*if (quantity==0) {
-			dao.del_inv(p.getProduct_id());
-		}*/
 		dao.insert(o);
 	}
 
 	@Transactional
 	public orderPojo create() {
-		return dao.create();
+		orderPojo o=new orderPojo();
+		o.setT(ZonedDateTime.now(ZoneId.systemDefault()));
+		o.setInvoiceGenerated(false);
+		return dao.create(o);
 	}
 	
 	@Transactional
@@ -131,16 +183,40 @@ public class orderitemService {
 
 	@Transactional(rollbackOn  = ApiException.class)
 	public int update(int id, orderitemPojo o, int quantity) throws ApiException {
+		logger.info("j");
 		productPojo p=checkprod(o);
         if (p==null) {
         	return 0;
         }
-        int q=check(o,p,quantity);
+		if (p.getMrp()<=o.getPrice()){
+			throw new ApiException("Selling Price should not be greater than MRP");
+		}
+        int q=editcheck(o,p,quantity);
         if (q==-1) {
         	return 2;
         }
+		inventoryPojo i=idao.select(p.getProduct_id());
+		logger.info("l"+i);
+		if (i==null){
+			if (q>0){
+				inventoryPojo i1=new inventoryPojo();
+				i1.setBarcode(p.getBarcode());
+				i1.setId(p.getProduct_id());
+				i1.setName(p.getName());
+				i1.setQuantity(q);
+				logger.info("l");
+				idao.insert(i1);
+			}
+		}
+		else if (q==0){
+			dao.del_inv(p.getProduct_id());
+	   }
+	else{
+	  i=idao.select(p.getProduct_id());
+	i.setQuantity(q);
+	idao.update(i);
+	}
         o.setName(p.getName());
-		dao.upd(q,o.getBarcode());
 		dao.update(id,o);
 		return 1;
 	}
@@ -150,8 +226,15 @@ public class orderitemService {
 		orderitemPojo oi=getid(id);
 		productPojo p=dao.check(oi.getBarcode());
 		inventoryPojo i=dao.prodquantity(p.getProduct_id());
+		if (i==null){
+			i=new inventoryPojo();
+			i.setBarcode(oi.getBarcode());
+			i.setId(p.getProduct_id());
+			i.setName(p.getName());
+			i.setQuantity(oi.getQuantity());
+			idao.insert(i);
+		}
 		int quantity=i.getQuantity()+oi.getQuantity();
-		dao.upd(quantity,oi.getBarcode());
 		dao.delete(id);
 	}
 	

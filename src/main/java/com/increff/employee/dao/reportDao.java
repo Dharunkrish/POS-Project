@@ -15,7 +15,6 @@ import com.increff.employee.model.daysalesData;
 import com.increff.employee.model.reportForm;
 import com.increff.employee.pojo.daySalesReportPojo;
 import com.increff.employee.pojo.orderitemPojo;
-import com.increff.employee.pojo.productPojo;
 import com.increff.employee.service.ApiException;
 
 	@Repository
@@ -30,7 +29,8 @@ import com.increff.employee.service.ApiException;
 		private static String select_order = "select  new com.increff.employee.model.daysalesData(b.brand,b.category,p.barcode,p.brand_Category_id) from productPojo p join brandPojo b on p.brand_Category_id=b.id";
 		private static String select_orderwbc = "select  new com.increff.employee.model.daysalesData(b.brand,b.category,p.barcode,p.brand_Category_id) from productPojo p join brandPojo b on p.brand_Category_id=b.id where b.brand=:brand and b.category=:category";
 		private static String select_orderwb = "select  new com.increff.employee.model.daysalesData(b.brand,b.category,p.barcode,p.brand_Category_id) from productPojo p join brandPojo b on p.brand_Category_id=b.id where b.brand=:brand";
-		private static String select_orderwc = "select  new com.increff.employee.model.daysalesData(b.brand,b.category,p.barcode,p.brand_Category_id) from productPojo p join brandPojo b on p.brand_Category=b.brand_category where b.category=:category";
+		private static String select_orderwc = "select  new com.increff.employee.model.daysalesData(b.brand,b.category,p.barcode,p.brand_Category_id) from productPojo p join brandPojo b on p.brand_Category_id=b.id where b.category=:category";
+
 
 		@Transactional 
 		public int getCount(ZonedDateTime d) {
@@ -59,11 +59,8 @@ import com.increff.employee.service.ApiException;
 		public List<daySalesReportPojo> get(reportForm r) throws ApiException {
 			 TypedQuery<daySalesReportPojo> query = getQuery(select_day, daySalesReportPojo.class);
 			    query.setParameter("date1",r.getFrom());
-			    query.setParameter("date2",r.getTo());
+			    query.setParameter("date2",r.getTo().plusDays(1));
 			    List<daySalesReportPojo> s= query.getResultList();
-			    for (daySalesReportPojo d:s) {
-			    	logger.info(d.getDate());
-			    }
 			    return s;
 		}
 		
@@ -72,7 +69,7 @@ import com.increff.employee.service.ApiException;
 		public List<orderitemPojo> getOrder(ZonedDateTime date1,ZonedDateTime date2) throws ApiException {
 			 TypedQuery<orderitemPojo> query = getQuery(sel_ord, orderitemPojo.class);
 			    query.setParameter("date1",date1);
-			    query.setParameter("date2",date2);
+			    query.setParameter("date2",date2.plusDays(1));
 			    return query.getResultList();
 		}
 		

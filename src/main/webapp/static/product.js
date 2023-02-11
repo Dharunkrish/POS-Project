@@ -14,17 +14,13 @@ function getbrandUrl(){
 function addproduct(event){
 	//Set the values to update
 	var $form = $("#product-form");
-	console.log($("#product-form"));
-	console.log("Hello");
 	var jso = toJsonobject($form);
 	if (isNaN(jso.mrp)){
 		alert("MRP must be a number");
 		return;
 	}
 	var json=JSON.stringify(jso);
-	var url = getproductUrl();
-	console.log(json);
-        console.log(url,"K");
+	var url = getproductUrl()+"/supervisor";
 	$.ajax({
 	   url: url,
 	   type: 'POST',
@@ -45,12 +41,11 @@ function updateproduct(event){
 	$('#edit-product-modal').modal('toggle');
 	//Get the ID
 	var product_id=$("#product-edit-form input[name=product_id]").val();
-	var url = getproductUrl() + "/" + product_id;
+	var url = getproductUrl() + "/supervisor/" + product_id;
 
 	//Set the values to update
 	var $form = $("#product-edit-form");
 	var json = toJson($form);
-	console.log(json);
 
 	$.ajax({
 	   url: url,
@@ -81,28 +76,13 @@ function getproductList(){
 	});
 }
 
-function deleteproduct(product_id){
-	var url = getproductUrl() + "/" + product_id;
-    console.log(url);
-	$.ajax({
-	   url: url,
-	   type: 'DELETE',
-	   success: function(data) {
-	   		getproductList();  
-	   },
-	   error: handleAjaxError
-	});
-}
 
 function showdropdown(){
-	   console.log("show");
 	   var url=getbrandUrl()
-	   console.log(url);
 	   $.ajax({
 	   url: url,
 	   type: 'GET',
 	   success: function(data) {
-	   	console.log(data);
 	   	displaydropdown(data);
 	   	
 	   },
@@ -111,9 +91,7 @@ function showdropdown(){
 }
 
 function showdropdown_edit(){
-	   console.log("show");
 	   var url=getbrandUrl()
-	   console.log(url);
 	   $.ajax({
 	   url: url,
 	   type: 'GET',
@@ -184,12 +162,12 @@ function downloadErrors(){
 //UI DISPLAY METHODS
 
 function displayproductList(data){
+	$('#product-table').dataTable().fnClearTable();
+    $('#product-table').dataTable().fnDestroy();
 	var $tbody = $('#product-table').find('tbody');
 	$tbody.empty();
 	for(var i in data){
 		var e = data[i];
-		console.log("hello");
-		console.log(data_arr,e);
 		//var buttonHtml = '<button onclick="deleteproduct(' + e.product_id + ')">delete</button>'
 		var buttonHtml = ' <button type="button" class="btn-sm btn-outline-info" onclick="displayEditproduct(' + e.product_id + ')"><i class="fa-solid fa-pen-to-square"></button>'
 		var row = '<tr>'
@@ -201,7 +179,17 @@ function displayproductList(data){
 		+ '</tr>';
         $tbody.append(row);
 	}
+	if (getRole()==="operator"){
+			$('#product-table').DataTable({
+  columnDefs: [
+    {
+        className: 'dt-center'
+    },                 { 'visible': false, 'targets': [4] }
+] } );
+}
+else{
 	$('#product-table').DataTable();
+}
 }
 
 function displaydropdownedit(data){
@@ -218,7 +206,6 @@ function displaydropdownedit(data){
         data_arr.push(data[i])
       $("#editBrandid").append(p);
 }
-console.log("l",edit);
 $("#editBrandid").val(edit);	
 
 }
@@ -239,12 +226,14 @@ function displaydropdown(data){
         data_arr.push(data[i])
       $("#inputBrandid").append(p);
 }
+$("#inputBrandid").selectpicker('refresh');
+$("#inputBrandid").val($('#inputBrandid option:first').val());
+$("#inputBrandid").selectpicker('refresh');
 getproductList();
 }
 
 function displayEditproduct(product_id){
     showdropdown_edit();
-    console.log(product_id);
 	var url = getproductUrl() + "/" + product_id;
 	$.ajax({
 	   url: url,
@@ -271,10 +260,8 @@ function resetUploadDialog(){
 }
 
 function updateUploadDialog(){
-	console.log("h");
 	if (errorData.length>0){
 		$('#download-errors').attr("disabled",false);
-		console.log("hijo");
 	}
 	$('#rowCount').html("" + fileData.length);
 	$('#processCount').html("" + processCount);
@@ -297,22 +284,18 @@ function displayUploadData(){
 
 function displayproduct(data){
 	var id=""+(data.brand_Category_id);
-	console.log("i",typeof(id))
 	$("#product-edit-form input[name=name]").val(data.name);	
 	$("#product-edit-form input[name=barcode]").val(data.barcode);	
 	$("#product-edit-form input[name=mrp]").val(data.mrp);	
 	$("#product-edit-form input[name=product_id]").val(data.product_id);	
     edit=data.brand_Category_id;
-    console.log(edit);
     $("#editBrandid").val(edit);
 	$('#edit-product-modal').modal('toggle');
 }
 
 function button(){
 	var d=$('#inputBrandid :selected').text();
-	console.log((d=="None" || ($('#product-form input[name=barcode]').val().trim()=="")) || ($('#product-form input[name=name]').val().trim()=="")||($('#product-form input[name=mrp]').val().trim()==""));
    $('#add-product').attr("disabled",(d=="None" || ($('#product-form input[name=barcode]').val().trim()=="")) || ($('#product-form input[name=name]').val().trim()=="")||($('#product-form input[name=mrp]').val().trim()==""));
-   console.log("D");
    }
 
 //INITIALIZATION CODE
@@ -333,6 +316,10 @@ function init(){
       $('#productFile').on('change', function(){
     $('#process-data').attr("disabled",false);
     	updateFileName();});
+       if (getRole()==="operator"){
+    	$("#add-pro").css("display","none");
+    	 $("#upload-data").css("display","none");
+    }
 }
 $(document).ready(showdropdown);
 $(document).ready(init);

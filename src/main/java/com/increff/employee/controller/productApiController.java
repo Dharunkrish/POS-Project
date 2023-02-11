@@ -32,7 +32,7 @@ public class productApiController {
 	private Logger logger = Logger.getLogger(productApiController.class);
 
 	@ApiOperation(value = "Adds an product")
-	@RequestMapping(path = "/api/product", method = RequestMethod.POST)
+	@RequestMapping(path = "/api/product/supervisor", method = RequestMethod.POST)
 	public void add(@RequestBody productForm form) throws ApiException {
 		productPojo p = convert(form);
 		service.add(p);
@@ -59,7 +59,7 @@ public class productApiController {
 	}
 
 	@ApiOperation(value = "Updates an brand")
-	@RequestMapping(path = "/api/product/{id}", method = RequestMethod.PUT)
+	@RequestMapping(path = "/api/product/supervisor/{id}", method = RequestMethod.PUT)
 	public void update(@PathVariable int id, @RequestBody productForm f) throws ApiException {
 		productPojo p = convert(f);
 		service.update(id, p);

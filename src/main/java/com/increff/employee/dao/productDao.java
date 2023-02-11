@@ -22,7 +22,6 @@ import com.increff.employee.service.ApiException;
 		private static String select_id = "select pc from productPojo pc where pc.product_id=:id";
 		private static String update_prod = "update productPojo pc set pc.name=:name, pc.barcode=:barcode,pc.brand_Category_id=:brand,pc.mrp=:mrp where pc.product_id=:id";
 		private static String select_all = "select pc from productPojo pc";
-		//private static String select_ba = "select new com.increff.employee.model.productDTO(pc.name, pc.barcode,pc.mrp,p.id, pc.product_id) from productPojo pc join pc.brand p where pc.barcode=:barcode";
 		private static String select_brand = "select b from brandPojo b where b.brand=:brand and b.category=:category";
 		private static String select_bar = "select pc from productPojo pc where pc.barcode=:barcode and product_id!=:id";
 
@@ -32,11 +31,6 @@ import com.increff.employee.service.ApiException;
 				em().persist(p);	
 		}
 
-		public int delete(int product_id) {
-			Query query = em().createQuery(delete_id);
-			query.setParameter("product_id", product_id);
-			return query.executeUpdate();
-		}
 
 		public productPojo select(int id) {
 			TypedQuery<productPojo> query = getQuery(select_id, productPojo.class);
@@ -59,22 +53,15 @@ import com.increff.employee.service.ApiException;
 			return p;
 		}
 		
-		public brandPojo findbrand(String brand,String category) {
+		/*public brandPojo findbrand(String brand,String category) {
 			TypedQuery<brandPojo> query = getQuery(select_brand, brandPojo.class);
 			query.setParameter("brand",brand );
 			query.setParameter("category",category );
 			return getSingle(query);
-		}
+		}*/
 
 
-		public void update(int id,productPojo p) throws ApiException{
-			Query query = getQuery(update_prod);
-			query.setParameter("name", p.getName());
-			query.setParameter("barcode", p.getBarcode());
-			query.setParameter("brand", p.getBrand_Category_id());
-			query.setParameter("mrp", p.getMrp());
-			query.setParameter("id",id);
-			logger.info(query.executeUpdate());	
+		public void update(productPojo p) throws ApiException{
 		}
 
 	}

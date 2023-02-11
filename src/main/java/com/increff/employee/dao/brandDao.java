@@ -20,39 +20,35 @@ import com.increff.employee.service.ApiException;
 
 		private static String select_id = "select p from brandPojo p where p.id=:id";
 		private static String select_brand = "select p from brandPojo p where p.brand=:brand";
+		private static String select_category = "select p from brandPojo p where p.category=:category";
 		private static String select_all = "select p from brandPojo p";
 		private static String select_prod = "SELECT c FROM brandPojo c WHERE c.brand = :brand and c.category= :category";
 		private static String update_id = "update brandPojo c set c.brand = :brand, c.category= :category WHERE c.id= :id";
-
-
-
-		
-
 		
 		@Transactional
 		public void insert(brandPojo p) throws ApiException {
 			em().persist(p);
 		}
 
-		public void delete(int id) {
-			brandPojo brand=select(id);
-			logger.info(brand.getBrand());
-			em().remove(brand);
-		}
 
 		public brandPojo select(int id) {
-			logger.info("df"+id);
 			TypedQuery<brandPojo> query = getQuery(select_id, brandPojo.class);
 			query.setParameter("id", id);
-			logger.info(id);
 			return getSingle(query);
 		}
-
-		public List<brandPojo> getbrand(String brand) {
+		
+		public List<brandPojo> getbrand(brandPojo b) {
 			TypedQuery<brandPojo> query = getQuery(select_brand, brandPojo.class);
-			query.setParameter("brand", brand);
+			query.setParameter("brand", b.getBrand());
 			return query.getResultList();
 		}
+
+		public List<brandPojo> getcategory(brandPojo b) {
+			TypedQuery<brandPojo> query = getQuery(select_category, brandPojo.class);
+			query.setParameter("category", b.getCategory());
+			return query.getResultList();
+		}
+		
 
 		public List<brandPojo> selectAll() {
 			TypedQuery<brandPojo> query = getQuery(select_all, brandPojo.class);
@@ -63,7 +59,6 @@ import com.increff.employee.service.ApiException;
 			TypedQuery<brandPojo> query = getQuery(select_prod, brandPojo.class);
 			query.setParameter("brand", brand);
 			query.setParameter("category", category);
-			//List<brandPojo>a= query.getResultList();
 			return getSingle(query);
 		}
 

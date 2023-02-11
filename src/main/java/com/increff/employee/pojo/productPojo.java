@@ -15,9 +15,10 @@ public class productPojo {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int product_id;
 	
-	@Column(unique=true)
+	@Column(unique=true,nullable=false)
 	private  String barcode;
-	
+	 
+	@Column(nullable=false)
 	private int brand_Category_id;
 	
 	public int getBrand_Category_id() {

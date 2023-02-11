@@ -29,7 +29,7 @@ public class inventoryApiController {
 	private InventoryService service;
 
 	@ApiOperation(value = "Adds an product")
-	@RequestMapping(path = "/api/inventory", method = RequestMethod.POST)
+	@RequestMapping(path = "/api/inventory/supervisor", method = RequestMethod.POST)
 	public void add(@RequestBody inventoryForm form) throws ApiException {
 		inventoryPojo p = convert(form);
 		service.add(p);
@@ -58,24 +58,23 @@ public class inventoryApiController {
 		List<inventoryPojo> list = service.getAll();
 		List<inventoryForm> list2 = new ArrayList<inventoryForm>();
 		for (inventoryPojo p : list) {
-			logger.info(p.getId());
 			list2.add(convert(p));
 		}
 		return list2;
 	}
 
 	@ApiOperation(value = "Updates an inventory")
-	@RequestMapping(path = "/api/inventory/{id}", method = RequestMethod.PUT)
+	@RequestMapping(path = "/api/inventory/supervisor/{id}", method = RequestMethod.PUT)
 	public void update(@PathVariable int id, @RequestBody inventoryForm f) throws ApiException {
 		inventoryPojo p = convert(f);
 		logger.info(p.getQuantity());
 		logger.info(id);
 		service.update(id, p);
 	}
+
 	
 
 	private static inventoryForm convert(inventoryPojo p) {
-		
 		inventoryForm d = new inventoryForm();
 		d.setQuantity(p.getQuantity());
 		d.setId(p.getId());

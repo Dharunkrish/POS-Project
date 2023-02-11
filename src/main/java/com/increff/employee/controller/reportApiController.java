@@ -37,8 +37,6 @@ public class reportApiController {
 	@ApiOperation(value = "Gets the Sales report")
 	@RequestMapping(path = "/api/reports/daySalesReport", method = RequestMethod.POST)
 	public List<reportData> get(@RequestBody reportForm r) throws Exception {
-		logger.info(r.getFrom());
-		logger.info(r.getTo());
 		List<reportData> p=new ArrayList<>();
 		List<daySalesReportPojo> d= service.get(r);
 		for (daySalesReportPojo s:d) {
@@ -50,6 +48,7 @@ public class reportApiController {
 	@ApiOperation(value = "Gets the Sales report")
 	@RequestMapping(path = "/api/reports/salesReport", method = RequestMethod.POST)
 	public List<daySalesReportForm> getsales(@RequestBody reportForm r) throws Exception {
+		logger.info(r.getFrom());
 		 Map<String,orderitemPojo> o=service.getorder(r);
 		 Map<Integer,List<Object>> m=service.getsales(r,o);
 		 List<daySalesReportForm> report=new ArrayList<>();

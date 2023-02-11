@@ -30,12 +30,23 @@ public class BrandApiController {
 	private Logger logger = Logger.getLogger(BrandApiController.class);
 
 	@ApiOperation(value = "Adds an product")
-	@RequestMapping(path = "/api/brand", method = RequestMethod.POST)
+	@RequestMapping(path = "/api/brand/supervisor", method = RequestMethod.POST)
 	public void add(@RequestBody brandForm form) throws ApiException {
 		brandPojo p = convert(form);
 		service.add(p);
 	}
-
+	
+	@ApiOperation(value = "Adds an product")
+	@RequestMapping(path = "/api/brand", method = RequestMethod.POST)
+	public List<brandData> get(@RequestBody brandForm form) throws ApiException {
+		brandPojo p = convert(form);
+		List<brandPojo> list =service.getbrand(p);
+		List<brandData> list2 = new ArrayList<brandData>();
+		for (brandPojo b : list) {
+			list2.add(convert(b));
+		}
+		return list2;
+	}
 
 
 	@ApiOperation(value = "Gets an brand by ID")
@@ -59,7 +70,7 @@ public class BrandApiController {
 	}
 
 	@ApiOperation(value = "Updates an brand")
-	@RequestMapping(path = "/api/brand/{id}", method = RequestMethod.PUT)
+	@RequestMapping(path = "/api/brand/supervisor/{id}", method = RequestMethod.PUT)
 	public void update(@PathVariable int id, @RequestBody brandForm f) throws ApiException {
 		brandPojo p = convert(f);
 		service.update(id, p);

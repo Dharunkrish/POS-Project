@@ -65,7 +65,7 @@
 	      <th scope="col">Order ID</th>
 	      <th scope="col">Created</th>
 	      <th scope="col">View</th>
-	      <th scope="col">Edit</th>
+	      <th scope="col" id="action">Edit</th>
 	      <th scope="col">Invoice</th>
 	    </tr>
 	  </thead>
@@ -154,11 +154,11 @@ Product with given barcode does not exist
       <div class="modal-footer">
       	<div id="addfooter">
       	<button type="button" class="btn btn-primary" id="submit">Submit</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancel">Cancel</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
       </div>
        <div id="editfooter">
       	<button type="button" class="btn btn-primary" id="edit-btn">Edit</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-secondary" id="cancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -274,7 +274,7 @@ Product with given barcode does not exist
 	     <div class="modal-footer">
        <div id="aftereditfooter">
       	<button type="button" class="btn btn-primary" id="edit-button">Edit</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-secondary" id="editcancel">Cancel</button>
       </div>
     </div>
     </div>

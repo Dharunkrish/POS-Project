@@ -17,9 +17,20 @@ public class daySalesReportForm {
 	public void setCount(int count) {
 		this.count = count;
 	}
-    public daySalesReportForm(double revenue,long count){
-    	this.count=(int) count;
+    public daySalesReportForm(Double revenue,Long count){
+    	if (count==null) {
+    		this.count=0;
+    	}
+    	else {
+    	this.count=(int)(long) count;
+    	}
+    	if (revenue==null) {
+    		this.revenue=0;
+    	}
+    	else {
     	this.revenue=revenue;
+    	}
+    	
     }
     
     public daySalesReportForm(){

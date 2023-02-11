@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="baseUrl" th:attr="content=${baseUrl}">
+<meta name="Role" th:attr="content=${Role}">
+
+
+
 
 <script src="https://kit.fontawesome.com/c30beb553f.js" crossorigin="anonymous"></script>
 
@@ -14,34 +18,16 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" th:href="@{/static/app.css}">
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/css/dataTables.bootstrap.min.css'>
-
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
 </head>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light mb-1" th:fragment="name_site_navbar">
-  <a class="navbar-brand" th:href="@{/}">
-    <img th:src="@{/static/logo.png}" class="d-inline-block align-top" alt="">
-  </a>
 
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-
-    <ul class="navbar-nav ml-auto">
-             <li class="nav-item">
-        <a class="btn btn-primary" th:href="@{/site/sign-up}">Sign up</a>
-      </li>
-       <li class="nav-item">
-        <a class="btn btn-primary" th:href="@{/site/login}">Login</a>
-      </li>
-    </ul>
- 
-  </div>
 </nav>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light  mb-1" th:fragment="name_app_navbar">
-  <a class="navbar-brand" th:href="@{/}">
-    <img th:src="@{/static/logo.jpg}" class="d-inline-block align-top" alt="">
+  <a class="navbar-brand" th:href="@{/ui/home}">
+    <img th:src="@{/static/logo.png}" class="d-inline-block align-top" alt="" style="width: 48%">
   </a>
 
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,7 +39,7 @@
         <a class="nav-link" th:href="@{/ui/home}">Home</a>
       </li>
       <li class="nav-item" id="admin-nav">
-        <a class="nav-link" th:href="@{/ui/admin}">Admin</a>
+        <a class="nav-link" th:href="@{/ui/supervisor/admin}">Admin</a>
       </li>
       <li class="nav-item" id="brand-nav">
         <a class="nav-link" th:href="@{/ui/brand}">Brand Category</a>
@@ -83,14 +69,22 @@
 </div>
     </ul>
     
-    <ul class="navbar-nav ml-auto">
-	    <li class="navbar-text">
-	    	[[${info.getEmail()}]]
-	    	&nbsp;&gt;&nbsp;
-	    </li>
-	    <li class="nav-item">
-	    	<a class="nav-link" th:href="@{/session/logout}">Logout</a>
-	    </li>
+        <ul class="navbar-nav ml-auto">
+      <li class="navbar-text" id="user">
+        [[${info.getEmail()}]]
+        <ul class="dropdown-menu" id="username" >
+        <li class="dropdown-item" id="logOut">
+              <a class="nav-link" th:href="@{/session/logout}"><p><i class="fa fa-sign-out" aria-hidden="true"></i>
+ Logout</p></a>
+            </li>
+        </ul>
+      </li>
+      <li class="navbar-text">
+      &nbsp;&gt;&nbsp;
+                [[${info.getRole()}]]
+                
+      </li>
+      
     </ul>
     
         
@@ -113,6 +107,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/i18n/defaults-*.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/js/bootstrap-select.min.js"></script>
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.2/js/toastr.min.js"></script>
 
 	<script th:src="@{/static/app.js}"/></script>
 	<script th:src="@{/static/papaparse.min.js}"/></script>

@@ -30,7 +30,7 @@ public class BrandServiceTest extends AbstractUnitTest {
 
 	public brandPojo Initialise2()  throws ApiException {
 		brandPojo p = new brandPojo();
-        p.setBrand("bru");
+        p.setBrand("bru1");
         p.setCategory("coffee");
 		service.add(p);
 		return p;
@@ -93,7 +93,7 @@ public class BrandServiceTest extends AbstractUnitTest {
 		brandPojo p2=b.get(1);
 		assertEquals("nestle", p1.getBrand());
 		assertEquals("maggi", p1.getCategory());
-		assertEquals("bru", p2.getBrand());
+		assertEquals("bru1", p2.getBrand());
 		assertEquals("coffee", p2.getCategory());
 		}
 
@@ -109,4 +109,14 @@ public class BrandServiceTest extends AbstractUnitTest {
 		assertEquals("tupperware", b1.getBrand());
 		assertEquals("bottle", b1.getCategory());
 	}
+
+	@Test
+	public void TestUpdateWrongBrandCategory() throws ApiException{
+		Initialise1();
+		brandPojo b=service.getAll().get(0);
+		exceptionRule.expect(ApiException.class);
+		exceptionRule.expectMessage("Brand nestle and Category maggi combination already exist");
+		service.update(b.getId(),b);
+	}
+
 }
