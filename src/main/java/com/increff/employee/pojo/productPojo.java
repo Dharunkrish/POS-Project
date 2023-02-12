@@ -31,6 +31,7 @@ public class productPojo {
 	}
 	private String name;
 	
+	@Column(nullable=false)
 	private double mrp;
 
 	

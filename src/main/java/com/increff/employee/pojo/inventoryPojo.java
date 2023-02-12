@@ -17,7 +17,6 @@ public class inventoryPojo {
 	private int id;
 	@Column(nullable=false)
 	private int quantity;
-	@Column(nullable=false)
 	private String barcode;
 	private String name;
 

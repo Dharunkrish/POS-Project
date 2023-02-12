@@ -33,6 +33,7 @@ public byte[] generatePdf(orderxmlForm orderxml) throws Exception{
 }
 
 public byte[] ReportgeneratePdf(DaySalesXml daysalesxml) throws Exception{
+    
     pdfconversionUtil.generateXml(new File("daysales.xml"), daysalesxml, DaySalesXml.class);
     return pdfconversionUtil.generatethePDF(new File("daysales.xml"), new StreamSource("daysales.xsl"));
 }
