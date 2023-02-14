@@ -21,4 +21,15 @@ public class InventoryReportXml {
 
 	@XmlElement
 	private List<InventoryXmlForm> data;
+
+	private int total_quantity;
+
+	public int getTotal_quantity() {
+		return total_quantity;
+	}
+
+	public void setTotal_quantity(int data) {
+		this.total_quantity = data;
+	}
+
 }

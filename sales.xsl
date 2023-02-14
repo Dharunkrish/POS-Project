@@ -69,6 +69,28 @@
                             </fo:table-header>
                             <fo:table-body end-indent="0in">
                                 <xsl:apply-templates select="data" />
+                                       <fo:table-row >
+            <fo:table-cell xsl:use-attribute-sets="tableBorder" font-family="Times New Roman">
+                <fo:block font-weight="bold">
+					Total
+                </fo:block>
+            </fo:table-cell>
+            <fo:table-cell xsl:use-attribute-sets="tableBorder" font-family="Times New Roman">
+                <fo:block>
+					
+                </fo:block>
+            </fo:table-cell>
+            <fo:table-cell xsl:use-attribute-sets="tableBorder" font-family="Times New Roman">
+                <fo:block>
+                    <xsl:value-of select="total_quantity" />
+                </fo:block>
+            </fo:table-cell>
+            <fo:table-cell xsl:use-attribute-sets="tableBorder" font-family="Times New Roman">
+                <fo:block>
+                    <xsl:value-of select="revenue" />
+                </fo:block>
+            </fo:table-cell>
+        </fo:table-row>
                             </fo:table-body>
                         </fo:table>
                     </fo:block>

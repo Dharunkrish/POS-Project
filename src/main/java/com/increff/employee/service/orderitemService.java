@@ -122,7 +122,6 @@ public class orderitemService {
 	public int editcheck(orderitemPojo o,productPojo p,int old_q) throws ApiException {
             	 inventoryPojo i=dao.prodquantity(p.getProduct_id());
 				 int value=o.getQuantity()-old_q;
-				 logger.info(i);
 				 if (i==null){
                            if (value>0){
 							return -1;
@@ -134,7 +133,6 @@ public class orderitemService {
                  else if ((o.getQuantity()-old_q)>i.getQuantity()) {
                 	 return -1;
              }
-
              return i.getQuantity()-(o.getQuantity()-old_q);
 	}
 
@@ -178,16 +176,18 @@ public class orderitemService {
 	
 	@Transactional(rollbackOn  = ApiException.class)
 	public void update(int id, orderPojo o) throws ApiException {
-		dao.update(id,o);
+		orderPojo oo=dao.selectid(id);
+		oo.setInvoiceGenerated(true);
+		dao.update(oo);
 	}
 
 	@Transactional(rollbackOn  = ApiException.class)
 	public int update(int id, orderitemPojo o, int quantity) throws ApiException {
-		logger.info("j");
 		productPojo p=checkprod(o);
         if (p==null) {
         	return 0;
         }
+        System.err.print(p.getMrp());
 		if (p.getMrp()<=o.getPrice()){
 			throw new ApiException("Selling Price should not be greater than MRP");
 		}
@@ -196,7 +196,6 @@ public class orderitemService {
         	return 2;
         }
 		inventoryPojo i=idao.select(p.getProduct_id());
-		logger.info("l"+i);
 		if (i==null){
 			if (q>0){
 				inventoryPojo i1=new inventoryPojo();
@@ -204,7 +203,6 @@ public class orderitemService {
 				i1.setId(p.getProduct_id());
 				i1.setName(p.getName());
 				i1.setQuantity(q);
-				logger.info("l");
 				idao.insert(i1);
 			}
 		}
@@ -213,12 +211,16 @@ public class orderitemService {
 	   }
 	else{
 	  i=idao.select(p.getProduct_id());
-	i.setQuantity(q);
-	idao.update(i);
+	  i.setQuantity(q);
+	  idao.update(i);
 	}
-        o.setName(p.getName());
-		dao.update(id,o);
-		return 1;
+	orderitemPojo o1=dao.selectitemid(id);
+	o1.setBarcode(p.getBarcode());
+	o1.setName(p.getName());
+	o1.setPrice(o.getPrice());
+	o1.setQuantity(o.getQuantity());
+	dao.update(o1);
+	return 1;
 	}
 
 	@Transactional(rollbackOn  = ApiException.class)
@@ -234,7 +236,6 @@ public class orderitemService {
 			i.setQuantity(oi.getQuantity());
 			idao.insert(i);
 		}
-		int quantity=i.getQuantity()+oi.getQuantity();
 		dao.delete(id);
 	}
 	

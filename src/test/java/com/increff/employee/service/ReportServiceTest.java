@@ -102,6 +102,14 @@ public class ReportServiceTest extends AbstractUnitTest {
 			brandservice.add(p1);
 			return p1;
 		}
+
+		public brandPojo BrandInitialise5() throws ApiException {
+			brandPojo p1 = new brandPojo();
+			p1.setBrand("nestle");
+			p1.setCategory("maggi");
+			brandservice.add(p1);
+			return p1;
+		}
         
 
 	public productPojo prodInitialise1() throws ApiException{ 
@@ -208,7 +216,7 @@ public class ReportServiceTest extends AbstractUnitTest {
 		oi.setName(i1.getName());
 		oi.setBarcode(i1.getBarcode());
 		oi.setQuantity(10);
-		oi.setPrice(100);
+		oi.setPrice(90);
 		return oi;
 	}
 
@@ -218,7 +226,7 @@ public class ReportServiceTest extends AbstractUnitTest {
 		oi.setName(i1.getName());
 		oi.setBarcode(i1.getBarcode());
 		oi.setQuantity(5);
-		oi.setPrice(200);
+		oi.setPrice(80);
 		return oi;
 	}
 
@@ -228,7 +236,7 @@ public class ReportServiceTest extends AbstractUnitTest {
 		oi.setName(i1.getName());
 		oi.setBarcode(i1.getBarcode());
 		oi.setQuantity(10);
-		oi.setPrice(50);
+		oi.setPrice(90);
 		return oi;
 	}
 
@@ -238,7 +246,7 @@ public class ReportServiceTest extends AbstractUnitTest {
 		oi.setName(i1.getName());
 		oi.setBarcode(i1.getBarcode());
 		oi.setQuantity(5);
-		oi.setPrice(300);
+		oi.setPrice(90);
 		return oi;
 	}
 
@@ -260,7 +268,6 @@ public class ReportServiceTest extends AbstractUnitTest {
 		orderservice.AddSingleItem(oi2,order.getId());
 		orderservice.AddSingleItem(oi3,order2.getId());
 		orderservice.AddSingleItem(oi4,order2.getId());
-
 	}
 
 	@Test
@@ -278,17 +285,17 @@ public class ReportServiceTest extends AbstractUnitTest {
 		   assertEquals("nestle", o.get(2));
 		   assertEquals("tea", o.get(3));
 		   assertEquals(10, o.get(0));
-		   assertEquals(1000.0, o.get(1));
+		   assertEquals(900.0, o.get(1));
 		   o=m.get(brand_id.get(1));
 		   assertEquals("bru", o.get(2));
 		   assertEquals("tea", o.get(3));
 		   assertEquals(15, o.get(0));
-		   assertEquals(1500.0, o.get(1));
+		   assertEquals(1300.0, o.get(1));
 		   o=m.get(brand_id.get(2));
 		   assertEquals("nestle", o.get(2));
 		   assertEquals("coffee", o.get(3));
 		   assertEquals(5, o.get(0));
-		   assertEquals(1500.0, o.get(1));
+		   assertEquals(450.0, o.get(1));
 	}
 
 	@Test
@@ -306,12 +313,12 @@ public class ReportServiceTest extends AbstractUnitTest {
 		   assertEquals("nestle", o.get(2));
 		   assertEquals("tea", o.get(3));
 		   assertEquals(10, o.get(0));
-		   assertEquals(1000.0, o.get(1));
+		   assertEquals(900.0, o.get(1));
 		   o=m.get(brand_id.get(1));
 		   assertEquals("nestle", o.get(2));
 		   assertEquals("coffee", o.get(3));
 		   assertEquals(5, o.get(0));
-		   assertEquals(1500.0, o.get(1));
+		   assertEquals(450.0, o.get(1));
 	}
 
 	@Test
@@ -329,12 +336,12 @@ public class ReportServiceTest extends AbstractUnitTest {
 		   assertEquals("nestle", o.get(2));
 		   assertEquals("tea", o.get(3));
 		   assertEquals(10, o.get(0));
-		   assertEquals(1000.0, o.get(1));
+		   assertEquals(900.0, o.get(1));
 		   o=m.get(brand_id.get(1));
 		   assertEquals("bru", o.get(2));
 		   assertEquals("tea", o.get(3));
 		   assertEquals(15, o.get(0));
-		   assertEquals(1500.0, o.get(1));
+		   assertEquals(1300.0, o.get(1));
 	}
 
 	@Test
@@ -352,7 +359,21 @@ public class ReportServiceTest extends AbstractUnitTest {
 		   assertEquals("nestle", o.get(2));
 		   assertEquals("tea", o.get(3));
 		   assertEquals(10, o.get(0));
-		   assertEquals(1000.0, o.get(1));
+		   assertEquals(900.0, o.get(1));
+	}
+
+	@Test
+	public void TestGetSalesWrong() throws ApiException{
+	Initialise1();
+	BrandInitialise5();
+	reportForm s=new reportForm();
+	s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
+	s.setTo(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()));
+	s.setBrand("bru");
+	s.setCategory("maggi");
+	exceptionRule.expect(ApiException.class);
+	exceptionRule.expectMessage("Brand "+s.getBrand()+" and Category "+s.getCategory()+" combination does not exist");
+	Map<Integer,List<Object>> m= service.getsales(s,service.getorder(s));
 	}
 
 	@Test
@@ -362,16 +383,10 @@ public class ReportServiceTest extends AbstractUnitTest {
 		   reportForm s=new reportForm();
 		   s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
 		   s.setTo(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()));
-		   System.err.print(s.getFrom());
-		   System.err.print(s.getTo());
 		   daySalesReportPojo r= service.get(s).get(0);
-		   System.err.print(r.getDate());
-           for(orderitemPojo oi:orderservice.get(1)){
-			System.err.print(oi.getId());
-		   }
 		   assertEquals(2, r.getTotal_orders());
 		   assertEquals(4, r.getTotal_items());
-		   assertEquals(4000, r.getRevenue(),0.01);
+		   assertEquals(2650, r.getRevenue(),0.01);
 		   assertEquals(ZonedDateTime.now().minus(Period.ofDays(1)).format(formatter), r.getDate().format(formatter));
 	}
 
@@ -419,31 +434,31 @@ public class ReportServiceTest extends AbstractUnitTest {
 
 
 	@Test
-	public void TestGetOrder() throws ApiException{
+	public void TestGetOrder() throws Exception{
 	Initialise1();
 	reportForm s=new reportForm();
 	s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
 	s.setTo(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()));
 	Map<String,orderitemPojo>m=service.getorder(s);
-	assertEquals(5, m.get("1").getId());
-	assertEquals(6, m.get("12").getId());
-	assertEquals(3, m.get("1").getOrder_id());
-	assertEquals(3, m.get("12").getOrder_id());
+	assertEquals(orderservice.getAll().get(0).getId(), m.get("1").getOrder_id());
+	assertEquals(orderservice.getAll().get(0).getId(), m.get("12").getOrder_id());
+	assertEquals(orderservice.getAll().get(1).getId(), m.get("123").getOrder_id());
+	assertEquals(orderservice.getAll().get(1).getId(), m.get("1234").getOrder_id());
 	assertEquals("1", m.get("1").getBarcode());
 	assertEquals("12", m.get("12").getBarcode());
+	assertEquals("123", m.get("123").getBarcode());
+	assertEquals("1234", m.get("1234").getBarcode());
 	}
 
 	@Test
 	public void TestGetInventory() throws Exception{
 	Initialise1();
-	reportForm s=new reportForm();
-	s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
-	s.setTo(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()));
 	Map<String,inventoryPojo>m=service.getinventory();
-	assertEquals("1", m.get("1").getBarcode());
+	System.err.print(m);
 	assertEquals("12", m.get("12").getBarcode());
-	assertEquals(10, m.get("1").getQuantity());
-	assertEquals(20, m.get("12").getQuantity());
+	assertEquals("1234", m.get("1234").getBarcode());
+	assertEquals(15, m.get("12").getQuantity());
+	assertEquals(15, m.get("1234").getQuantity());
 	}
 
 	@Test
@@ -454,7 +469,13 @@ public class ReportServiceTest extends AbstractUnitTest {
 	    s.setTo(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()));
 		Map<Integer,List<Object>> m=service.getinventoryReport(service.getinventory());
 		List<Integer> brand_id = new ArrayList<Integer>(m.keySet());
-		List<Object> o=m.get(brand_id.get(0));
+		List<Object> o=m.get(brand_id.get(2));
+		System.err.print(m);
+		assertEquals("nestle", o.get(1));
+		assertEquals("coffee", o.get(2));
+		assertEquals(20, o.get(0));
+		o=m.get(brand_id.get(0));
+		System.err.print(m);
 		assertEquals("nestle", o.get(1));
 		assertEquals("tea", o.get(2));
 		assertEquals(10, o.get(0));
@@ -462,12 +483,26 @@ public class ReportServiceTest extends AbstractUnitTest {
 		assertEquals("bru", o.get(1));
 		assertEquals("tea", o.get(2));
 		assertEquals(30, o.get(0));
-		o=m.get(brand_id.get(2));
-		assertEquals("nestle", o.get(1));
-		assertEquals("coffee", o.get(2));
-		assertEquals(20, o.get(0));
 	}
 
+	@Test
+	public void TestInventoryReportAfterDelete() throws Exception{
+		Initialise1();
+		reportForm s=new reportForm();
+	    s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
+	    s.setTo(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()));
+		Map<Integer,List<Object>> m=service.getinventoryReport(service.getinventory());
+		List<Integer> brand_id = new ArrayList<Integer>(m.keySet());
+		System.err.print(m);
+		List<Object> o=m.get(brand_id.get(0));
+		assertEquals("bru", o.get(1));
+		assertEquals("tea", o.get(2));
+		assertEquals(15, o.get(0));
+		o=m.get(brand_id.get(1));
+		assertEquals("nestle", o.get(1));
+		assertEquals("coffee", o.get(2));
+		assertEquals(15, o.get(0));
+	}
 	}
 
 	

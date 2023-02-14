@@ -17,9 +17,9 @@ import com.increff.employee.model.orderForm;
 import com.increff.employee.model.orderitemForm;
 import com.increff.employee.pojo.orderPojo;
 import com.increff.employee.pojo.orderitemPojo;
-import com.increff.employee.pojo.productPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.orderitemService;
+import com.increff.employee.util.DataConversionUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,16 +39,16 @@ public class orderApiController {
 	public booForm add(@RequestBody List<orderitemForm> form) throws ApiException {
 		List <orderitemPojo> item=new ArrayList<orderitemPojo>();
 		for(orderitemForm f:form) {
-			item.add(convert(f));
+			item.add(DataConversionUtil.convert(f));
 		}
-		return convert(service.AddItems(item));
+		return DataConversionUtil.convert(service.AddItems(item));
 	}
 	
 	@ApiOperation(value = "Creating a order")
 	@RequestMapping(path = "/api/order/supervisor/{id}", method = RequestMethod.POST)
 	public booForm AddToExistingOrder(@PathVariable int id,@RequestBody orderitemForm form) throws ApiException {
-			int q=service.AddSingleItem(convert(form),id);
-		    return convert(q);
+			int q=service.AddSingleItem(DataConversionUtil.convert(form),id);
+		    return DataConversionUtil.convert(q);
 	}
 
 	@ApiOperation(value = "Gets list of all orders")
@@ -56,7 +56,7 @@ public class orderApiController {
 	public List<orderForm> getAll() throws Exception {
 		List<orderForm> list2 = new ArrayList<orderForm>();
 		for (orderPojo p : service.getAll()) {
-			list2.add(convert(p));
+			list2.add(DataConversionUtil.convert(p));
 		}
 		return list2;
 	}
@@ -69,30 +69,7 @@ public class orderApiController {
 		return service.get(id);
 	}
 	
-	private static orderForm convert(orderPojo p) {
-		orderForm d = new orderForm();
-		d.setId(p.getId());
-		d.setTime(p.getT().format(formatter));
-		d.setInvoiceGenerated(p.isInvoiceGenerated());
-		return d;
-	}
 
-	private static orderitemPojo convert(orderitemForm f) {
-		orderitemPojo o = new orderitemPojo();
-		o.setQuantity(f.getQuantity());
-		o.setBarcode(f.getBarcode());
-		o.setPrice(f.getPrice());
-		o.setName(f.getName());
-		return o;
-	}
-	
-	
-	
-	private static booForm convert(int is_p) {
-		booForm form=new booForm();
-		form.setIs_p(is_p);
-		return form;
-	}
 	
 
 	

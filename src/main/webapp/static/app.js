@@ -36,7 +36,6 @@ function handleAjaxError(response){
   console.log(response)
 	var response = JSON.parse(response.responseText);
     toastr.options.timeOut = 0;
-    console.log(response.message);
     toastr.error(response.message);
 }
 

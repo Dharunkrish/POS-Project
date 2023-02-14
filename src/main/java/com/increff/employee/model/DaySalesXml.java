@@ -20,6 +20,13 @@ public class DaySalesXml {
 	private String to;
 	@XmlElement
 	private List<DaySalesXmlForm> data;
+	@XmlElement
+	private int total_order;
+	@XmlElement
+	private int total_item;
+	@XmlElement
+	private double revenue;
+
 	public String getFrom() {
 		return from;
 	}
@@ -39,6 +46,34 @@ public class DaySalesXml {
 		this.data = data;
 	}
 
+	public int getTotal_order() {
+		return total_order;
+	}
+
+
+	public void setTotal_order(int total_order) {
+		this.total_order = total_order;
+	}
+
+
+	public int getTotal_item() {
+		return total_item;
+	}
+
+
+	public void setTotal_item(int total_item) {
+		this.total_item = total_item;
+	}
+
+
+	public double getRevenue() {
+		return revenue;
+	}
+
+
+	public void setRevenue(double revenue) {
+		this.revenue = revenue;
+	}
 
 	    
 	}

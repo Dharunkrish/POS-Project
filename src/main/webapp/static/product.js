@@ -16,7 +16,8 @@ function addproduct(event){
 	var $form = $("#product-form");
 	var jso = toJsonobject($form);
 	if (isNaN(jso.mrp)){
-		alert("MRP must be a number");
+		toastr.options.timeOut = 0;
+        toastr.error("MRP must be a number");
 		return;
 	}
 	var json=JSON.stringify(jso);
@@ -31,6 +32,8 @@ function addproduct(event){
 	   success: function(response) {
 	   		getproductList();  
 	   		$("#add-product-modal").modal('toggle');
+	   	   toastr.options.timeOut = 3000;
+        toastr.success("Product created Successfully");  
 	   },
 	   error: handleAjaxError
 	});
@@ -38,14 +41,20 @@ function addproduct(event){
 }
 
 function updateproduct(event){
-	$('#edit-product-modal').modal('toggle');
 	//Get the ID
 	var product_id=$("#product-edit-form input[name=product_id]").val();
 	var url = getproductUrl() + "/supervisor/" + product_id;
 
 	//Set the values to update
 	var $form = $("#product-edit-form");
+	var mrp=$("#product-edit-form input[name=mrp]").val();
 	var json = toJson($form);
+    if (isNaN(mrp)){
+		toastr.options.timeOut = 0;
+        toastr.error("MRP must be a number");
+		return;
+	}
+		$('#edit-product-modal').modal('toggle');
 
 	$.ajax({
 	   url: url,
@@ -56,6 +65,8 @@ function updateproduct(event){
        },	   
 	   success: function(response) {
 	   		getproductList();   
+	   	toastr.options.timeOut = 3000;
+        toastr.success("Product Updated Successfully");  
 	   },
 	   error: handleAjaxError
 	});
@@ -121,6 +132,11 @@ function readFileDataCallback(results){
 }
 
 function uploadRows(){
+		if (fileData.length>5000){
+		toastr.options.timeOut = 0;
+        toastr.error("File Rows should be within 5000 rows");
+		return;
+	}
 	//Update progress
 	updateUploadDialog();
 	//If everything processed then return
@@ -133,7 +149,7 @@ function uploadRows(){
 	processCount++;
 	
 	var json = JSON.stringify(row);
-	var url = getproductUrl();
+	var url = getproductUrl()+"/supervisor";
 
 	//Make ajax call
 	$.ajax({
@@ -180,16 +196,25 @@ function displayproductList(data){
         $tbody.append(row);
 	}
 	if (getRole()==="operator"){
-			$('#product-table').DataTable({
+			var ta=$('#product-table').DataTable({
   columnDefs: [
     {
         className: 'dt-center'
     },                 { 'visible': false, 'targets': [4] }
-] } );
+],
+                 pageLength : 7,
+        autoWidth: true,
+    lengthMenu: [[7, 10, 20, -1], [7, 10, 20, 'All']]} )
 }
 else{
-	$('#product-table').DataTable();
+	var ta=$('#product-table').DataTable({
+		pageLength : 7,
+        autoWidth: true,
+    lengthMenu: [[7, 10, 20, -1], [7, 10, 20, 'All']]
+	});
 }
+    new $.fn.dataTable.FixedHeader(ta);
+
 }
 
 function displaydropdownedit(data){
@@ -295,7 +320,7 @@ function displayproduct(data){
 
 function button(){
 	var d=$('#inputBrandid :selected').text();
-   $('#add-product').attr("disabled",(d=="None" || ($('#product-form input[name=barcode]').val().trim()=="")) || ($('#product-form input[name=name]').val().trim()=="")||($('#product-form input[name=mrp]').val().trim()==""));
+   $('#add-product').attr("disabled",(d=="None" || ($('#product-form input[name=barcode]').val().trim()=="")) ||($('#product-form input[name=mrp]').val().trim()==""));
    }
 
 //INITIALIZATION CODE

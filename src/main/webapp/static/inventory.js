@@ -8,8 +8,19 @@ function getinventoryUrl(){
 function addinventory(event){
 	//Set the values to update
 	var $form = $("#inventory-add-form");
-    $('#add-inventory-modal').modal('toggle');
+	var q=$("#inventory-add-form input[name=quantity]").val();
+	if (isNaN(q)){
+		toastr.options.timeOut = 0;
+        toastr.error("Quantity must be a number");
+		return;
+	}
+	if (q%1!=0){
+		toastr.options.timeOut = 0;
+        toastr.error("Quantity must be a whole number");
+		return;
+	}
 	var json = toJson($form);
+    $('#add-inventory-modal').modal('toggle');
     document.getElementById("inventory-add-form").reset();    
 	var url = getinventoryUrl()+"/supervisor";
 	$.ajax({
@@ -20,7 +31,9 @@ function addinventory(event){
        	'Content-Type': 'application/json'
        },	   
 	   success: function(response) {
-	   		getinventoryList();  
+	   		getinventoryList();
+	   		toastr.options.timeOut = 3000;
+        toastr.success("Inventory created Successfully");  
 	   },
 	   error: handleAjaxError
 	});
@@ -28,10 +41,19 @@ function addinventory(event){
 }
 
 function updateinventory(event){
-	$('#edit-inventory-modal').modal('toggle');
 	//Get the ID
 	var id = $("#inventory-edit-form input[name=productid]").val();	
 	var b = $("#inventory-edit-form input[name=quantity]").val();	
+	if (isNaN(b)){
+		toastr.options.timeOut = 0;
+        toastr.error("Quantity must be a number");
+		return;
+	}
+	if (b%1!=0){
+		toastr.options.timeOut = 0;
+        toastr.error("Quantity must be a whole number");
+		return;
+	}
 	var url = getinventoryUrl() + "/supervisor/" + id;
 
 	//Set the values to update
@@ -46,6 +68,10 @@ function updateinventory(event){
        },	   
 	   success: function(response) {
 	   		getinventoryList();   
+	   		toastr.options.timeOut = 3000;
+        toastr.success("Inventory updated Successfully");
+        	$('#edit-inventory-modal').modal('toggle');
+  
 	   },
 	   error: handleAjaxError
 	});
@@ -123,7 +149,8 @@ function readFileDataCallback(results){
 
 function uploadRows(){
 	if (fileData.length>5000){
-		alert("File Rows should be within 5000 rows");
+		toastr.options.timeOut = 0;
+        toastr.error("File Rows should be within 5000 rows");
 		return;
 	}
 	//Update progress
@@ -138,7 +165,7 @@ function uploadRows(){
 	processCount++;
 	
 	var json = JSON.stringify(row);
-	var url = getinventoryUrl();
+	var url = getinventoryUrl()+"/supervisor";
 
 	//Make ajax call
 	$.ajax({
@@ -184,16 +211,24 @@ function displayinventoryList(data){
         $tbody.append(row);
 	}
 	if (getRole()==="operator"){
-	$('#inventory-table').DataTable({
+	var ta=$('#inventory-table').DataTable({
   columnDefs: [
     {
         className: 'dt-center'
     },                 { 'visible': false, 'targets': [3] }
-] } );
+],pageLength : 7,
+        autoWidth: true,
+    lengthMenu: [[7, 10, 20, -1], [7, 10, 20, 'All']] } );
 }
 else{
-	$('#inventory-table').DataTable();
+	var ta=$('#inventory-table').DataTable({
+		pageLength : 7,
+        autoWidth: true,
+    lengthMenu: [[7, 10, 20, -1], [7, 10, 20, 'All']]
+	});
 }
+    new $.fn.dataTable.FixedHeader(ta);
+
 }
 
 function displaydropdown(data){
@@ -269,8 +304,9 @@ function displayinventory(data){
 }
 
 function button(){
-	var d=$('#idvalue :selected').text();
-   $('#add-inventory').attr("disabled",(d=="None" || ($('#inventory-add-form input[name=quantity]').val().trim()=="")));
+	var d=$('#idvalue :selected').val();
+	console.log(d);
+   $('#add-inventory').attr("disabled",(d==="none" || ($('#inventory-add-form input[name=quantity]').val().trim()==="")));
    }
 
 

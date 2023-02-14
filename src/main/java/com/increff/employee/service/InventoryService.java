@@ -60,7 +60,6 @@ public class InventoryService {
 	public void update(int id, inventoryPojo p) throws ApiException {
 		inventoryPojo i=getCheck(id);
 		i.setQuantity(p.getQuantity());
-		logger.info(i.getId()+""+i.getBarcode()+i.getName()+i.getQuantity());
 		dao.update(i);
 	}
 

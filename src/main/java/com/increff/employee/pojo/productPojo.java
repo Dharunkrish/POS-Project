@@ -25,14 +25,15 @@ public class productPojo {
 		return brand_Category_id;
 	}
 
-
-	public void setBrand_Category_id(int brand_Category_id) {
-		this.brand_Category_id = brand_Category_id;
-	}
 	private String name;
 	
 	@Column(nullable=false)
 	private double mrp;
+
+	public void setBrand_Category_id(int brand_Category_id) {
+		this.brand_Category_id = brand_Category_id;
+	}
+
 
 	
 	public String getBarcode() {

@@ -35,6 +35,10 @@ table.dataTable thead tr {
 	color: blue;
 }
 
+img{
+  width:80%;
+}
+
 * {
   font-family: sans-serif; /* Change your font family */
 }

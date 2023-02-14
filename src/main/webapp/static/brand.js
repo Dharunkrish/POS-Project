@@ -169,21 +169,27 @@ function displaybrandList(data){
         $tbody.append(row);
 	}
 	if (getRole()==="operator"){
-	$('#brand-table').DataTable({
+	var ta=$('#brand-table').DataTable({
   columnDefs: [
             {"className": "dt-center", "targets": "_all"},
-                { 'visible': false, 'targets': [2] },
-] } );
+                { 'visible': false, 'targets': [2] }],
+                 pageLength : 7,
+        autoWidth: true,
+    lengthMenu: [[7, 10, 20, -1], [7, 10, 20, 'All']]} );
 }
 else{
-		$('#brand-table').DataTable({
+		var ta=$('#brand-table').DataTable({
   columnDefs: [
     {
         className: 'dt-center'
     }
-],   "info":false
+],   "info":false,
+                 pageLength : 7,
+        autoWidth: true,
+    lengthMenu: [[7, 10, 20, -1], [7, 10, 20, 'All']]
  } );
 }
+    new $.fn.dataTable.FixedHeader(ta);
 
 }
 

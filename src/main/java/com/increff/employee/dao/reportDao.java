@@ -73,13 +73,13 @@ import com.increff.employee.service.ApiException;
 			    return query.getResultList();
 		}
 		
-		@Transactional
+		/*@Transactional
 		public List<orderitemPojo> getproduct(reportForm r) throws ApiException {
 			 TypedQuery<orderitemPojo> query = getQuery(select_order, orderitemPojo.class);
 			    query.setParameter("date1",r.getFrom());
 			    query.setParameter("date2",r.getTo());
 			    return query.getResultList();
-		}
+		}*/
 		
 		@Transactional
 		public List<daysalesData> getsaleswb(reportForm r) throws ApiException {
@@ -101,11 +101,6 @@ import com.increff.employee.service.ApiException;
 			    return query.getResultList();
 		}
 		
-		@Transactional
-		public List<daysalesData> getinventory() throws ApiException {
-			 TypedQuery<daysalesData> query = getQuery(select_order, daysalesData.class);
-			    return query.getResultList();
-		}
 		
 		@Transactional
 		public List<daysalesData> getsaleswbc(reportForm r) throws ApiException {

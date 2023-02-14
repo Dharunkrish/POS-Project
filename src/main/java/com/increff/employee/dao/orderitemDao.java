@@ -33,6 +33,7 @@ import com.increff.employee.service.ApiException;
         private static String select_order_id="select i from orderPojo i where id=:id";
 		private static String update_order = "update orderPojo pc set pc.isInvoiceGenerated=:i where id=:id";
 		private static String delete_order_item = "delete orderitemPojo pc where pc.id=:id";
+		private static String select_orderitemid="select i from orderitemPojo i where id=:id";
 
 
 
@@ -43,13 +44,6 @@ import com.increff.employee.service.ApiException;
 				em().persist(o);
 		}
 		
-		public int upd(int quantity,String barcode) {
-			Query query=getQuery(update_inv);
-			query.setParameter("quantity",quantity);
-			query.setParameter("barcode", barcode);
-			query.executeUpdate();
-			return 1;
-		}
        public void del_inv(int id) {
         	Query query = em().createQuery(delete_inv);
 			query.setParameter("id", id);
@@ -95,22 +89,18 @@ import com.increff.employee.service.ApiException;
 			List<orderPojo> p= query.getResultList();
 			return p;
 		}
-		
 
-		public void update(int id,orderPojo o) throws ApiException{
-			Query query = getQuery(update_order);
-			query.setParameter("i",true);
+		public orderitemPojo selectitemid(int id) throws ApiException{
+            TypedQuery<orderitemPojo> query = getQuery(select_orderitemid, orderitemPojo.class);
 			query.setParameter("id",id);
+			return query.getSingleResult();
+
+		}
+		
+		public void update(orderPojo o) throws ApiException{
 			}
 		
-		public void update(int id,orderitemPojo o) throws ApiException{
-			Query query = getQuery(update_orderitem);
-			query.setParameter("name", o.getName());
-			query.setParameter("barcode", o.getBarcode());
-			query.setParameter("price", o.getPrice());
-			query.setParameter("quantity", o.getQuantity());
-			query.setParameter("id",id);
-			query.executeUpdate();
+		public void update(orderitemPojo o) throws ApiException{
 			
 		}
 			

@@ -15,6 +15,7 @@ import com.increff.employee.model.UserForm;
 import com.increff.employee.pojo.UserPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.UserService;
+import com.increff.employee.util.DataConversionUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,7 +30,7 @@ public class AdminApiController {
 	@ApiOperation(value = "Adds a user")
 	@RequestMapping(path = "/api/supervisor/user", method = RequestMethod.POST)
 	public void addUser(@RequestBody UserForm form) throws ApiException {
-		UserPojo p = convert(form);
+		UserPojo p = DataConversionUtil.convert(form);
 		service.add(p);
 	}
 
@@ -45,7 +46,7 @@ public class AdminApiController {
 		List<UserPojo> list = service.getAll();
 		List<UserData> list2 = new ArrayList<UserData>();
 		for (UserPojo p : list) {
-			list2.add(convert(p));
+			list2.add(DataConversionUtil.convert(p));
 		}
 		return list2;
 	}
@@ -54,24 +55,10 @@ public class AdminApiController {
 	@ApiOperation(value = "Adds a user")
 	@RequestMapping(path = "/api/supervisor/user/{id}", method = RequestMethod.PUT)
 	public void updateUser(@PathVariable int id,@RequestBody UserForm form) throws ApiException {
-		UserPojo p = convert(form);
+		UserPojo p = DataConversionUtil.convert(form);
 		service.update(p,id);
 	}
 
-	private static UserData convert(UserPojo p) {
-		UserData d = new UserData();
-		d.setEmail(p.getEmail());
-		d.setRole(p.getRole());
-		d.setId(p.getId());
-		return d;
-	}
 
-	private static UserPojo convert(UserForm f) {
-		UserPojo p = new UserPojo();
-		p.setEmail(f.getEmail());
-		p.setRole(f.getRole());
-		p.setPassword(f.getPassword());
-		return p;
-	}
 
 }

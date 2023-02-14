@@ -31,7 +31,6 @@ function displaySalesReport(data) {
     $tbody.empty();
     var totalQuantity = 0;
     var totalRevenue = 0;
-    console.log(data);
     for(var i in data){
         var e = data[i];
         var row = '<tr>'
@@ -42,7 +41,7 @@ function displaySalesReport(data) {
         $tbody.append(row);
         totalQuantity += e.count;
     }
-    $('#SalesReport-table').DataTable();
+    var ta=$('#SalesReport-table').DataTable();
     var row = '<tr>'
             + '<td>' + '' + '</td>'
             + '<td>' + '' + '</td>'
@@ -56,6 +55,8 @@ function displaySalesReport(data) {
             + '<td>'  + totalQuantity + '</td>'
             + '</tr>';
     $tbody.append(row);
+        new $.fn.dataTable.FixedHeader(ta);
+
 }
 
 function downloadPdf() {

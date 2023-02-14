@@ -112,7 +112,7 @@ function displaySalesReport(data) {
         totalQuantity += e.count;
         totalRevenue += e.revenue
     }
-    $('#SalesReport-table').DataTable();
+    var ta=$('#SalesReport-table').DataTable();
     var row = '<tr>'
             + '<td>' + '' + '</td>'
             + '<td>' + '' + '</td>'
@@ -127,6 +127,8 @@ function displaySalesReport(data) {
             + '<td>'  + totalRevenue + '</td>'
             + '</tr>';
     $tbody.append(row);
+        new $.fn.dataTable.FixedHeader(ta);
+
 }
 
 function downloadPDF() {

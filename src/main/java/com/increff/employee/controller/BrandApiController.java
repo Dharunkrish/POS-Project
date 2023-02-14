@@ -16,6 +16,7 @@ import com.increff.employee.model.brandForm;
 import com.increff.employee.pojo.brandPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.brandService;
+import com.increff.employee.util.DataConversionUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,18 +33,18 @@ public class BrandApiController {
 	@ApiOperation(value = "Adds an product")
 	@RequestMapping(path = "/api/brand/supervisor", method = RequestMethod.POST)
 	public void add(@RequestBody brandForm form) throws ApiException {
-		brandPojo p = convert(form);
+		brandPojo p = DataConversionUtil.convert(form);
 		service.add(p);
 	}
 	
 	@ApiOperation(value = "Adds an product")
 	@RequestMapping(path = "/api/brand", method = RequestMethod.POST)
 	public List<brandData> get(@RequestBody brandForm form) throws ApiException {
-		brandPojo p = convert(form);
+		brandPojo p = DataConversionUtil.convert(form);
 		List<brandPojo> list =service.getbrand(p);
 		List<brandData> list2 = new ArrayList<brandData>();
 		for (brandPojo b : list) {
-			list2.add(convert(b));
+			list2.add(DataConversionUtil.convert(b));
 		}
 		return list2;
 	}
@@ -53,7 +54,7 @@ public class BrandApiController {
 	@RequestMapping(path = "/api/brand/{id}", method = RequestMethod.GET)
 	public brandData get(@PathVariable int id) throws ApiException {
 		brandPojo p = service.get(id);
-		return convert(p);
+		return DataConversionUtil.convert(p);
 	}
 	
 
@@ -64,7 +65,7 @@ public class BrandApiController {
 		List<brandPojo> list = service.getAll();
 		List<brandData> list2 = new ArrayList<brandData>();
 		for (brandPojo p : list) {
-			list2.add(convert(p));
+			list2.add(DataConversionUtil.convert(p));
 		}
 		return list2;
 	}
@@ -72,23 +73,7 @@ public class BrandApiController {
 	@ApiOperation(value = "Updates an brand")
 	@RequestMapping(path = "/api/brand/supervisor/{id}", method = RequestMethod.PUT)
 	public void update(@PathVariable int id, @RequestBody brandForm f) throws ApiException {
-		brandPojo p = convert(f);
+		brandPojo p = DataConversionUtil.convert(f);
 		service.update(id, p);
-	}
-	
-
-	private static brandData convert(brandPojo p) {
-		brandData d = new brandData();
-		d.setBrand(p.getBrand());
-		d.setCategory(p.getCategory());
-		d.setId(p.getId());
-		return d;
-	}
-
-	private static brandPojo convert(brandForm f) {
-		brandPojo p = new brandPojo();
-		p.setBrand(f.getBrand());
-		p.setCategory(f.getCategory());
-		return p;
 	}
 }

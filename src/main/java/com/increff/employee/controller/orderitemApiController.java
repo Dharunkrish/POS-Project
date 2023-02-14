@@ -9,13 +9,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.increff.employee.model.booForm;
-import com.increff.employee.model.inventoryForm;
 import com.increff.employee.model.orderitemForm;
-import com.increff.employee.pojo.inventoryPojo;
 import com.increff.employee.pojo.orderitemPojo;
 import com.increff.employee.pojo.productPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.orderitemService;
+import com.increff.employee.util.DataConversionUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,15 +30,15 @@ public class orderitemApiController {
 	@ApiOperation(value = "Checks a orderItem")
 	@RequestMapping(path = "/api/orderitem/supervisor/check", method = RequestMethod.POST)
 	public booForm Add(@RequestBody orderitemForm form) throws ApiException {
-        orderitemPojo o=convert(form);
+        orderitemPojo o=DataConversionUtil.convert(form);
         productPojo p=service.checkitems(o,0);
         if (p.getProduct_id()==-1) {
-        	return convert(0,"");
+        	return DataConversionUtil.convert(0,"");
         }
         else if (p.getProduct_id()==-2) {
-        	return convert(2,"");
+        	return DataConversionUtil.convert(2,"");
         }
-        return convert(1,p.getName());
+        return DataConversionUtil.convert(1,p.getName());
 	}
 
 	
@@ -55,8 +54,8 @@ public class orderitemApiController {
 	@ApiOperation(value = "Updates an orderitem")
 	@RequestMapping(path = "/api/orderitem/supervisor/{id}", method = RequestMethod.PUT)
 	public booForm Update(@PathVariable int id, @RequestBody orderitemForm f) throws ApiException {
-        orderitemPojo o=convert(f);    
-		return convert(service.update(id, o,f.getOld_q()),"");
+        orderitemPojo o=DataConversionUtil.convert(f);    
+		return DataConversionUtil.convert(service.update(id, o,f.getOld_q()),f.getName());
 	}
 	
 	@ApiOperation(value = "Gets an orderitem by ID")
@@ -65,21 +64,4 @@ public class orderitemApiController {
 		service.delete(id);
 	}
 
-
-
-	private static orderitemPojo convert(orderitemForm f) {
-		orderitemPojo o = new orderitemPojo();
-		o.setQuantity(f.getQuantity());
-		o.setBarcode(f.getBarcode());
-		o.setPrice(f.getPrice());
-		o.setName(f.getName());
-		return o;
-	}
-	
-	private static booForm convert(int is_p,String name) {
-		booForm form=new booForm();
-		form.setIs_p(is_p);
-		form.setName(name);
-		return form;
-	}
 }

@@ -36,6 +36,22 @@ public class BrandServiceTest extends AbstractUnitTest {
 		return p;
 	}
 
+	public brandPojo Initialise3()  throws ApiException {
+		brandPojo p = new brandPojo();
+        p.setBrand("bru1");
+        p.setCategory("maggi");
+		service.add(p);
+		return p;
+	}
+
+	public brandPojo Initialise4()  throws ApiException {
+		brandPojo p = new brandPojo();
+        p.setBrand("nestle");
+        p.setCategory("coffee");
+		service.add(p);
+		return p;
+	}
+
 	@Test
 	public void TestAdd() throws ApiException {
 		brandPojo p = new brandPojo();
@@ -119,4 +135,49 @@ public class BrandServiceTest extends AbstractUnitTest {
 		service.update(b.getId(),b);
 	}
 
+	@Test
+	public void TestGetBrandWithoutBrandCategory() throws ApiException{
+		Initialise1();
+		Initialise2();
+		brandPojo b=new brandPojo();
+		List<brandPojo> brandItems=service.getbrand(b);
+		brandPojo p1=brandItems.get(0);
+		brandPojo p2=brandItems.get(1);
+		assertEquals("nestle", p1.getBrand());
+		assertEquals("maggi", p1.getCategory());
+		assertEquals("bru1", p2.getBrand());
+		assertEquals("coffee", p2.getCategory());
+	}
+
+
+	@Test
+	public void TestGetBrandWithoutCategory() throws ApiException{
+		Initialise1();
+		Initialise4();
+		brandPojo b=new brandPojo();
+		b.setBrand("nestle");
+		List<brandPojo> brandItems=service.getbrand(b);
+		brandPojo p1=brandItems.get(0);
+		brandPojo p2=brandItems.get(1);
+		assertEquals("nestle", p1.getBrand());
+		assertEquals("maggi", p1.getCategory());
+		assertEquals("nestle", p2.getBrand());
+		assertEquals("coffee", p2.getCategory());
+	}
+
+	@Test
+	public void TestGetBrandWithoutBrand() throws ApiException{
+		Initialise1();
+		Initialise2();
+		Initialise3();
+		brandPojo b=new brandPojo();
+		b.setCategory("maggi");
+		List<brandPojo> brandItems=service.getbrand(b);
+		brandPojo p1=brandItems.get(0);
+		brandPojo p2=brandItems.get(1);
+		assertEquals("nestle", p1.getBrand());
+		assertEquals("maggi", p1.getCategory());
+		assertEquals("bru1", p2.getBrand());
+		assertEquals("maggi", p2.getCategory());
+	}
 }

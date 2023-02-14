@@ -1,65 +1,197 @@
 package com.increff.employee.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXResult;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.fop.apps.Fop;
-import org.apache.fop.apps.FopFactory;
-import org.apache.fop.apps.MimeConstants;
 import org.apache.log4j.Logger;
 
-import com.increff.employee.controller.InvoiceApiController;
+import com.increff.employee.model.DaySalesXmlForm;
+import com.increff.employee.model.InventoryXmlForm;
+import com.increff.employee.model.SalesReportDataXml;
+import com.increff.employee.model.UserData;
+import com.increff.employee.model.UserForm;
+import com.increff.employee.model.booForm;
+import com.increff.employee.model.brandData;
+import com.increff.employee.model.brandForm;
+import com.increff.employee.model.daySalesReportForm;
+import com.increff.employee.model.inventoryForm;
+import com.increff.employee.model.orderData;
+import com.increff.employee.model.orderForm;
+import com.increff.employee.model.orderitemForm;
+import com.increff.employee.model.reportData;
+import com.increff.employee.pojo.UserPojo;
+import com.increff.employee.pojo.brandPojo;
+import com.increff.employee.pojo.daySalesReportPojo;
+import com.increff.employee.pojo.inventoryPojo;
+import com.increff.employee.pojo.orderPojo;
+import com.increff.employee.pojo.orderitemPojo;
+
 
 public class DataConversionUtil {
 
-	private static Logger logger = Logger.getLogger(pdfconversionUtil.class);
+	public static Logger logger = Logger.getLogger(pdfconversionUtil.class);
+	
+	public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    //Generate PDF
-    public static byte[] generatethePDF(File xml_file, StreamSource xsl_source) throws Exception {
-        FopFactory fopFactory = FopFactory.newInstance(new File(".").toURI());
-        // Setup a buffer to obtain the content length
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        // Setup FOP
-        Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
-        TransformerFactory factory = TransformerFactory.newInstance();
-        Transformer transformer = factory.newTransformer(xsl_source);
-        // Make sure the XSL transformation's result is piped through to FOP
-        Result res = new SAXResult(fop.getDefaultHandler());
-        logger.info("hello");
-        // Setup input
-        Source src = new StreamSource(xml_file);
+	public static UserData convert(UserPojo p) {
+		UserData d = new UserData();
+		d.setEmail(p.getEmail());
+		d.setRole(p.getRole());
+		d.setId(p.getId());
+		return d;
+	}
 
-        // Start the transformation and rendering process
-        transformer.transform(src, res);
+	public static UserPojo convert(UserForm f) {
+		UserPojo p = new UserPojo();
+		p.setEmail(f.getEmail());
+		p.setRole(f.getRole());
+		p.setPassword(f.getPassword());
+		return p;
+	}
+	
+	public static brandData convert(brandPojo p) {
+		brandData d = new brandData();
+		d.setBrand(p.getBrand());
+		d.setCategory(p.getCategory());
+		d.setId(p.getId());
+		return d;
+	}
 
-        byte[] bytes = out.toByteArray();
-        
-        out.close();
-        out.flush();
+	public static brandPojo convert(brandForm f) {
+		brandPojo p = new brandPojo();
+		p.setBrand(f.getBrand());
+		p.setCategory(f.getCategory());
+		return p;
+	}
+	
+	public static inventoryForm convert(inventoryPojo p) {
+		inventoryForm d = new inventoryForm();
+		d.setQuantity(p.getQuantity());
+		d.setId(p.getId());
+		d.setBarcode(p.getBarcode());
+		d.setName(p.getName());
+		return d;
+	}
 
-        return bytes;
+	public static inventoryPojo convert(inventoryForm f) {
+		inventoryPojo pr = new inventoryPojo();
+		pr.setQuantity(f.getQuantity());
+		pr.setId(f.getId());
+		return pr;
+	}
+	
+	 public static orderData convert(orderitemPojo orderitem) {
+			orderData d=new orderData();
+			d.setName(orderitem.getName());
+			d.setQuantity(orderitem.getQuantity());
+			d.setMrp(orderitem.getPrice());
+			d.setPrice(orderitem.getQuantity()*orderitem.getPrice());
+			return d;
+		 }
 
-    }
-    
-    
-    //Generate XML
-    public static void generateXml(File file,Object list,Class<?> class_type) throws JAXBException {
-        JAXBContext context = JAXBContext.newInstance(class_type);
-        Marshaller m = context.createMarshaller();
-        // for pretty-print XML in JAXB
-        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        m.marshal(list, file);
-    }
+		 public static List<DaySalesXmlForm> convert(List<daySalesReportPojo> ds) {
+			List<DaySalesXmlForm> s=new ArrayList<DaySalesXmlForm>();
+			for(daySalesReportPojo d:ds){
+			DaySalesXmlForm r=new  DaySalesXmlForm();
+			r.setDate(formatter.format(d.getDate()));
+			r.setTotal_order(d.getTotal_orders());
+			r.setTotal_item(d.getTotal_items());
+			r.setRevenue(d.getRevenue());
+			s.add(r);
+			}
+			return s;
+		}
+		 
+			public static daySalesReportForm convert2(List<Object> p) {
+				daySalesReportForm r=new daySalesReportForm();
+				r.setCount((int) p.get(0));
+				r.setRevenue((double) p.get(1));
+				r.setBrand((String) p.get(2));
+				r.setCategory((String) p.get(3));
+				return r;
+			}
+		 
+		public static List<SalesReportDataXml> convert1(Map<Integer,List<Object>> m) {
+			List<SalesReportDataXml> s=new ArrayList<SalesReportDataXml>();
+			for (int b:m.keySet()) {
+				List<Object> p=m.get(b);
+				SalesReportDataXml r=new SalesReportDataXml();
+				r.setQuantity((int) p.get(0));
+				r.setRevenue((double) p.get(1));
+				r.setBrand((String) p.get(2));
+				r.setCategory((String) p.get(3));
+				s.add(r);
+			 }
+				return s;
+			}
+
+		public static List<InventoryXmlForm> convert2(Map<Integer,List<Object>> m) {
+			List<InventoryXmlForm> s=new ArrayList<InventoryXmlForm>();
+			for (int b:m.keySet()) {
+				List<Object> p=m.get(b);
+				InventoryXmlForm r=new InventoryXmlForm();
+				r.setQuantity((int) p.get(0));
+				r.setBrand((String) p.get(1));
+				r.setCategory((String) p.get(2));
+				s.add(r);
+			 }
+				return s;
+			}
+		
+		public static orderForm convert(orderPojo p) {
+			orderForm d = new orderForm();
+			d.setId(p.getId());
+			d.setTime(p.getT().format(formatter));
+			d.setInvoiceGenerated(p.isInvoiceGenerated());
+			return d;
+		}
+
+		public static orderitemPojo convert(orderitemForm f) {
+			orderitemPojo o = new orderitemPojo();
+			o.setQuantity(f.getQuantity());
+			o.setBarcode(f.getBarcode());
+			o.setPrice(f.getPrice());
+			o.setName(f.getName());
+			return o;
+		}
+		
+		
+		
+		public static booForm convert(int is_p) {
+			booForm form=new booForm();
+			form.setIs_p(is_p);
+			return form;
+		}
+
+		public static booForm convert(int is_p,String name) {
+			booForm form=new booForm();
+			form.setIs_p(is_p);
+			form.setName(name);
+			return form;
+		}
+		
+		public static reportData convert(daySalesReportPojo d) {
+			reportData r=new reportData();
+			r.setDate(formatter.format(d.getDate()));
+			r.setTotal_order(d.getTotal_orders());
+			r.setTotal_item(d.getTotal_items());
+			r.setRevenue(d.getRevenue());
+			return r;
+		}
+		
+
+		
+		public static daySalesReportForm convert1(List<Object> p) {
+			daySalesReportForm r=new daySalesReportForm();
+			r.setCount((int) p.get(0));
+			r.setBrand((String) p.get(1));
+			r.setCategory((String) p.get(2));
+			return r;
+		}
+		
+
 }
 
 

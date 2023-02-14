@@ -76,4 +76,30 @@ public class SalesXmlForm {
 
 	@XmlElement
 	private List<SalesReportDataXml> data;
+	
+	@XmlElement
+	private int total_quantity;
+	
+	@XmlElement
+	private double revenue;
+
+
+	public int getTotal_quantity() {
+		return total_quantity;
+	}
+
+
+	public void setTotal_quantity(int total_quantity) {
+		this.total_quantity = total_quantity;
+	}
+
+
+	public double getRevenue() {
+		return revenue;
+	}
+
+
+	public void setRevenue(double revenue) {
+		this.revenue = revenue;
+	}
 }

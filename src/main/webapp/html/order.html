@@ -45,14 +45,15 @@
 </div>
 <div class="row input-daterange">
 	<div class="col-md-4">
-		<input type="date" name="from_date" id="from_date" class="form-control" />
+		      <label>From: <label>
+		<input type="date" name="from_date" id="from_date" class="form-control" style="width: 200%; margin-left: 10px;" />
 	</div>
-	<div class="col-md-4">
-		<input type="date" name="to_date" id="to_date" class="form-control" />
+	<div class="col-md-4" style="margin-left: 20px;">
+		      <label>To: <label>
+		<input type="date" name="to_date" id="to_date" class="form-control" style="width: 200%; margin-left: 10px;"/>
 	</div>
-	<div class="col-md-4">
+	<div class="col-md-3">
 		<button type="button" name="filter" id="filter" class="btn btn-primary" style="width:150px;margin-right:10px">Filter</button>
-		<button type="button" name="refresh" id="refresh" class="btn btn-primary" style="width:150px;">Clear</button>
 	</div>
 </div>
     <div class="row">
@@ -96,17 +97,17 @@ Product with given barcode does not exist
       </div>
       <div class="modal-body">
       	<div id="add-div">
-			<form class="form-inline" id="order-form" style="margin-left: 15px">
+			<form class="form-inline required" id="order-form" style="margin-left: 15px">
 			  <div class="form-group">
-			    <label for="inputBarcode" class="col-m-2 col-form-label">Barcode</label>
+			    <label for="inputBarcode" class="col-m-2 control-label">Barcode</label>
 			      <input type="text" class="form-control" name="barcode" id="inputBarcode" placeholder="enter barcode" style="margin-left: 15px;margin-right: 15px">
 			  </div>
 			  <div class="form-group">
-			    <label for="inputQuantity" class="col-m-2">Quantity</label>
+			    <label for="inputQuantity" class="col-m-2 control-label">Quantity</label>
 			      <input type="text" class="form-control" name="quantity" id="inputQuantity" placeholder="enter quantity" style="margin-left: 15px;margin-right: 15px">
 			  </div>
 			  <div class="form-group">
-			    <label for="inputPrice" class="col-m-2">Price</label>
+			    <label for="inputPrice" class="col-m-2 control-label">Price</label>
 			      <input type="text" class="form-control" name="price" id="inputPrice" placeholder="enter price" style="margin-left: 15px;margin-right: 15px">
 			  </div>
 			  <button type="button" class="btn btn-primary" id="add-items">Add</button>
@@ -134,15 +135,15 @@ Product with given barcode does not exist
      <div id="beditdiv">
 			<form class="form-horizontal" id="edit-form" style="margin-left: 15px">
 			  <div class="form-group">
-			    <label for="inputBarcode" class="col-sm-2 col-form-label">Barcode</label>
+			    <label for="inputBarcode" class="col-sm-2 control-label">Barcode</label>
 			      <input type="text" class="form-control" name="barcode" id="inputBarcode" placeholder="enter barcode" >
 			  </div>
 			  <div class="form-group">
-			    <label for="inputQuantity" class="col-sm-2">Quantity</label>
+			    <label for="inputQuantity" class="col-sm-2 control-label">Quantity</label>
 			      <input type="text" class="form-control" name="quantity" id="inputQuantity" placeholder="enter quantity">
 			  </div>
 			  <div class="form-group">
-			    <label for="inputPrice" class="col-sm-2">Price</label>
+			    <label for="inputPrice" class="col-sm-2 control-label">Price</label>
 			      <input type="text" class="form-control" name="price" id="inputPrice" placeholder="enter price">
 			  </div>
 			  <input type="hidden" name="id" id="edit-id">
@@ -157,7 +158,7 @@ Product with given barcode does not exist
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
       </div>
        <div id="editfooter">
-      	<button type="button" class="btn btn-primary" id="edit-btn">Edit</button>
+      	<button type="button" class="btn btn-primary" id="edit-btn">Update</button>
         <button type="button" class="btn btn-secondary" id="cancel">Cancel</button>
       </div>
     </div>
@@ -217,17 +218,17 @@ Product with given barcode does not exist
       </div>
       <div class="modal-body">
    <div id="whole">
-			<form class="form-inline" id="add-order-form">
+			<form class="form-inline required" id="add-order-form">
 			  <div class="form-group">
-			    <label for="inputBarcode" class="col-m-2 col-form-label">Barcode</label>
+			    <label for="inputBarcode" class="col-m-2 control-label">Barcode</label>
 			      <input type="text" class="form-control" name="barcode" id="inputBarcode" placeholder="enter barcode" style="margin-left: 15px;margin-right: 15px">
 			  </div>
 			  <div class="form-group">
-			    <label for="inputQuantity" class="col-m-2">Quantity</label>
+			    <label for="inputQuantity" class="col-m-2 control-label">Quantity</label>
 			      <input type="text" class="form-control" name="quantity" id="inputQuantity" placeholder="enter quantity"  style="margin-left: 15px;margin-right: 15px">
 			  </div>
 			  <div class="form-group">
-			    <label for="inputPrice" class="col-m-2">Price</label>
+			    <label for="inputPrice" class="col-m-2 control-label">Price</label>
 			      <input type="text" class="form-control" name="price" id="inputPrice" placeholder="enter price" style="margin-left: 15px;margin-right: 15px">
 			  </div>
 			  <button type="button" class="btn btn-primary" id="add-edit-items">Add</button>
@@ -254,17 +255,17 @@ Product with given barcode does not exist
 </div>
 </div>
       	<div id="editdiv">
-			<form class="form-horizontal" id="edit-view-form">
+			<form class="form-horizontal required" id="edit-view-form">
 			  <div class="form-group">
-			    <label for="inputBarcode" class="col-sm-2 col-form-label">Barcode</label>
+			    <label for="inputBarcode" class="col-sm-2 control-label">Barcode</label>
 			      <input type="text" class="form-control" name="barcode" id="editBarcode" placeholder="enter barcode">
 			  </div>
 			  <div class="form-group">
-			    <label for="inputQuantity" class="col-sm-2">Quantity</label>
+			    <label for="inputQuantity" class="col-sm-2 control-label">Quantity</label>
 			      <input type="text" class="form-control" name="quantity" id="editQuantity" placeholder="enter quantity">
 			  </div>
 			  <div class="form-group">
-			    <label for="inputPrice" class="col-sm-2">Price</label>
+			    <label for="inputPrice" class="col-sm-2 control-label">Price</label>
 			      <input type="text" class="form-control" name="price" id="editPrice" placeholder="enter price">
 			  </div>
 			  <input type="hidden" name="id" id="edit-Id">
@@ -273,7 +274,7 @@ Product with given barcode does not exist
 	</div>
 	     <div class="modal-footer">
        <div id="aftereditfooter">
-      	<button type="button" class="btn btn-primary" id="edit-button">Edit</button>
+      	<button type="button" class="btn btn-primary" id="edit-button">Update</button>
         <button type="button" class="btn btn-secondary" id="editcancel">Cancel</button>
       </div>
     </div>

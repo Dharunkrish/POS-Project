@@ -16,6 +16,7 @@ import com.increff.employee.pojo.inventoryPojo;
 import com.increff.employee.pojo.productPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.InventoryService;
+import com.increff.employee.util.DataConversionUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,7 +32,7 @@ public class inventoryApiController {
 	@ApiOperation(value = "Adds an product")
 	@RequestMapping(path = "/api/inventory/supervisor", method = RequestMethod.POST)
 	public void add(@RequestBody inventoryForm form) throws ApiException {
-		inventoryPojo p = convert(form);
+		inventoryPojo p = DataConversionUtil.convert(form);
 		service.add(p);
 	}
 
@@ -42,7 +43,7 @@ public class inventoryApiController {
 	@RequestMapping(path = "/api/inventory/{id}", method = RequestMethod.GET)
 	public inventoryForm get(@PathVariable int id) throws ApiException {
 		inventoryPojo p = service.get(id);
-		return convert(p);
+		return DataConversionUtil.convert(p);
 	}
 	
 	@ApiOperation(value = "Gets an inventory by ID")
@@ -58,7 +59,7 @@ public class inventoryApiController {
 		List<inventoryPojo> list = service.getAll();
 		List<inventoryForm> list2 = new ArrayList<inventoryForm>();
 		for (inventoryPojo p : list) {
-			list2.add(convert(p));
+			list2.add(DataConversionUtil.convert(p));
 		}
 		return list2;
 	}
@@ -66,30 +67,8 @@ public class inventoryApiController {
 	@ApiOperation(value = "Updates an inventory")
 	@RequestMapping(path = "/api/inventory/supervisor/{id}", method = RequestMethod.PUT)
 	public void update(@PathVariable int id, @RequestBody inventoryForm f) throws ApiException {
-		inventoryPojo p = convert(f);
-		logger.info(p.getQuantity());
-		logger.info(id);
+		inventoryPojo p = DataConversionUtil.convert(f);
 		service.update(id, p);
 	}
-
-	
-
-	private static inventoryForm convert(inventoryPojo p) {
-		inventoryForm d = new inventoryForm();
-		d.setQuantity(p.getQuantity());
-		d.setId(p.getId());
-		d.setBarcode(p.getBarcode());
-		d.setName(p.getName());
-		return d;
-	}
-
-	private static inventoryPojo convert(inventoryForm f) {
-		inventoryPojo pr = new inventoryPojo();
-		pr.setQuantity(f.getQuantity());
-		pr.setId(f.getId());
-		return pr;
-	}
-	
-
 	
 }

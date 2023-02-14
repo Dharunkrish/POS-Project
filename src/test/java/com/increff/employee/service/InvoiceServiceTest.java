@@ -29,6 +29,12 @@ import com.increff.employee.pojo.orderPojo;
 import com.increff.employee.pojo.orderitemPojo;
 import com.increff.employee.dao.orderitemDao;
 import com.increff.employee.dao.reportDao;
+import com.increff.employee.model.DaySalesXml;
+import com.increff.employee.model.DaySalesXmlForm;
+import com.increff.employee.model.InventoryReportXml;
+import com.increff.employee.model.InventoryXmlForm;
+import com.increff.employee.model.SalesReportDataXml;
+import com.increff.employee.model.SalesXmlForm;
 import com.increff.employee.model.orderData;
 import com.increff.employee.model.orderxmlForm;
 import com.increff.employee.model.reportForm;
@@ -51,6 +57,9 @@ public class InvoiceServiceTest extends AbstractUnitTest {
 	private InventoryService invservice;
 
 	@Autowired
+	private reportService repservice;
+
+	@Autowired
 	private productService prodservice;
 
 	@Autowired
@@ -62,6 +71,8 @@ public class InvoiceServiceTest extends AbstractUnitTest {
 
 
 	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+	DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
 
 
 
@@ -162,8 +173,22 @@ public class InvoiceServiceTest extends AbstractUnitTest {
 		return order;
 	}
 
+	public orderPojo Initialise2()  throws ApiException {
+		orderPojo order =new orderPojo();
+		order.setT(ZonedDateTime.now().minus(Period.ofDays(1)));
+		order.setInvoiceGenerated(false);
+		order=dao.create(order);
+		orderitemPojo oi1=OrderItemInitialise1();
+		orderitemPojo oi2=OrderItemInitialise2();
+		oi1.setQuantity(oi1.getQuantity()-2);
+		oi2.setQuantity(oi2.getQuantity()-4);
+		orderservice.AddSingleItem(oi1,order.getId());
+		orderservice.AddSingleItem(oi2,order.getId());
+		return order;
+	}
+
 	@Test
-	public void TestGenerateXMLList() throws Exception{
+	public void TestGenerateInvoiceXMLList() throws Exception{
 		   orderPojo o=Initialise1();
 		   orderxmlForm xmlList=new orderxmlForm();
 		   xmlList.setOrder_id(o.getId());
@@ -204,7 +229,172 @@ public class InvoiceServiceTest extends AbstractUnitTest {
 		double total=invoiceService.calculateTotal(xmlList);
 		assertEquals(2000,total,0.01);
 	}
- 
+
+	@Test
+	public void TestGenerateDaySalesXMLList() throws Exception{
+		Initialise1();
+		repservice.add();
+		reportForm s=new reportForm();
+		s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
+		s.setTo(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()));
+		DaySalesXml d=service.generateDaySalesReport(s);
+		assertEquals(s.getFrom().format(formatter1),d.getFrom());
+		assertEquals(s.getTo().format(formatter1), d.getTo());
+		List<DaySalesXmlForm> ds=d.getData();
+		assertEquals(1, ds.get(0).getTotal_order());
+		assertEquals(2, ds.get(0).getTotal_item());
+		assertEquals(2000, ds.get(0).getRevenue(),0.01);
+		assertEquals(ZonedDateTime.now().minus(Period.ofDays(1)).format(formatter1), ds.get(0).getDate());
+	}
+
+	@Test
+	public void TestGenerateSalesXMLList() throws Exception{
+		Initialise1();
+		reportForm s=new reportForm();
+		s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
+		s.setTo(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()));
+		s.setBrand("none");
+		s.setCategory("none");
+		SalesXmlForm d=service.generateSalesReport(s);
+		assertEquals(s.getFrom().format(formatter1),d.getFrom());
+		assertEquals(s.getTo().format(formatter1), d.getTo());
+		assertEquals("All",d.getBrand());
+		assertEquals("All", d.getCategory());
+		List<SalesReportDataXml> ds=d.getData();
+		SalesReportDataXml o=ds.get(0);
+		assertEquals("nestle1", o.getBrand());
+		assertEquals("maggi1", o.getCategory());
+		assertEquals(10, o.getQuantity());
+		assertEquals(1000.0, o.getRevenue(),0.01);
+		o=ds.get(1);
+		assertEquals("bru1", o.getBrand());
+		assertEquals("coffee1", o.getCategory());
+		assertEquals(5, o.getQuantity());
+		assertEquals(1000.0, o.getRevenue(),0.01);
+		assertEquals(15,d.getTotal_quantity());
+		assertEquals(2000, d.getRevenue(),0.01);
+	}
+
+	@Test
+	public void TestGenerateSalesXMLListWithBrand() throws Exception{
+		Initialise1();
+		reportForm s=new reportForm();
+		s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
+		s.setTo(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()));
+		s.setBrand("nestle1");
+		s.setCategory("none");
+		SalesXmlForm d=service.generateSalesReport(s);
+		assertEquals(s.getFrom().format(formatter1),d.getFrom());
+		assertEquals(s.getTo().format(formatter1), d.getTo());
+		assertEquals("nestle1",d.getBrand());
+		assertEquals("All", d.getCategory());
+		List<SalesReportDataXml> ds=d.getData();
+		SalesReportDataXml o=ds.get(0);
+		assertEquals("nestle1", o.getBrand());
+		assertEquals("maggi1", o.getCategory());
+		assertEquals(10, o.getQuantity());
+		assertEquals(1000.0, o.getRevenue(),0.01);
+		assertEquals(10,d.getTotal_quantity());
+		assertEquals(1000, d.getRevenue(),0.01);
+	}
+
+	@Test
+	public void TestGenerateSalesXMLListWithCategory() throws Exception{
+		Initialise1();
+		reportForm s=new reportForm();
+		s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
+		s.setTo(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()));
+		s.setBrand("none");
+		s.setCategory("coffee1");
+		SalesXmlForm d=service.generateSalesReport(s);
+		assertEquals(s.getFrom().format(formatter1),d.getFrom());
+		assertEquals(s.getTo().format(formatter1), d.getTo());
+		assertEquals("All",d.getBrand());
+		assertEquals("coffee1", d.getCategory());
+		List<SalesReportDataXml> ds=d.getData();
+		SalesReportDataXml o=ds.get(0);
+		assertEquals("bru1", o.getBrand());
+		assertEquals("coffee1", o.getCategory());
+		assertEquals(5, o.getQuantity());
+		assertEquals(1000.0, o.getRevenue(),0.01);
+		assertEquals(5,d.getTotal_quantity());
+		assertEquals(1000, d.getRevenue(),0.01);
+	}
+
+	@Test
+	public void TestGenerateSalesXMLListWithBrandCategory() throws Exception{
+		Initialise1();
+		reportForm s=new reportForm();
+		s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
+		s.setTo(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()));
+		s.setBrand("bru1");
+		s.setCategory("coffee1");
+		SalesXmlForm d=service.generateSalesReport(s);
+		assertEquals(s.getFrom().format(formatter1),d.getFrom());
+		assertEquals(s.getTo().format(formatter1), d.getTo());
+		assertEquals("bru1",d.getBrand());
+		assertEquals("coffee1", d.getCategory());
+		List<SalesReportDataXml> ds=d.getData();
+		SalesReportDataXml o=ds.get(0);
+		assertEquals("bru1", o.getBrand());
+		assertEquals("coffee1", o.getCategory());
+		assertEquals(5, o.getQuantity());
+		assertEquals(1000.0, o.getRevenue(),0.01);
+		assertEquals(5,d.getTotal_quantity());
+		assertEquals(1000, d.getRevenue(),0.01);
+	}
+	@Test
+	public void TestGenerateInventoryXMLList() throws Exception{
+		Initialise2();
+		InventoryReportXml d=service.generateInventoryReport();
+		List<InventoryXmlForm> ds=d.getData();
+		InventoryXmlForm o=ds.get(0);
+		assertEquals("nestle1", o.getBrand());
+		assertEquals("maggi1", o.getCategory());
+		assertEquals(2, o.getQuantity());
+		o=ds.get(1);
+		assertEquals("bru1", o.getBrand());
+		assertEquals("coffee1", o.getCategory());
+		assertEquals(19, o.getQuantity());
+		assertEquals(21,d.getTotal_quantity());
+	}
+
+	@Test
+	public void TestInventoryTotal() throws Exception{
+		Initialise2();
+		InventoryReportXml d=service.generateInventoryReport();
+		int total=invoiceService.calculateInventoryTotal(d.getData());
+		assertEquals(21,total);
+	}
+
+	@Test
+	public void TestSalesReportTotal() throws Exception{
+	   Initialise1();
+		reportForm s=new reportForm();
+		s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
+		s.setTo(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()));
+		s.setBrand("none");
+		s.setCategory("none");
+		SalesXmlForm d=service.generateSalesReport(s);
+		List<Object> m=invoiceService.calculateSalesTotal(d.getData());
+		assertEquals(15,m.get(0));
+		assertEquals(2000.0, m.get(1));
+	}
+
+	@Test
+	public void TestDaySalesReportTotal() throws Exception{
+	    Initialise1();
+		repservice.add();
+		reportForm s=new reportForm();
+		s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
+		s.setTo(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()));
+		DaySalesXml d=service.generateDaySalesReport(s);
+		List<Object> m=service.calculateDaySalesTotal(d.getData());
+		System.err.print(d.getData().get(0).getDate());
+		assertEquals(1, m.get(0));
+		assertEquals(2, m.get(2));
+		assertEquals(2000.0,(double)m.get(1),0.01);
+	}
 	}
 
 	

@@ -24,6 +24,22 @@ function len(){
 function additems(){
 var $form = $("#order-form");
 var json = toJsonobject($form);
+console.log(json);
+if (isNaN(json.quantity)){
+		toastr.options.timeOut = 0;
+        toastr.error("Quantity must be a number");
+		return;
+}
+	if (json.quantity%1!=0){
+		toastr.options.timeOut = 0;
+        toastr.error("Quantity must be a whole number");
+		return;
+	}
+if (isNaN(json.price)){
+		toastr.options.timeOut = 0;
+        toastr.error("Selling Price must be a number");
+		return;
+}
 json['id']=len();
 const items=JSON.parse(sessionStorage.getItem("itemlist"));
  document.getElementById("order-form").reset();    
@@ -127,6 +143,24 @@ function edititem(){
 var $form = $("#edit-form");
 var url=Url()+ '/supervisor/check';
 var json = toJson($form);
+var quantity = $("#edit-form input[name=quantity]").val();
+var price = $("#edit-form input[name=price]").val();
+console.log(price,quantity)
+if (isNaN(quantity)){
+		toastr.options.timeOut = 0;
+        toastr.error("Quantity must be a number");
+		return;
+}
+	if (quantity%1!=0){
+		toastr.options.timeOut = 0;
+        toastr.error("Quantity must be a whole number");
+		return;
+	}
+if (isNaN(price)){
+		toastr.options.timeOut = 0;
+        toastr.error("Selling Price must be a number");
+		return;
+}
 $.ajax({
 	   url: url,
 	   type: 'POST',
@@ -166,6 +200,21 @@ $.ajax({
 function updateitem(){
 var $form = $("#edit-view-form");
 var json = toJsonobject($form);
+if (isNaN(json.quantity)){
+		toastr.options.timeOut = 0;
+        toastr.error("Quantity must be a number");
+		return;
+}
+	if (json.quantity%1!=0){
+		toastr.options.timeOut = 0;
+        toastr.error("Quantity must be a whole number");
+		return;
+	}
+if (isNaN(json.price)){
+		toastr.options.timeOut = 0;
+        toastr.error("Selling Price must be a number");
+		return;
+}
 json['old_q']=quantity_v;
 json1=JSON.stringify(json);
 var id=$("#edit-view-form input[name=id]").val();
@@ -276,6 +325,8 @@ function addedititem(){
 				return;}
 			else{
 			getedititem(o_Id);
+			 document.getElementById("add-order-form").reset();    
+
 		}
 		},
 	  error: handleAjaxError
@@ -329,11 +380,12 @@ function showtable(){
 }
 
 function displayOrder(data){
+	console.log("k");
 	$('#order-table').dataTable().fnClearTable();
     $('#order-table').dataTable().fnDestroy();
 	var $tbody = $('#order-table').find('tbody');
 	$tbody.empty();
-	$('#from_date').val(data[0].time.slice(0,11))
+	//$('#from_date').val(data[0].time.slice(0,11))
 	for(var i in data){
 		var e = (data[i]);
 		e.time=e.time.replace('T',"   ");
@@ -353,28 +405,31 @@ function displayOrder(data){
 		+ '<td>' + buttonHtml1 +'</td>'
 		+ '<td>' + buttonHtml3 +'</td>'
 		+ '<td>' + buttonHtml2 +'</td>';
+
         $tbody.append(row);
 	}
-	   
 	    if (getRole()==="operator"){
-	    	 $('#order-table').DataTable({"columnDefs": [
-        { "targets": [1,2,3], "searchable": false },
+	    	 var ta=$('#order-table').DataTable({"columnDefs": [
+        { "targets": [2,3], "searchable": false },
                 { 'visible': false, 'targets': [3] }
     ],
-        pageLength : 7,
+        pageLength : 6,
         autoWidth: true,
-
-    lengthMenu: [[7, 10, 20, -1], [7, 10, 20, 'All']]});
+    lengthMenu: [[6, 10, 20, -1], [6, 10, 20, 'All']]});
 	    }
 	    else{
- $('#order-table').DataTable({"columnDefs": [
-        { "targets": [1,2,3], "searchable": false }    ],
-        pageLength : 7,
+ var ta=$('#order-table').DataTable({"columnDefs": [
+        { "targets": [2,3], "searchable": false }    ],
+        pageLength : 6,
         autoWidth: true,
-
-    lengthMenu: [[7, 10, 20, -1], [7, 10, 20, 'All']]});
+    lengthMenu: [[6, 10, 20, -1], [6, 10, 20, 'All']]});
 	    }
+
+    new $.fn.dataTable.FixedHeader(ta);
+
 }
+	   
+
 
 	 	
 function displayOrderitem(data){
@@ -426,6 +481,7 @@ function downloadPDF(id) {
       	link.download="Invoice_" + id +"_"+ new Date() + ".pdf";
       	link.click();
       	$('#orderedit'+id+'').attr("disabled",true);
+      	getorder();
 	   },
 	   error: function(response){
 	   		handleAjaxError(response);
@@ -447,6 +503,7 @@ function clearstorage(){
     e.preventDefault();
     var startDate = $('#from_date').val();
      var endDate = $('#to_date').val();
+     console.log(startDate,endDate);
      $.fn.dataTableExt.afnFiltering.length = 0;
     filterByDate(1, startDate, endDate); // We call our filter function
     $('#order-table').dataTable().fnDraw(); // Manually redraw the table after filtering
@@ -456,9 +513,11 @@ var filterByDate = function(column, startDate, endDate) {
   // Custom filter syntax requires pushing the new filter to the global filter array
    var start = normalizeDate(startDate);
     var end = normalizeDate(endDate);
+    console.log(start,end)
 		$.fn.dataTableExt.afnFiltering.push(
 		   	function( oSettings, aData, iDataIndex ) {
 		   	  var rowDate = aData[column].slice(0,10);
+		   	  console.log(aData,iDataIndex)
           // If our date from the row is between the start and end
           if (start <= rowDate && rowDate <= end) {
             return true;
@@ -506,7 +565,6 @@ function init(){
          updateitem();
 	});
 	$("#cancel").click(function(){
-		    console.log("d");
 			$('#add-div').css("display", "block");
 		    $('#beditdiv').css("display", "none");
 		    $('#addfooter').css("display", "block");
@@ -525,11 +583,16 @@ function init(){
     $('#submit').click(addorder)
     $("#clear").click(clearstorage);
     $("#closesign").click(clearstorage);
-     $("#refresh-data").click(getorder);
+     $("#refresh-data").click(function(){
+           $('#from_date').val("")
+       $('#to_date').val("")
+            $.fn.dataTableExt.afnFiltering.length = 0;
+       getorder();});
     if (getRole()==="operator"){
     	$("#add-ord").css("display","none");
     }
 }
+
 $(document).ready(init);
 $(document).ready(getorder);
 $(document).ready(function(){

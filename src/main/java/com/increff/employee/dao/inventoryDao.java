@@ -55,19 +55,6 @@ import com.increff.employee.service.ApiException;
 		}
 
 
-		public int upd(int quantity,String barcode) {
-			Query query=getQuery(update_inv);
-			query.setParameter("quantity",quantity);
-			query.setParameter("barcode", barcode);
-			query.executeUpdate();
-			return 1;
-		}
-		
-		public inventoryPojo getbar(String barcode) {
-			 TypedQuery<inventoryPojo> query=getQuery(get_inv,inventoryPojo.class);
-			query.setParameter("barcode", barcode);
-			return query.getSingleResult();
-		}
 		
 		public void update(inventoryPojo p) throws ApiException{
 		}
