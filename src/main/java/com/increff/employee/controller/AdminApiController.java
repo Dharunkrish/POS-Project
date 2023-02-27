@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.increff.employee.model.UserData;
-import com.increff.employee.model.UserForm;
+import com.increff.employee.model.Data.UserData;
+import com.increff.employee.model.Form.UserForm;
 import com.increff.employee.pojo.UserPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.UserService;
@@ -22,41 +22,35 @@ import io.swagger.annotations.ApiOperation;
 
 @Api
 @RestController
+@RequestMapping(path = "/api/supervisor/user")
 public class AdminApiController {
 
 	@Autowired
 	private UserService service;
 
 	@ApiOperation(value = "Adds a user")
-	@RequestMapping(path = "/api/supervisor/user", method = RequestMethod.POST)
+	@RequestMapping(method = RequestMethod.POST)
 	public void addUser(@RequestBody UserForm form) throws ApiException {
-		UserPojo p = DataConversionUtil.convert(form);
-		service.add(p);
+		service.add(form);
 	}
 
 	@ApiOperation(value = "Deletes a user")
-	@RequestMapping(path = "/api/supervisor/user/{id}", method = RequestMethod.DELETE)
+	@RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
 	public void deleteUser(@PathVariable int id) {
 		service.delete(id);
 	}
 
 	@ApiOperation(value = "Gets list of all users")
-	@RequestMapping(path = "/api/supervisor/user", method = RequestMethod.GET)
+	@RequestMapping(method = RequestMethod.GET)
 	public List<UserData> getAllUser() {
-		List<UserPojo> list = service.getAll();
-		List<UserData> list2 = new ArrayList<UserData>();
-		for (UserPojo p : list) {
-			list2.add(DataConversionUtil.convert(p));
-		}
-		return list2;
+		return service.getAll();
 	}
 	
 
 	@ApiOperation(value = "Adds a user")
-	@RequestMapping(path = "/api/supervisor/user/{id}", method = RequestMethod.PUT)
+	@RequestMapping(path = "/{id}", method = RequestMethod.PUT)
 	public void updateUser(@PathVariable int id,@RequestBody UserForm form) throws ApiException {
-		UserPojo p = DataConversionUtil.convert(form);
-		service.update(p,id);
+		service.update(form,id);
 	}
 
 

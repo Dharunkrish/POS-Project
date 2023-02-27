@@ -1,0 +1,25 @@
+body{
+	background-color : #e3f2fd;
+	
+}
+
+.bx{
+	font-size: 20px;
+	top: 10px;
+	left: 95%;
+}
+
+#em,#pd{
+position: relative;
+width: 100%
+}
+
+#email,#password{ 
+ position: absolute;  
+ width:100%;
+ padding-right: 10%;
+}
+
+.card{
+	height: 350px;
+}

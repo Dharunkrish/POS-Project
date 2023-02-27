@@ -1,4 +1,5 @@
-
+var e=0;
+var pattern=new RegExp("^[a-zA-Z0-9_]*$")
 function getbrandUrl(){
 	var baseUrl = $("meta[name=baseUrl]").attr("content")
 	return baseUrl + "/api/brand";
@@ -7,6 +8,21 @@ function getbrandUrl(){
 //BUTTON ACTIONS
 function addbrand(event){
 	//Set the values to update
+	console.log(event);
+	if (!pattern.test($("#inputBrand").val())){
+       document.getElementById('inputBrand').setCustomValidity('Enter only alpahanumeric charaters & underscores');
+       return;
+	}
+	else{
+		       document.getElementById('inputBrand').setCustomValidity('');
+	}
+	if (!pattern.test($("#inputcategory").val())){
+       document.getElementById('inputcategory').setCustomValidity('Enter only alpahanumeric charaters & underscores');
+       return;
+	}
+	else{
+		       document.getElementById('inputcategory').setCustomValidity('');
+	}
 	var $form = $("#brand-add-form");
 	var json = toJson($form);
 	var url = getbrandUrl()+"/supervisor";
@@ -31,6 +47,22 @@ function addbrand(event){
 }
 
 function updatebrand(event){
+	console.log("fgg");
+	if (!pattern.test($("#editbrand").val())){
+		console.log("f");
+       document.getElementById('editbrand').setCustomValidity('Enter only alpahanumeric charaters & underscores');
+       return;
+	}
+	else{
+		       document.getElementById('editbrand').setCustomValidity('');
+	}
+	if (!pattern.test($("#editcategory").val())){
+       document.getElementById('editcategory').setCustomValidity('Enter only alpahanumeric charaters & underscores');
+       return;
+	}
+	else{
+		       document.getElementById('editcategory').setCustomValidity('');
+	}
 	$('#edit-brand-modal').modal('toggle');
 	//Get the ID
 	var id = $("#brand-edit-form input[name=id]").val();	
@@ -73,18 +105,6 @@ function getbrandList(){
 	});
 }
 
-function deletebrand(id){
-	var url = getbrandUrl() + "/" + id;
-
-	$.ajax({
-	   url: url,
-	   type: 'DELETE',
-	   success: function(data) {
-	   		getbrandList();  
-	   },
-	   error: handleAjaxError
-	});
-}
 
 // FILE UPLOAD METHODS
 var fileData = [];
@@ -93,20 +113,29 @@ var processCount = 0;
 
 
 function processData(){
-		   		toastr.options.timeOut = 2000;
-	   		toastr.success("File uploaded successfully");
-
+    $('#process-data').attr("disabled",true);
 	var file = $('#brandFile')[0].files[0];
 	readFileData(file, readFileDataCallback);
+	setTimeout(function(){
+		            if (e===1){
+		            	        e=0
+            		   			toastr.timeOut=0;
+    toastr.error("Uploaded file has some errors. Download the file to see the error")
+            }
+            else{
+            				   		toastr.options.timeOut = 2000;
+	
+	   		toastr.success("File uploaded successfully");
+            }
+        },200);
 }
 
 function readFileDataCallback(results){
 	fileData = results.data;
-	uploadRows();
-
+	uploadRows(0);
 }
 
-function uploadRows(){
+function uploadRows(i){
 	
 	if (fileData.length>5000){
 		alert("File Rows should be within 5000 rows");
@@ -116,12 +145,14 @@ function uploadRows(){
 	updateUploadDialog();
 	//If everything processed then return
 	if(processCount==fileData.length){
+		    $("#brandFile").val("");
+            $('#brandFilecategory').html("Choose File");
 		return;
 	}
-	
 	//Process next row
 	var row = fileData[processCount];
 	processCount++;
+
 	
 	var json = JSON.stringify(row);
 	var url = getbrandUrl()+"/supervisor";
@@ -135,16 +166,16 @@ function uploadRows(){
        	'Content-Type': 'application/json'
        },	   
 	   success: function(response) {
-	   		uploadRows();  
+	   		uploadRows(i++);  
 	   },
 	   error: function(response){
-	   		row.error=response.responseText
+	   		row.error=response.responseJSON.message
 	   		errorData.push(row);
-	   		uploadRows();
-	   }
+	   		uploadRows(i++);
+	}
 	});
-
 }
+
 
 function downloadErrors(){
 	writeFileData(errorData);
@@ -184,9 +215,8 @@ else{
         className: 'dt-center'
     }
 ],   "info":false,
-                 pageLength : 7,
         autoWidth: true,
-    lengthMenu: [[7, 10, 20, -1], [7, 10, 20, 'All']]
+    lengthMenu: [[10, 20, -1], [10, 20, 'All']]
  } );
 }
     new $.fn.dataTable.FixedHeader(ta);
@@ -207,13 +237,13 @@ function displayEditbrand(id){
 
 function resetUploadDialog(){
 	//Reset file name
-	var $file = $('#brandFile');
-	$file.val('');
-	$('#brandFileName').html("Choose File");
+	var file = $('');
+	$('#brandFilecategory').html("Choose File");
 	//Reset various counts
 	processCount = 0;
 	fileData = [];
 	errorData = [];
+	 	$("#download-errors").attr("disabled",true);
 	//Update counts	
 	updateUploadDialog();
 }
@@ -221,6 +251,7 @@ function resetUploadDialog(){
 function updateUploadDialog(){
 	if (errorData.length>0){
 		$("#download-errors").attr("disabled",false);
+		e=1;
 	}
 	$('#rowCount').html("" + fileData.length);
 	$('#processCount').html("" + processCount);
@@ -231,9 +262,17 @@ function updateFileName(){
 	var $file = $('#brandFile');
 	var fileName = $file.val();
 	var f=fileName.split("\\");
+	l=f[f.length-1];
+	if (l.slice(-3)!=="tsv"){
+		toastr.options.timeOut = 0;
+	   		toastr.error("Upload only TSV files");
+	   		$("#brandFile").val("");
+	   		return;
+	}
 	$('#brandFilecategory').html(f[f.length-1]);
 
 }
+
 
 function displayUploadData(){
  	resetUploadDialog(); 	
@@ -276,6 +315,7 @@ function init(){
     	$("#add").css("display","none");
     	 $("#upload-data").css("display","none");
     }
+    $("#brandFile").click(resetUploadDialog)
 }
 
 $(document).ready(init);

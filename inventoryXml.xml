@@ -1,29 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <items>
     <data>
-        <quantity>10</quantity>
+        <quantity>88</quantity>
         <category>coffee</category>
         <brand>nestle</brand>
     </data>
     <data>
-        <quantity>229</quantity>
-        <category>soap</category>
-        <brand>cinthol</brand>
-    </data>
-    <data>
-        <quantity>2</quantity>
-        <category>maggi</category>
-        <brand>nestle</brand>
-    </data>
-    <data>
-        <quantity>100</quantity>
-        <category>coffee</category>
+        <quantity>150</quantity>
+        <category>tea</category>
         <brand>bru</brand>
     </data>
     <data>
-        <quantity>600</quantity>
-        <category>coffee</category>
-        <brand>nek</brand>
+        <quantity>190</quantity>
+        <category>shoe</category>
+        <brand>nike</brand>
     </data>
-    <total_quantity>941</total_quantity>
+    <data>
+        <quantity>2</quantity>
+        <category>bottle</category>
+        <brand>tupperware</brand>
+    </data>
+    <total_quantity>430</total_quantity>
 </items>

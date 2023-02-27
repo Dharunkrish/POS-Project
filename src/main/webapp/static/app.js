@@ -33,7 +33,6 @@ function toJsonobject($form){
 
 
 function handleAjaxError(response){
-  console.log(response)
 	var response = JSON.parse(response.responseText);
     toastr.options.timeOut = 0;
     toastr.error(response.message);
@@ -57,7 +56,8 @@ function writeFileData(arr){
 		escapeChar: '',
 		delimiter: "\t"
 	};
-	
+	 console.log("s",arr)
+  
 	var data = Papa.unparse(arr, config);
     var blob = new Blob([data], {type: 'text/tsv;charset=utf-8;'});
     var fileUrl =  null;
@@ -87,5 +87,7 @@ toastr.options = {
   "hideEasing": "linear",
   "showMethod": "fadeIn",
   "hideMethod": "fadeOut",
-  "font-size":  "15px"
+  "font-size":  "15px",
+  "preventDuplicates": "true"
 };
+

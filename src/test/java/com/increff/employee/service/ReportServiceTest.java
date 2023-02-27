@@ -28,8 +28,8 @@ import com.increff.employee.dao.brandDao;
 import com.increff.employee.dao.inventoryDao;
 import com.increff.employee.dao.orderitemDao;
 import com.increff.employee.dao.reportDao;
-import com.increff.employee.model.daysalesData;
-import com.increff.employee.model.reportForm;
+import com.increff.employee.model.Data.daysalesData;
+import com.increff.employee.model.Form.reportForm;
 import com.increff.employee.pojo.brandPojo;
 import com.increff.employee.pojo.daySalesReportPojo;
 
@@ -251,27 +251,32 @@ public class ReportServiceTest extends AbstractUnitTest {
 	}
 
 
-	public void Initialise1()  throws ApiException {
-		orderPojo order =new orderPojo();
-		order.setT(ZonedDateTime.now().minus(Period.ofDays(1)));
-		order.setInvoiceGenerated(false);
-		order=dao.create(order);
-		orderPojo order2 =new orderPojo();
-		order2.setT(ZonedDateTime.now().minus(Period.ofDays(1)));
-		order2.setInvoiceGenerated(false);
-		order2=dao.create(order2);
+	public void Initialise1()  throws Exception {
 		orderitemPojo oi1=OrderItemInitialise1();
 		orderitemPojo oi2=OrderItemInitialise2();
 		orderitemPojo oi3=OrderItemInitialise3();
 		orderitemPojo oi4=OrderItemInitialise4();
-		orderservice.AddSingleItem(oi1,order.getId());
-		orderservice.AddSingleItem(oi2,order.getId());
-		orderservice.AddSingleItem(oi3,order2.getId());
-		orderservice.AddSingleItem(oi4,order2.getId());
+		List<orderitemPojo> o=new ArrayList<orderitemPojo> ();
+		o.add(oi1);
+		o.add(oi2);
+		orderservice.AddItems(o);
+		orderPojo o1=orderservice.getAll().get(0);
+		o1.setId(o1.getId());
+		o1.setT(ZonedDateTime.now().minus(Period.ofDays(1)));
+		orderservice.update(o1.getId(), o1);
+		List<orderitemPojo> or=new ArrayList<orderitemPojo> ();
+		or.add(oi3);
+		or.add(oi4);
+		orderservice.AddItems(or);
+		orderPojo o2=orderservice.getAll().get(1);
+		o2.setId(o2.getId());
+		o2.setT(ZonedDateTime.now().minus(Period.ofDays(1)));
+		orderservice.update(o2.getId(), o2);
 	}
 
+
 	@Test
-	public void TestGetSalesWithoutBrandCategory() throws ApiException{
+	public void TestGetSalesWithoutBrandCategory() throws Exception{
            Initialise1();
 		   reportForm s=new reportForm();
 	       s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
@@ -299,7 +304,7 @@ public class ReportServiceTest extends AbstractUnitTest {
 	}
 
 	@Test
-	public void TestGetSalesWithoutCategory() throws ApiException{
+	public void TestGetSalesWithoutCategory() throws Exception{
            Initialise1();
 		   reportForm s=new reportForm();
 	       s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
@@ -322,7 +327,7 @@ public class ReportServiceTest extends AbstractUnitTest {
 	}
 
 	@Test
-	public void TestGetSalesWithoutBrand() throws ApiException{
+	public void TestGetSalesWithoutBrand() throws Exception{
            Initialise1();
 		   reportForm s=new reportForm();
 	       s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
@@ -345,7 +350,7 @@ public class ReportServiceTest extends AbstractUnitTest {
 	}
 
 	@Test
-	public void TestGetSales() throws ApiException{
+	public void TestGetSales() throws Exception{
            Initialise1();
 		   reportForm s=new reportForm();
 	       s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
@@ -363,7 +368,7 @@ public class ReportServiceTest extends AbstractUnitTest {
 	}
 
 	@Test
-	public void TestGetSalesWrong() throws ApiException{
+	public void TestGetSalesWrong() throws Exception{
 	Initialise1();
 	BrandInitialise5();
 	reportForm s=new reportForm();
@@ -493,6 +498,7 @@ public class ReportServiceTest extends AbstractUnitTest {
 	    s.setTo(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()));
 		Map<Integer,List<Object>> m=service.getinventoryReport(service.getinventory());
 		List<Integer> brand_id = new ArrayList<Integer>(m.keySet());
+		System.err.print("kk");
 		System.err.print(m);
 		List<Object> o=m.get(brand_id.get(0));
 		assertEquals("bru", o.get(1));

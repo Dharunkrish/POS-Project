@@ -1,5 +1,6 @@
 package com.increff.employee.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -9,8 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.increff.employee.dao.productDao;
-import com.increff.employee.pojo.brandPojo;
+import com.increff.employee.model.Data.productData;
+import com.increff.employee.model.Form.productForm;
 import com.increff.employee.pojo.productPojo;
+import com.increff.employee.util.DataConversionUtil;
 import com.increff.employee.util.StringUtil;
 
 @Service
@@ -25,7 +28,8 @@ public class productService {
 	private Logger logger = Logger.getLogger(productDao.class);
 
 	@Transactional(rollbackOn = ApiException.class)
-	public void add(productPojo p) throws ApiException {
+	public void add(productForm form) throws ApiException {
+		productPojo p = DataConversionUtil.convert(form);
 		normalize(p);
 		if (p.getMrp()<0){
 			throw new ApiException("MRP cannot be negative"); 
@@ -36,17 +40,23 @@ public class productService {
 	}
 
 	@Transactional(rollbackOn = ApiException.class)
-	public productPojo get(int id) throws ApiException {
-		return getCheck(id);
+	public productData get(int id) throws ApiException {
+		return DataConversionUtil.convert(getCheck(id));
 	}
 
 	@Transactional
-	public List<productPojo> getAll() throws Exception {
-		return dao.selectAll();
+	public List<productData> getAll() throws Exception {
+		List<productPojo> list=dao.selectAll();
+		List<productData> list2 = new ArrayList<productData>();
+		for (productPojo p : list) {
+			list2.add(DataConversionUtil.convert(p));
+		}
+		return list2;
 	}
 
 	@Transactional(rollbackOn  = ApiException.class)
-	public void update(int id, productPojo p) throws ApiException {
+	public void update(int id, productForm f) throws ApiException {
+		productPojo p = DataConversionUtil.convert(f);
 		normalize(p); 
 		if (p.getMrp()<0){
 			throw new ApiException("MRP cannot be negative"); 

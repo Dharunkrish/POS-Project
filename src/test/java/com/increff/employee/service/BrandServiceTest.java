@@ -9,6 +9,8 @@ import java.util.List;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.increff.employee.model.Data.brandData;
+import com.increff.employee.model.Form.brandForm;
 import com.increff.employee.pojo.brandPojo;
 
 
@@ -20,32 +22,32 @@ public class BrandServiceTest extends AbstractUnitTest {
 	@Rule
 	public ExpectedException exceptionRule = ExpectedException.none();
     
-	public brandPojo Initialise1()  throws ApiException {
-		brandPojo p = new brandPojo();
+	public brandForm Initialise1()  throws ApiException {
+		brandForm p = new brandForm();
         p.setBrand("nestle");
         p.setCategory("maggi");
 		service.add(p);
 		return p;
 	}
 
-	public brandPojo Initialise2()  throws ApiException {
-		brandPojo p = new brandPojo();
+	public brandForm Initialise2()  throws ApiException {
+		brandForm p = new brandForm();
         p.setBrand("bru1");
         p.setCategory("coffee");
 		service.add(p);
 		return p;
 	}
 
-	public brandPojo Initialise3()  throws ApiException {
-		brandPojo p = new brandPojo();
+	public brandForm Initialise3()  throws ApiException {
+		brandForm p = new brandForm();
         p.setBrand("bru1");
         p.setCategory("maggi");
 		service.add(p);
 		return p;
 	}
 
-	public brandPojo Initialise4()  throws ApiException {
-		brandPojo p = new brandPojo();
+	public brandForm Initialise4()  throws ApiException {
+		brandForm p = new brandForm();
         p.setBrand("nestle");
         p.setCategory("coffee");
 		service.add(p);
@@ -54,7 +56,7 @@ public class BrandServiceTest extends AbstractUnitTest {
 
 	@Test
 	public void TestAdd() throws ApiException {
-		brandPojo p = new brandPojo();
+		brandForm p = new brandForm();
         p.setBrand("nestle");
         p.setCategory("maggi");
 		service.add(p);
@@ -94,7 +96,7 @@ public class BrandServiceTest extends AbstractUnitTest {
 	public void TestGetBrandCategory() throws ApiException{
 		Initialise1();
 		int id=service.getAll().get(0).getId();
-        brandPojo p=service.get(id);
+        brandForm p=service.get(id);
 		assertEquals("nestle", p.getBrand());
 		assertEquals("maggi", p.getCategory());
 	}
@@ -103,10 +105,10 @@ public class BrandServiceTest extends AbstractUnitTest {
 	public void TestGetAllBrandCategory() throws ApiException{
 		Initialise1();
 		Initialise2();
-        List<brandPojo> b=service.getAll();
+        List<brandData> b=service.getAll();
 		assertEquals(2, b.size());
-		brandPojo p1=b.get(0);
-		brandPojo p2=b.get(1);
+		brandData p1=b.get(0);
+		brandData p2=b.get(1);
 		assertEquals("nestle", p1.getBrand());
 		assertEquals("maggi", p1.getCategory());
 		assertEquals("bru1", p2.getBrand());
@@ -117,11 +119,11 @@ public class BrandServiceTest extends AbstractUnitTest {
 	public void TestUpdateBrandCategory() throws ApiException{
 		Initialise1();
 		int id=service.getAll().get(0).getId();
-		brandPojo b=new brandPojo();
+		brandForm b=new brandForm();
         b.setBrand("tupperware");
 		b.setCategory("bottle");
         service.update(id,b);
-		brandPojo b1=service.get(id);
+		brandForm b1=service.get(id);
 		assertEquals("tupperware", b1.getBrand());
 		assertEquals("bottle", b1.getCategory());
 	}
@@ -129,7 +131,7 @@ public class BrandServiceTest extends AbstractUnitTest {
 	@Test
 	public void TestUpdateWrongBrandCategory() throws ApiException{
 		Initialise1();
-		brandPojo b=service.getAll().get(0);
+		brandData b=service.getAll().get(0);
 		exceptionRule.expect(ApiException.class);
 		exceptionRule.expectMessage("Brand nestle and Category maggi combination already exist");
 		service.update(b.getId(),b);
@@ -139,10 +141,10 @@ public class BrandServiceTest extends AbstractUnitTest {
 	public void TestGetBrandWithoutBrandCategory() throws ApiException{
 		Initialise1();
 		Initialise2();
-		brandPojo b=new brandPojo();
-		List<brandPojo> brandItems=service.getbrand(b);
-		brandPojo p1=brandItems.get(0);
-		brandPojo p2=brandItems.get(1);
+		brandForm b=new brandForm();
+		List<brandData> brandItems=service.getbrand(b);
+		brandForm p1=brandItems.get(0);
+		brandForm p2=brandItems.get(1);
 		assertEquals("nestle", p1.getBrand());
 		assertEquals("maggi", p1.getCategory());
 		assertEquals("bru1", p2.getBrand());
@@ -154,11 +156,11 @@ public class BrandServiceTest extends AbstractUnitTest {
 	public void TestGetBrandWithoutCategory() throws ApiException{
 		Initialise1();
 		Initialise4();
-		brandPojo b=new brandPojo();
+		brandForm b=new brandForm();
 		b.setBrand("nestle");
-		List<brandPojo> brandItems=service.getbrand(b);
-		brandPojo p1=brandItems.get(0);
-		brandPojo p2=brandItems.get(1);
+		List<brandData> brandItems=service.getbrand(b);
+		brandForm p1=brandItems.get(0);
+		brandForm p2=brandItems.get(1);
 		assertEquals("nestle", p1.getBrand());
 		assertEquals("maggi", p1.getCategory());
 		assertEquals("nestle", p2.getBrand());
@@ -170,11 +172,11 @@ public class BrandServiceTest extends AbstractUnitTest {
 		Initialise1();
 		Initialise2();
 		Initialise3();
-		brandPojo b=new brandPojo();
+		brandForm b=new brandForm();
 		b.setCategory("maggi");
-		List<brandPojo> brandItems=service.getbrand(b);
-		brandPojo p1=brandItems.get(0);
-		brandPojo p2=brandItems.get(1);
+		List<brandData> brandItems=service.getbrand(b);
+		brandForm p1=brandItems.get(0);
+		brandForm p2=brandItems.get(1);
 		assertEquals("nestle", p1.getBrand());
 		assertEquals("maggi", p1.getCategory());
 		assertEquals("bru1", p2.getBrand());

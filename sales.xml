@@ -1,27 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <items>
-    <from>2023-01-14</from>
-    <to>2023-02-13</to>
-    <brand>All</brand>
-    <category>All</category>
+    <from>2023-01-21</from>
+    <to>2023-02-20</to>
+    <brand>nestle</brand>
+    <category>coffee</category>
     <data>
-        <quantity>1</quantity>
-        <category>soap</category>
-        <revenue>1.0</revenue>
-        <brand>cinthol</brand>
-    </data>
-    <data>
-        <quantity>80</quantity>
+        <quantity>10</quantity>
         <category>coffee</category>
-        <revenue>80000.0</revenue>
-        <brand>bru</brand>
+        <revenue>200.0</revenue>
+        <brand>nestle</brand>
     </data>
-    <data>
-        <quantity>100</quantity>
-        <category>coffee</category>
-        <revenue>10000.0</revenue>
-        <brand>nek</brand>
-    </data>
-    <total_quantity>181</total_quantity>
-    <revenue>90001.0</revenue>
+    <total_quantity>10</total_quantity>
+    <revenue>200.0</revenue>
 </items>

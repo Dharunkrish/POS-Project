@@ -1,5 +1,8 @@
 package com.increff.employee.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,26 +10,30 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.increff.employee.model.DaySalesXmlForm;
-import com.increff.employee.model.InventoryXmlForm;
-import com.increff.employee.model.SalesReportDataXml;
-import com.increff.employee.model.UserData;
-import com.increff.employee.model.UserForm;
-import com.increff.employee.model.booForm;
-import com.increff.employee.model.brandData;
-import com.increff.employee.model.brandForm;
-import com.increff.employee.model.daySalesReportForm;
-import com.increff.employee.model.inventoryForm;
-import com.increff.employee.model.orderData;
-import com.increff.employee.model.orderForm;
-import com.increff.employee.model.orderitemForm;
-import com.increff.employee.model.reportData;
+import com.increff.employee.model.Data.UserData;
+import com.increff.employee.model.Data.brandData;
+import com.increff.employee.model.Data.productData;
+import com.increff.employee.model.Data.reportData;
+import com.increff.employee.model.Form.UserForm;
+import com.increff.employee.model.Form.OrderItemData;
+import com.increff.employee.model.Form.brandForm;
+import com.increff.employee.model.Form.daySalesReportForm;
+import com.increff.employee.model.Form.inventoryForm;
+import com.increff.employee.model.Form.orderForm;
+import com.increff.employee.model.Form.orderitemForm;
+import com.increff.employee.model.Form.productForm;
+import com.increff.employee.model.Xml.DaySalesXmlForm;
+import com.increff.employee.model.Xml.InventoryXmlForm;
+import com.increff.employee.model.Xml.SalesReportDataXml;
+import com.increff.employee.model.Xml.orderData;
 import com.increff.employee.pojo.UserPojo;
 import com.increff.employee.pojo.brandPojo;
 import com.increff.employee.pojo.daySalesReportPojo;
 import com.increff.employee.pojo.inventoryPojo;
 import com.increff.employee.pojo.orderPojo;
 import com.increff.employee.pojo.orderitemPojo;
+import com.increff.employee.pojo.productPojo;
+import com.increff.employee.service.ApiException;
 
 
 public class DataConversionUtil {
@@ -34,6 +41,8 @@ public class DataConversionUtil {
 	public static Logger logger = Logger.getLogger(pdfconversionUtil.class);
 	
 	public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	private static final DecimalFormat df = new DecimalFormat("0.00");
+
 
 	public static UserData convert(UserPojo p) {
 		UserData d = new UserData();
@@ -113,28 +122,26 @@ public class DataConversionUtil {
 				return r;
 			}
 		 
-		public static List<SalesReportDataXml> convert1(Map<Integer,List<Object>> m) {
+		public static List<SalesReportDataXml> convert4(List<daySalesReportForm> m) {
 			List<SalesReportDataXml> s=new ArrayList<SalesReportDataXml>();
-			for (int b:m.keySet()) {
-				List<Object> p=m.get(b);
+			for (daySalesReportForm b:m) {
 				SalesReportDataXml r=new SalesReportDataXml();
-				r.setQuantity((int) p.get(0));
-				r.setRevenue((double) p.get(1));
-				r.setBrand((String) p.get(2));
-				r.setCategory((String) p.get(3));
+				r.setQuantity(b.getCount());
+				r.setBrand(b.getBrand());
+				r.setCategory(b.getCategory());
+				r.setRevenue(b.getRevenue());
 				s.add(r);
 			 }
 				return s;
 			}
 
-		public static List<InventoryXmlForm> convert2(Map<Integer,List<Object>> m) {
+		public static List<InventoryXmlForm> convert3(List<daySalesReportForm> m) {
 			List<InventoryXmlForm> s=new ArrayList<InventoryXmlForm>();
-			for (int b:m.keySet()) {
-				List<Object> p=m.get(b);
+			for (daySalesReportForm b:m) {
 				InventoryXmlForm r=new InventoryXmlForm();
-				r.setQuantity((int) p.get(0));
-				r.setBrand((String) p.get(1));
-				r.setCategory((String) p.get(2));
+				r.setQuantity(b.getCount());
+				r.setBrand(b.getBrand());
+				r.setCategory(b.getCategory());
 				s.add(r);
 			 }
 				return s;
@@ -152,23 +159,33 @@ public class DataConversionUtil {
 			orderitemPojo o = new orderitemPojo();
 			o.setQuantity(f.getQuantity());
 			o.setBarcode(f.getBarcode());
-			o.setPrice(f.getPrice());
+			BigDecimal bd = new BigDecimal(f.getPrice()).setScale(2, RoundingMode.HALF_UP); 
+			o.setPrice(bd.doubleValue());
+			logger.info(o.getPrice());
 			o.setName(f.getName());
 			return o;
 		}
 		
 		
 		
-		public static booForm convert(int is_p) {
-			booForm form=new booForm();
+		public static OrderItemData convert(int is_p) {
+			OrderItemData form=new OrderItemData();
 			form.setIs_p(is_p);
 			return form;
 		}
 
-		public static booForm convert(int is_p,String name) {
-			booForm form=new booForm();
+		public static OrderItemData convert(int is_p,int quantity) {
+			OrderItemData form=new OrderItemData();
+			form.setIs_p(is_p);
+			form.setQuantity(quantity);
+			return form;
+		}
+
+		public static OrderItemData convert(int is_p,String name,int quantity) {
+			OrderItemData form=new OrderItemData();
 			form.setIs_p(is_p);
 			form.setName(name);
+			form.setQuantity(quantity);
 			return form;
 		}
 		
@@ -189,6 +206,25 @@ public class DataConversionUtil {
 			r.setBrand((String) p.get(1));
 			r.setCategory((String) p.get(2));
 			return r;
+		}
+		
+		public static productData convert(productPojo p) {
+			productData d = new productData();
+			d.setBrand_Category_id(p.getBrand_Category_id());
+			d.setName(p.getName());
+			d.setBarcode(p.getBarcode());
+			d.setMrp(p.getMrp());
+			d.setProduct_id(p.getProduct_id());
+			return d;
+		}
+
+		public static productPojo convert(productForm f) throws ApiException {
+			productPojo p=new productPojo();
+			p.setName(f.getName());
+			p.setBarcode(f.getBarcode());
+			p.setMrp(f.getMrp());
+			p.setBrand_Category_id(f.getBrand_Category_id());
+			return p;
 		}
 		
 

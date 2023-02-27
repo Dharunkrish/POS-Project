@@ -8,8 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.increff.employee.model.InfoData;
-import com.increff.employee.model.UserForm;
+import com.increff.employee.model.Data.InfoData;
+import com.increff.employee.model.Data.UserData;
+import com.increff.employee.model.Form.UserForm;
 import com.increff.employee.pojo.UserPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.UserService;
@@ -34,25 +35,16 @@ public class InitApiController extends AbstractUiController {
 	@ApiOperation(value = "Initializes application")
 	@RequestMapping(path = "/site/init", method = RequestMethod.POST)
 	public ModelAndView initSite(UserForm form) throws ApiException {
-		List<UserPojo> list = service.getAll();
+		List<UserData> list = service.getAll();
 		if (list.size() > 0) {
 			info.setMessage("Application already initialized. Please use existing credentials");
 		} else {
 			form.setRole("admin");
-			UserPojo p = convert(form);
-			service.add(p);
+			service.add(form);
 			info.setMessage("Application initialized");
 		}
 		return mav("init.html");
 
-	}
-
-	private static UserPojo convert(UserForm f) {
-		UserPojo p = new UserPojo();
-		p.setEmail(f.getEmail());
-		p.setRole(f.getRole());
-		p.setPassword(f.getPassword());
-		return p;
 	}
 
 }

@@ -12,7 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.increff.employee.dao.inventoryDao;
 import com.increff.employee.dao.orderitemDao;
-import com.increff.employee.pojo.brandPojo;
+import com.increff.employee.model.Data.brandData;
+import com.increff.employee.model.Data.productData;
+import com.increff.employee.model.Form.brandForm;
+import com.increff.employee.model.Form.inventoryForm;
+import com.increff.employee.model.Form.productForm;
 import com.increff.employee.pojo.inventoryPojo;
 import com.increff.employee.pojo.productPojo;
 
@@ -38,49 +42,49 @@ public class InventoryServiceTest extends AbstractUnitTest {
 	private Logger logger = Logger.getLogger(orderitemDao.class);
 
     
-	public brandPojo BrandInitialise1()  throws ApiException {
-		brandPojo p = new brandPojo();
+	public brandData BrandInitialise1()  throws ApiException {
+		brandForm p = new brandForm();
         p.setBrand("nestle");
         p.setCategory("maggi");
 		brandservice.add(p);
-		return p;
+		return brandservice.getAll().get(0);
 	}
 
-	public brandPojo BrandInitialise2()  throws ApiException {
-		brandPojo p = new brandPojo();
+	public brandData BrandInitialise2()  throws ApiException {
+		brandForm p = new brandForm();
         p.setBrand("bru1");
         p.setCategory("coffee");
 		brandservice.add(p);
-		return p;
+		return brandservice.getAll().get(1);
 	}
 
 	//Initialise Product 1
-	public productPojo prodInitialise1()  throws ApiException {
-		brandPojo b=BrandInitialise1();
-		productPojo p = new productPojo();
+	public productData prodInitialise1()  throws Exception {
+		brandData b=BrandInitialise1();
+		productForm p = new productForm();
         p.setName("150 g");
 		p.setBarcode("1");
 		p.setMrp(10.0);
 		p.setBrand_Category_id(b.getId());
 		prodservice.add(p);
-		return p;
+		return prodservice.getAll().get(0);
 	}
 
 	//Initialise Product 2
-	public productPojo prodInitialise2()  throws ApiException {
-		brandPojo b=BrandInitialise2();
-		productPojo p = new productPojo();
+	public productData prodInitialise2()  throws Exception {
+		brandData b=BrandInitialise2();
+		productForm p = new productForm();
         p.setName("1 Liter");
 		p.setBarcode("2");
 		p.setMrp(20.0);
 		p.setBrand_Category_id(b.getId());
 		prodservice.add(p);
-		return p;
+		return prodservice.getAll().get(1);
 	}
 
-	public inventoryPojo Initialise1()  throws ApiException {
-		productPojo p=prodInitialise1();
-		inventoryPojo i = new inventoryPojo();
+	public inventoryForm Initialise1()  throws Exception {
+		productData p=prodInitialise1();
+		inventoryForm i = new inventoryForm();
 		i.setId(p.getProduct_id());
         i.setName("150 g");
 		i.setBarcode("1");
@@ -89,9 +93,9 @@ public class InventoryServiceTest extends AbstractUnitTest {
 		return i;
 	}
 
-	public inventoryPojo Initialise2()  throws ApiException {
-	    productPojo p=prodInitialise2();
-		inventoryPojo i = new inventoryPojo();
+	public inventoryForm Initialise2()  throws Exception {
+	    productData p=prodInitialise2();
+		inventoryForm i = new inventoryForm();
         i.setId(p.getProduct_id());
         i.setName("1 Liter");
 		i.setBarcode("2");
@@ -100,9 +104,11 @@ public class InventoryServiceTest extends AbstractUnitTest {
 		return i;
 	}
 
-	public inventoryPojo Initialise3()  throws ApiException {
+	public inventoryPojo Initialise3()  throws Exception {
+		prodInitialise1();
+		productData p1=prodInitialise2();
 		inventoryPojo p = new inventoryPojo();
-        p.setId(2);
+        p.setId(p1.getProduct_id());
         p.setName("250 g");
 		p.setBarcode("2");
 		p.setQuantity(-30);
@@ -111,8 +117,8 @@ public class InventoryServiceTest extends AbstractUnitTest {
 
 	@Test
 	public void TestAdd() throws Exception {
-		productPojo i=prodInitialise1();
-		inventoryPojo p = new inventoryPojo();
+		productData i=prodInitialise1();
+		inventoryForm p = new inventoryForm();
 		System.out.print(prodservice.getAll().size());
 		p.setId(i.getProduct_id());
         p.setName("150 g");
@@ -127,8 +133,8 @@ public class InventoryServiceTest extends AbstractUnitTest {
 
 	@Test
 	public void TestAddWrong1() throws Exception {
-		productPojo i=prodInitialise1();
-		inventoryPojo p = new inventoryPojo();
+		productData i=prodInitialise1();
+		inventoryForm p = new inventoryForm();
 		System.out.print(prodservice.getAll().size());
 		p.setId(i.getProduct_id());
         p.setName("150 g");
@@ -140,7 +146,7 @@ public class InventoryServiceTest extends AbstractUnitTest {
 	}
 
 	@Test
-	public void TestCheckQuantity() throws ApiException{
+	public void TestCheckQuantity() throws Exception{
 		inventoryPojo i =Initialise3();
 		exceptionRule.expect(ApiException.class);
 		exceptionRule.expectMessage("Quantity should not be zero or negative");
@@ -148,7 +154,7 @@ public class InventoryServiceTest extends AbstractUnitTest {
 	}
 
 	@Test
-	public void TestProductCheck() throws ApiException{
+	public void TestProductCheck() throws Exception{
 		inventoryPojo i =Initialise3();
 		exceptionRule.expect(ApiException.class);
 		exceptionRule.expectMessage("Product with given Product ID does not exit, id: "+i.getId());
@@ -156,8 +162,8 @@ public class InventoryServiceTest extends AbstractUnitTest {
 	}
 
 	@Test
-	public void TestInventoryCheck() throws ApiException{
-		inventoryPojo i =Initialise1();
+	public void TestInventoryCheck() throws Exception{
+		inventoryPojo i =Initialise3();
 		exceptionRule.expect(ApiException.class);
 		exceptionRule.expectMessage("Inventory details for the given Product ID already exists");
         service.InvCheck(i.getId());
@@ -173,8 +179,8 @@ public class InventoryServiceTest extends AbstractUnitTest {
 
 	@Test
 	public void TestGetInventory() throws Exception{
-		inventoryPojo i=Initialise1();
-        inventoryPojo p=service.get(i.getId());
+		inventoryForm i=Initialise1();
+        inventoryForm p=service.get(i.getId());
 		assertEquals(i.getId(), p.getId());
 		assertEquals("150 g", p.getName());
 		assertEquals("1", p.getBarcode());
@@ -183,12 +189,12 @@ public class InventoryServiceTest extends AbstractUnitTest {
 
 	@Test
 	public void TestGetAllInventory() throws Exception{
-		inventoryPojo i1=Initialise1();
-		inventoryPojo i2=Initialise2();
-        List<inventoryPojo> p=service.getAll();
+		inventoryForm i1=Initialise1();
+		inventoryForm i2=Initialise2();
+        List<inventoryForm> p=service.getAll();
 		assertEquals(2, p.size());
-		inventoryPojo p1=p.get(0);
-		inventoryPojo p2=p.get(1);
+		inventoryForm p1=p.get(0);
+		inventoryForm p2=p.get(1);
 		assertEquals(i1.getId(), p1.getId());
 		assertEquals("150 g", p1.getName());
 		assertEquals("1", p1.getBarcode());
@@ -201,11 +207,11 @@ public class InventoryServiceTest extends AbstractUnitTest {
 
 	@Test
 	public void TestInventoryUpdate() throws Exception{
-		inventoryPojo p1= Initialise1();
-		inventoryPojo p=new inventoryPojo();
+		inventoryForm p1= Initialise1();
+		inventoryForm p=new inventoryForm();
 		p.setQuantity(200);
         service.update(p1.getId(), p);
-		inventoryPojo p2=service.get(service.getAll().get(0).getId());
+		inventoryForm p2=service.get(service.getAll().get(0).getId());
 		assertEquals(p1.getId(), p2.getId());
 		assertEquals(200, p2.getQuantity());
 	}

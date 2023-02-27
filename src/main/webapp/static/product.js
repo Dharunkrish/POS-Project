@@ -1,4 +1,8 @@
-  data_arr=new Array();
+ data_arr={};
+ var pattern=new RegExp("^[a-zA-Z0-9_]*$")
+ var pattern2=new RegExp("^[a-zA-Z0-9_ ]*$")
+
+
 var edit=0;
 function getproductUrl(){
 	var baseUrl = $("meta[name=baseUrl]").attr("content")
@@ -15,6 +19,21 @@ function addproduct(event){
 	//Set the values to update
 	var $form = $("#product-form");
 	var jso = toJsonobject($form);
+    if (!pattern2.test(jso.name)){
+       document.getElementById('inputName').setCustomValidity('Enter only alpahanumeric charaters & underscores');
+       return;
+	}
+	else{
+		document.getElementById('inputName').setCustomValidity('');
+	}
+	if (!pattern.test(jso.barcode)){
+       document.getElementById('inputBarcode').setCustomValidity('Enter only alpahanumeric charaters & underscores');
+       return;
+	}
+	else{
+		       document.getElementById('inputBarcode').setCustomValidity('');
+	}
+	jso.mrp=parseFloat(jso.mrp).toFixed(2);
 	if (isNaN(jso.mrp)){
 		toastr.options.timeOut = 0;
         toastr.error("MRP must be a number");
@@ -48,7 +67,23 @@ function updateproduct(event){
 	//Set the values to update
 	var $form = $("#product-edit-form");
 	var mrp=$("#product-edit-form input[name=mrp]").val();
-	var json = toJson($form);
+	var json = toJsonobject($form);
+	       if (!pattern.test(json.name)){
+       document.getElementById('editName').setCustomValidity('Enter only alpahanumeric charaters & underscores');
+       return;
+	}
+	else{
+		       document.getElementById('editName').setCustomValidity('');
+	}
+	if (!pattern.test(json.barcode)){
+       document.getElementById('editBarcode').setCustomValidity('Enter only alpahanumeric charaters & underscores');
+       return;
+	}
+	else{
+		       document.getElementById('editBarcode').setCustomValidity('');
+	}
+		json.mrp=parseFloat(json.mrp).toFixed(2);
+		json=JSON.stringify(json);
     if (isNaN(mrp)){
 		toastr.options.timeOut = 0;
         toastr.error("MRP must be a number");
@@ -122,6 +157,8 @@ var processCount = 0;
 
 
 function processData(){
+	toastr.options.timeOut = 2000;
+	   		toastr.success("File uploaded successfully");
 	var file = $('#productFile')[0].files[0];
 	readFileData(file, readFileDataCallback);
 }
@@ -163,7 +200,7 @@ function uploadRows(){
 	   		uploadRows();  
 	   },
 	   error: function(response){
-	   		row.error=response.responseText
+	   		row.error=response.responseJSON.message
 	   		errorData.push(row);
 	   		uploadRows();
 	   }
@@ -182,39 +219,37 @@ function displayproductList(data){
     $('#product-table').dataTable().fnDestroy();
 	var $tbody = $('#product-table').find('tbody');
 	$tbody.empty();
+	console.log(data_arr)
 	for(var i in data){
 		var e = data[i];
+				console.log(e.brand_Category_id)
 		//var buttonHtml = '<button onclick="deleteproduct(' + e.product_id + ')">delete</button>'
 		var buttonHtml = ' <button type="button" class="btn-sm btn-outline-info" onclick="displayEditproduct(' + e.product_id + ')"><i class="fa-solid fa-pen-to-square"></button>'
 		var row = '<tr>'
 		+ '<td>' + e.name + '</td>'
 		+ '<td>'  + e.barcode + '</td>'
-		+ '<td>'  + e.mrp + '</td>'
-        + '<td>'  + data_arr[e.brand_Category_id-1].brand + "/" +  data_arr[e.brand_Category_id-1].category +'</td>'
+		+ '<td>'  + (e.mrp).toFixed(2) + '</td>'
+        + '<td>'  + data_arr[e.brand_Category_id].brand + "/" +  data_arr[e.brand_Category_id].category +'</td>'
 		+ '<td>' + buttonHtml + '</td>'
 		+ '</tr>';
         $tbody.append(row);
 	}
 	if (getRole()==="operator"){
 			var ta=$('#product-table').DataTable({
-  columnDefs: [
-    {
-        className: 'dt-center'
-    },                 { 'visible': false, 'targets': [4] }
-],
-                 pageLength : 7,
-        autoWidth: true,
-    lengthMenu: [[7, 10, 20, -1], [7, 10, 20, 'All']]} )
-}
-else{
-	var ta=$('#product-table').DataTable({
-		pageLength : 7,
-        autoWidth: true,
-    lengthMenu: [[7, 10, 20, -1], [7, 10, 20, 'All']]
-	});
-}
-    new $.fn.dataTable.FixedHeader(ta);
-
+			  columnDefs: [
+			    {
+			        className: 'dt-center'
+			    },                 { 'visible': false, 'targets': [4] }],
+			  autoWidth: true,
+			  lengthMenu: [[10, 20, -1], [10, 20, 'All']]} )
+			}
+	else{
+				var ta=$('#product-table').DataTable({
+			        autoWidth: true,
+			    lengthMenu: [[10, 20, -1], [10, 20, 'All']]
+				});
+			}
+	new $.fn.dataTable.FixedHeader(ta);
 }
 
 function displaydropdownedit(data){
@@ -228,10 +263,9 @@ function displaydropdownedit(data){
 		var p=$("<option />");
         p.html(e);
         p.val(data[i].id);
-        data_arr.push(data[i])
-      $("#editBrandid").append(p);
+        data_arr[data[i].id]=(data[i])
+        $("#editBrandid").append(p);
 }
-$("#editBrandid").val(edit);	
 
 }
 
@@ -248,14 +282,13 @@ function displaydropdown(data){
 		var p=$("<option />");
         p.html(e);
         p.val(parseInt(data[i].id));
-        data_arr.push(data[i])
-      $("#inputBrandid").append(p);
-}
-$("#inputBrandid").selectpicker('refresh');
-$("#inputBrandid").val($('#inputBrandid option:first').val());
-$("#inputBrandid").selectpicker('refresh');
-getproductList();
-}
+        data_arr[data[i].id]=(data[i])
+        $("#inputBrandid").append(p);}
+	$("#inputBrandid").selectpicker('refresh');
+	$("#inputBrandid").val($('#inputBrandid option:first').val());
+	$("#inputBrandid").selectpicker('refresh');
+	getproductList();
+	}
 
 function displayEditproduct(product_id){
     showdropdown_edit();
@@ -297,6 +330,13 @@ function updateFileName(){
 	var $file = $('#productFile');
 	var fileName = $file.val();
 	var f=fileName.split("\\");
+	l=f[f.length-1];
+	if (l.slice(-3)!=="tsv"){
+		toastr.options.timeOut = 0;
+	   		toastr.error("Upload only TSV files");
+	   		$("#productFile").val("");
+	   		return;
+	   	}
 	$('#productFilecategory').html(f[f.length-1]);
 }
 
@@ -314,13 +354,18 @@ function displayproduct(data){
 	$("#product-edit-form input[name=mrp]").val(data.mrp);	
 	$("#product-edit-form input[name=product_id]").val(data.product_id);	
     edit=data.brand_Category_id;
-    $("#editBrandid").val(edit);
+    console.log(edit);
+    setTimeout(function(){
+    	    $("#editBrandid").val(edit);
+
+    	},20);
 	$('#edit-product-modal').modal('toggle');
 }
 
 function button(){
-	var d=$('#inputBrandid :selected').text();
-   $('#add-product').attr("disabled",(d=="None" || ($('#product-form input[name=barcode]').val().trim()=="")) ||($('#product-form input[name=mrp]').val().trim()==""));
+	var d=$('#inputBrandid :selected').val();
+	console.log(d);
+   $('#add-product').attr("disabled",(d==="none" || ($('#product-form input[name=barcode]').val().trim()==="")) ||($('#product-form input[name=mrp]').val().trim()===""));
    }
 
 //INITIALIZATION CODE
@@ -338,7 +383,7 @@ function init(){
 	$('#upload-data').click(displayUploadData);
 	$('#process-data').click(processData);
 	$('#download-errors').click(downloadErrors);
-      $('#productFile').on('change', function(){
+    $('#productFile').on('change', function(){
     $('#process-data').attr("disabled",false);
     	updateFileName();});
        if (getRole()==="operator"){

@@ -11,7 +11,10 @@ import org.springframework.stereotype.Service;
 
 import com.increff.employee.controller.productApiController;
 import com.increff.employee.dao.brandDao;
+import com.increff.employee.model.Data.brandData;
+import com.increff.employee.model.Form.brandForm;
 import com.increff.employee.pojo.brandPojo;
+import com.increff.employee.util.DataConversionUtil;
 import com.increff.employee.util.StringUtil;
 
 @Service
@@ -22,7 +25,8 @@ public class brandService {
 	private Logger logger = Logger.getLogger(productApiController.class);
 
 	@Transactional(rollbackOn = ApiException.class)
-	public void add(brandPojo p) throws ApiException {
+	public void add(brandForm f) throws ApiException {
+		brandPojo p = DataConversionUtil.convert(f);
 		normalize(p);
 		insertCheck(p.getBrand(),p.getCategory());
 		dao.insert(p);
@@ -30,15 +34,16 @@ public class brandService {
 
 
 	@Transactional(rollbackOn = ApiException.class)
-	public brandPojo get(int id) throws ApiException {
-		return getCheck(id);
+	public brandData get(int id) throws ApiException {
+		return 	DataConversionUtil.convert(getCheck(id));
 	}
 	
 	@Transactional(rollbackOn = ApiException.class)
-	public List<brandPojo> getbrand(brandPojo b) throws ApiException {
+	public List<brandData> getbrand(brandForm form) throws ApiException {
+		brandPojo b = DataConversionUtil.convert(form);
 		List<brandPojo> br=new ArrayList<brandPojo>();
 		if ((b.getBrand()==null || b.getBrand()=="") && (b.getCategory()==null || b.getCategory()=="")) {
-			br= getAll();
+			br= dao.selectAll();
 		}
 		else if ((b.getBrand()==null || b.getBrand()=="")) {
 			br= dao.getcategory(b);
@@ -47,18 +52,28 @@ public class brandService {
 			br= dao.getbrand(b);
 
 		}
-		return br;
+		List<brandData> list2 = new ArrayList<brandData>();
+		for (brandPojo bd : br) {
+			list2.add(DataConversionUtil.convert(bd));
+		}
+		return list2;
 	}
 	
 
 
 	@Transactional
-	public List<brandPojo> getAll() {
-		return dao.selectAll();
+	public List<brandData> getAll() {
+		List<brandPojo> list= dao.selectAll();
+		List<brandData> list2 = new ArrayList<brandData>();
+		for (brandPojo p : list) {
+			list2.add(DataConversionUtil.convert(p));
+		}
+		return list2;
 	}
 
 	@Transactional(rollbackOn  = ApiException.class)
-	public void update(int id, brandPojo p) throws ApiException {
+	public void update(int id, brandForm f) throws ApiException {
+		brandPojo p = DataConversionUtil.convert(f);
 		normalize(p);
 		logger.info(p.getBrand());
 		insertCheck(p.getBrand(),p.getCategory());
@@ -84,6 +99,7 @@ public class brandService {
 		}
 		return;
 	}
+	
 	
 	
 

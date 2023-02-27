@@ -157,3 +157,7 @@ table.dataTable thead .sorting{
   color:red;
   margin-left: 4px;
 }
+
+#brandFilecategory,#productFilecategory,#inventoryFileName {overflow: hidden;
+ text-overflow: ellipsis;
+  white-space: nowrap;}

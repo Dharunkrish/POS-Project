@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.increff.employee.model.InfoData;
+import com.increff.employee.model.Data.InfoData;
 import com.increff.employee.util.SecurityUtil;
 import com.increff.employee.util.UserPrincipal;
 

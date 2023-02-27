@@ -13,10 +13,14 @@ import org.springframework.stereotype.Service;
 
 import com.increff.employee.dao.inventoryDao;
 import com.increff.employee.dao.orderitemDao;
+import com.increff.employee.model.Form.OrderItemData;
+import com.increff.employee.model.Form.orderForm;
+import com.increff.employee.model.Form.orderitemForm;
 import com.increff.employee.pojo.inventoryPojo;
 import com.increff.employee.pojo.orderPojo;
 import com.increff.employee.pojo.orderitemPojo;
 import com.increff.employee.pojo.productPojo;
+import com.increff.employee.util.DataConversionUtil;
 import com.increff.employee.util.StringUtil;
 
 
@@ -32,106 +36,111 @@ public class orderitemService {
 	private Logger logger = Logger.getLogger(orderitemDao.class);
 	
 	@Transactional(rollbackOn = ApiException.class)
-	public productPojo checkitems(orderitemPojo o,int old_q) throws ApiException {
+	public List<Object> checkitems(orderitemPojo o,int old_q) throws ApiException {
+		List<Object> res=new ArrayList<Object>();
 		normalize(o);
         productPojo p=checkprod(o);
         if (p==null) {
-        	p=new productPojo();
-        	p.setProduct_id(-1);
-        	return p;
+        	throw new ApiException("Product with given barcode does not exist");
         }
 		if (p.getMrp()<=o.getPrice()){
 			throw new ApiException("Selling Price should not be greater than MRP");
 		}
-        int q=check(o,p,old_q);
-        if (q==-1) {
-        	p=new productPojo();
-        	p.setProduct_id(-2);
-        	return p;
+        List<Integer> q=check(o,p,old_q);
+        if (q.get(0)==-2) {
+			throw new ApiException("Present inventory availability for "+p.getName()+" is only "+q.get(1)+" items");
         }
-		p.setMrp(q);
-		return p;
+		res.add(p.getProduct_id());
+		res.add(q.get(1));
+		res.add(p.getName());
+		return res;
 	}
 
 	@Transactional(rollbackOn = ApiException.class)
-	public int AddItems(List<orderitemPojo> item) throws ApiException {
-		List<productPojo> inv_q=new ArrayList<productPojo>();
+	public List<Integer> AddItems(List<orderitemForm> form) throws ApiException {
+		List <orderitemPojo> item=new ArrayList<orderitemPojo>();
+		for(orderitemForm f:form) {
+			item.add(DataConversionUtil.convert(f));
+		}
+		List<List<Object>> inv_q=new ArrayList<List<Object>>();
+		List<Integer> res=new ArrayList<Integer>();
 		for (orderitemPojo o:item){
-		productPojo p=checkitems(o,0);
-		    if (p.getProduct_id()==-1) {
-		    	return 0;
-		    }
-			if (p.getProduct_id()==-2){
-				return 2;
-			}
+		List<Object> p=checkitems(o,0);
 			inv_q.add(p);
 		}
 		int id=create().getId();
 		for(int i=0;i<item.size();i++) {
 			orderitemPojo order=item.get(i);
-			productPojo p=inv_q.get(i);
+			List<Object> p=inv_q.get(i);
 			order.setOrder_id(id);
-			if (p.getMrp()==0){
-				dao.del_inv(p.getProduct_id());
+			if ((int)p.get(1)==0){
+				dao.del_inv((int)p.get(0));
 		}
 		else{
-		inventoryPojo q=idao.select(p.getProduct_id());
-		q.setQuantity((int)p.getMrp());
+		inventoryPojo q=idao.select((int)p.get(0));
+		q.setQuantity((int)p.get(1));
 		idao.update(q);
 		}
-		    order.setName(p.getName());
+		    order.setName((String)p.get(2));
 			add(order);
 		}
-		return 1;
+		res.add(1);
+		res.add(2);
+		return res;
 	}
 
 	@Transactional(rollbackOn = ApiException.class)
-	public int AddSingleItem(orderitemPojo o,int id) throws ApiException {
-		productPojo p=checkitems(o,0);
-		if (p.getProduct_id()==-1) {
-			return 0;
-		}
-		if (p.getProduct_id()==-2) {
-			return 2;
-		}	
-        if (p.getMrp()==0){
-				dao.del_inv(p.getProduct_id());
+	public void AddSingleItem(orderitemForm form,int id) throws ApiException {
+		orderitemPojo o=DataConversionUtil.convert(form);
+		List<Object> p=checkitems(o,0);
+        if ((int)p.get(1)==0){
+				dao.del_inv((int)p.get(0));
 		}
 		else{
-		inventoryPojo i=idao.select(p.getProduct_id());
-		i.setQuantity((int)p.getMrp());
+		inventoryPojo i=idao.select((int)p.get(0));
+		i.setQuantity((int)p.get(1));
 		idao.update(i);
 		}
-	    o.setName(p.getName());
+	    o.setName((String)p.get(2));
 		o.setOrder_id(id);
 		add(o);
-		return 1;
 	}
 
 	@Transactional(rollbackOn = ApiException.class)
-	public int check(orderitemPojo o,productPojo p,int old_q) throws ApiException {
+	public List<Integer> check(orderitemPojo o,productPojo p,int old_q) throws ApiException {
             	 inventoryPojo i=dao.prodquantity(p.getProduct_id());
+				 List<Integer> res=new ArrayList<Integer>();
+				 if (i==null){
+					res.add(-2);
+					res.add(0);
+					return res;
+				 }
                  if ((o.getQuantity()-old_q)>i.getQuantity()) {
-                	 return -1;
+					res.add(-2);
+					res.add(i.getQuantity());
+                	 return res;
              }
-
-             return i.getQuantity()-(o.getQuantity()-old_q);
+            res.add(1);
+            res.add(i.getQuantity()-(o.getQuantity()-old_q));
+			return res;
 	}
-
+	
 	@Transactional(rollbackOn = ApiException.class)
 	public int editcheck(orderitemPojo o,productPojo p,int old_q) throws ApiException {
             	 inventoryPojo i=dao.prodquantity(p.getProduct_id());
 				 int value=o.getQuantity()-old_q;
 				 if (i==null){
                            if (value>0){
-							return -1;
+							throw new ApiException("Present inventory availability is only 0 items");
 						   }
 						   else{
 							return Math.abs(o.getQuantity()-old_q);
 						   }
 				 }
                  else if ((o.getQuantity()-old_q)>i.getQuantity()) {
-                	 return -1;
+
+					throw new ApiException("Present inventory availability is only "+(i.getQuantity()+old_q)+" items");
+
              }
              return i.getQuantity()-(o.getQuantity()-old_q);
 	}
@@ -156,8 +165,23 @@ public class orderitemService {
 	}
 	
 	@Transactional
-	public List<orderPojo> getAll() throws Exception {
-		return dao.selectAll();
+	public List<orderForm> getAll() throws Exception {
+		List<orderForm> list2=new ArrayList<orderForm>();
+		for(orderPojo p:dao.selectAll()){
+			list2.add(DataConversionUtil.convert(p));
+		}
+		return list2;
+	}
+	
+	public OrderItemData checkitem(orderitemForm form) throws ApiException{
+		List<Object> p=checkitems(DataConversionUtil.convert(form),0);
+        if ((int)p.get(0)==-1) {
+        	return DataConversionUtil.convert(0,"",0);
+        }
+        else if ((int)p.get(0)==-2) {
+        	return DataConversionUtil.convert(2,"",(int)p.get(1));
+        }
+        return DataConversionUtil.convert(1,(String)p.get(2),0);
 	}
 	
 	@Transactional
@@ -182,20 +206,25 @@ public class orderitemService {
 	}
 
 	@Transactional(rollbackOn  = ApiException.class)
-	public int update(int id, orderitemPojo o, int quantity) throws ApiException {
+	public int update(int id, orderitemForm f, int quantity) throws ApiException {
+		int order_id=dao.selectitemid(id).getOrder_id();
+		orderPojo od=dao.selectid(order_id);
+		if (od.isInvoiceGenerated()==true) {
+			throw new ApiException("This order cannot be edited as invoice is already generated");
+		}
+        orderitemPojo o=DataConversionUtil.convert(f);    
 		productPojo p=checkprod(o);
+		double mrp=checkprod(o).getMrp();
         if (p==null) {
-        	return 0;
+			throw new ApiException("Product with given barcode does not exist");
         }
-        System.err.print(p.getMrp());
-		if (p.getMrp()<=o.getPrice()){
+        System.err.print(mrp+""+o.getPrice());
+		if (mrp<=o.getPrice()){
 			throw new ApiException("Selling Price should not be greater than MRP");
 		}
         int q=editcheck(o,p,quantity);
-        if (q==-1) {
-        	return 2;
-        }
 		inventoryPojo i=idao.select(p.getProduct_id());
+		System.err.print(p.getProduct_id());
 		if (i==null){
 			if (q>0){
 				inventoryPojo i1=new inventoryPojo();
@@ -234,7 +263,12 @@ public class orderitemService {
 			i.setId(p.getProduct_id());
 			i.setName(p.getName());
 			i.setQuantity(oi.getQuantity());
+			System.err.print(i.getId());
 			idao.insert(i);
+		}
+		else{
+			i.setQuantity(i.getQuantity()+oi.getQuantity());
+			idao.update(i);
 		}
 		dao.delete(id);
 	}

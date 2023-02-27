@@ -1,11 +1,13 @@
 package com.increff.employee.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
@@ -13,17 +15,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.increff.employee.dao.orderitemDao;
-import com.increff.employee.model.DaySalesXml;
-import com.increff.employee.model.DaySalesXmlForm;
-import com.increff.employee.model.InventoryReportXml;
-import com.increff.employee.model.InventoryXmlForm;
-import com.increff.employee.model.SalesReportDataXml;
-import com.increff.employee.model.SalesXmlForm;
-import com.increff.employee.model.orderData;
-import com.increff.employee.model.orderxmlForm;
-import com.increff.employee.model.reportForm;
+import com.increff.employee.dao.reportDao;
+import com.increff.employee.model.Form.reportForm;
+import com.increff.employee.model.Xml.DaySalesXml;
+import com.increff.employee.model.Xml.DaySalesXmlForm;
+import com.increff.employee.model.Xml.InventoryReportXml;
+import com.increff.employee.model.Xml.InventoryXmlForm;
+import com.increff.employee.model.Xml.SalesReportDataXml;
+import com.increff.employee.model.Xml.SalesXmlForm;
+import com.increff.employee.model.Xml.orderData;
+import com.increff.employee.model.Xml.orderxmlForm;
 import com.increff.employee.pojo.daySalesReportPojo;
 import com.increff.employee.pojo.orderPojo;
+import com.increff.employee.pojo.orderitemPojo;
 import com.increff.employee.util.DataConversionUtil;
 import com.increff.employee.util.pdfconversionUtil;
 
@@ -36,33 +40,48 @@ public class invoiceService {
 
     @Autowired
 	private reportService reportservice;
+    
+    @Autowired
+	private reportDao reportdao;
 
 	private Logger logger = Logger.getLogger(orderitemDao.class);
     public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
-public byte[] generatePdf(orderxmlForm orderxml) throws Exception{
-	orderxmlForm orderInvoiceXmlList = generateInvoiceList(orderxml);
+public void generatePdf(int id,HttpServletResponse response) throws Exception{
+	List<orderitemPojo> orderList=orderService.get(id);
+	List<orderData> d=new ArrayList<>();
+	for(orderitemPojo o:orderList) {
+	    d.add(DataConversionUtil.convert(o));
+	}
+	orderxmlForm invoicexml=new orderxmlForm();
+	invoicexml.setOrder_id(id);
+	invoicexml.setOrderInvoiceData(d);
+	orderxmlForm orderInvoiceXmlList = generateInvoiceList(invoicexml);
     pdfconversionUtil.generateXml(new File("invoice.xml"), orderInvoiceXmlList, orderxmlForm.class);
-    return pdfconversionUtil.generatethePDF(new File("invoice.xml"), new StreamSource("invoice.xsl"));
+    byte[] bytes= pdfconversionUtil.generatethePDF(new File("invoice.xml"), new StreamSource("invoice.xsl"));
+	createPdfResponse(bytes,response);
 }
 
-public byte[] ReportgeneratePdf(reportForm r) throws Exception{
+public void ReportgeneratePdf(reportForm r,HttpServletResponse response) throws Exception{
     DaySalesXml daysalesxml=generateDaySalesReport(r);
     pdfconversionUtil.generateXml(new File("daysales.xml"), daysalesxml, DaySalesXml.class);
-    return pdfconversionUtil.generatethePDF(new File("daysales.xml"), new StreamSource("daysales.xsl"));
+    byte[] bytes= pdfconversionUtil.generatethePDF(new File("daysales.xml"), new StreamSource("daysales.xsl"));
+	createPdfResponse(bytes,response);
 }
 
-public byte[] SalesReportgeneratePdf(reportForm r) throws Exception{
+public void SalesReportgeneratePdf(reportForm r,HttpServletResponse response) throws Exception{
     SalesXmlForm salesxml=generateSalesReport(r);
     pdfconversionUtil.generateXml(new File("sales.xml"), salesxml, SalesXmlForm.class);
-    return pdfconversionUtil.generatethePDF(new File("sales.xml"), new StreamSource("sales.xsl"));
+    byte[] bytes= pdfconversionUtil.generatethePDF(new File("sales.xml"), new StreamSource("sales.xsl"));
+	createPdfResponse(bytes,response);
 }
 
-public byte[] InventoryReportgeneratePdf() throws Exception{
+public void InventoryReportgeneratePdf(HttpServletResponse response) throws Exception{
     InventoryReportXml inventoryxml=generateInventoryReport();
     pdfconversionUtil.generateXml(new File("inventoryXml.xml"), inventoryxml, InventoryReportXml.class);
-    return pdfconversionUtil.generatethePDF(new File("inventoryXml.xml"), new StreamSource("inventoryXml.xsl"));
+    byte[] bytes= pdfconversionUtil.generatethePDF(new File("inventoryXml.xml"), new StreamSource("inventoryXml.xsl"));
+	createPdfResponse(bytes,response);
 }
 
 public orderxmlForm generateInvoiceList(orderxmlForm orderxmlList) throws Exception {
@@ -77,7 +96,7 @@ public orderxmlForm generateInvoiceList(orderxmlForm orderxmlList) throws Except
     }
 
     public DaySalesXml generateDaySalesReport(reportForm r) throws Exception {
-        List<daySalesReportPojo> d=reportservice.get(r);
+        List<daySalesReportPojo> d=reportdao.get(r);
 	    DaySalesXml x=new DaySalesXml();
 		x.setData(DataConversionUtil.convert(d));
 		x.setFrom(r.getFrom().format(formatter));
@@ -90,9 +109,8 @@ public orderxmlForm generateInvoiceList(orderxmlForm orderxmlList) throws Except
     }
 
     public SalesXmlForm generateSalesReport(reportForm r) throws Exception {
-        Map<Integer,List<Object>> d=reportservice.getsales(r,reportservice.getorder(r));
 	    SalesXmlForm x=new SalesXmlForm();
-		x.setData(DataConversionUtil.convert1(d));
+		x.setData(DataConversionUtil.convert4(reportservice.getsales(r)));
 		x.setFrom(r.getFrom().format(formatter));
 		x.setTo(r.getTo().format(formatter));
 		if ((r.getBrand()).equals("none") || r.getBrand().isEmpty()) {
@@ -115,9 +133,8 @@ public orderxmlForm generateInvoiceList(orderxmlForm orderxmlList) throws Except
     }
 
     public InventoryReportXml generateInventoryReport() throws Exception {
-        Map<Integer,List<Object>> d=reportservice.getinventoryReport(reportservice.getinventory());
 	    InventoryReportXml x=new InventoryReportXml();
-	    x.setData(DataConversionUtil.convert2(d));
+	    x.setData(DataConversionUtil.convert3(reportservice.getinventoryReport()));
         x.setTotal_quantity(calculateInventoryTotal(x.getData()));
         return x;
     }
@@ -166,4 +183,13 @@ public static List<Object> calculateDaySalesTotal(List<DaySalesXmlForm> salesxml
 	total.add(total3);
 	return total;
 }
+
+//Creates PDF
+public void createPdfResponse(byte[] bytes, HttpServletResponse response) throws IOException {
+    response.setContentType("application/pdf");
+    response.setContentLength(bytes.length);
+    response.getOutputStream().write(bytes);
+    response.getOutputStream().flush();
+}
+
 }

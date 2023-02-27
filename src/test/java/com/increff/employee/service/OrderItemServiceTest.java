@@ -121,6 +121,25 @@ public class OrderItemServiceTest extends AbstractUnitTest {
 		invservice.add(i);
 		return oi;
 	}
+    public orderPojo Initialise1() throws Exception{
+	List<orderitemPojo> item=new ArrayList<orderitemPojo>();
+		inventoryPojo i1=InvInitialise1();
+		inventoryPojo i2=InvInitialise2();
+		orderitemPojo oi1=new orderitemPojo();
+		orderitemPojo oi2=new orderitemPojo();
+		oi1.setBarcode(i1.getBarcode());
+		oi1.setPrice(1);
+		oi1.setQuantity(i1.getQuantity()-1);
+		item.add(oi1);
+		oi2.setBarcode(i2.getBarcode());
+		oi2.setPrice(2);
+		oi2.setQuantity(i2.getQuantity()-2);
+		item.add(oi2);
+
+		//order add
+		service.AddItems(item);
+		return service.getAll().get(0);
+	}
 
 	@Test
 	public void TestOrderCreate() throws Exception{
@@ -590,6 +609,38 @@ public class OrderItemServiceTest extends AbstractUnitTest {
 		assertEquals(2,service.update(oi2.getId(), oi2,quantity));		
 	}
 
+	@Test
+	public void TestUpdateItemDelInv() throws Exception{
+		List<orderitemPojo> item=new ArrayList<orderitemPojo>();
+		productPojo p=prodInitialise1();
+		inventoryPojo i = new inventoryPojo();
+		i.setId(p.getProduct_id());
+        i.setName("150 g");
+		i.setBarcode("1");
+		i.setQuantity(10);
+		invservice.add(i);
+		orderitemPojo oi1=new orderitemPojo();
+		oi1.setBarcode(i.getBarcode());
+		oi1.setPrice(1);
+		oi1.setQuantity(i.getQuantity()-1);
+		item.add(oi1);
+		service.AddItems(item);
+		assertEquals(indao.selectAll().size(), 1);
+		int order_id=service.getAll().get(0).getId();
+		orderitemPojo oi2=service.get(order_id).get(0);
+		int quantity=oi2.getQuantity();
+		p.setMrp(1000);
+		oi2.setPrice(1);
+		oi2.setQuantity(quantity+1);
+        assertEquals(1,service.update(oi2.getId(), oi2,quantity));		
+		orderitemPojo item1=service.getid(oi2.getId());
+		assertEquals(item1.getBarcode(), i.getBarcode());
+		assertEquals(item1.getOrder_id(), order_id);
+		assertEquals(item1.getName(), i.getName());
+		assertEquals(item1.getPrice(), oi2.getPrice(),0.01);
+		assertEquals(item1.getQuantity(), oi1.getQuantity());
+		assertEquals(indao.selectAll().size(), 0);
+	}
 
 
 	@Test
@@ -616,4 +667,5 @@ public class OrderItemServiceTest extends AbstractUnitTest {
 		List<orderitemPojo> items=service.get(order_id);
 		assertEquals(0, items.size());
 	}
+	
 }

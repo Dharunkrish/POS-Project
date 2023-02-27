@@ -1,5 +1,6 @@
 package com.increff.employee.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -10,8 +11,10 @@ import org.springframework.stereotype.Service;
 
 import com.increff.employee.dao.inventoryDao;
 import com.increff.employee.dao.productDao;
+import com.increff.employee.model.Form.inventoryForm;
 import com.increff.employee.pojo.inventoryPojo;
 import com.increff.employee.pojo.productPojo;
+import com.increff.employee.util.DataConversionUtil;
 
 @Service
 public class InventoryService {
@@ -24,7 +27,8 @@ public class InventoryService {
 	private Logger logger = Logger.getLogger(inventoryDao.class);
 
 	@Transactional(rollbackOn = ApiException.class)
-	public void add(inventoryPojo p) throws ApiException {
+	public void add(inventoryForm form) throws ApiException {
+		inventoryPojo p = DataConversionUtil.convert(form);
 		QuantityCheck(p);
 		ProductCheck(p.getId());
 		InvCheck(p.getId());
@@ -33,23 +37,25 @@ public class InventoryService {
 
 
 	@Transactional(rollbackOn = ApiException.class)
-	public inventoryPojo get(int id) throws ApiException {
+	public inventoryForm get(int id) throws ApiException {
 	    inventoryPojo i= getCheck(id);
         productPojo o=pdao.select(id);
         i.setBarcode(o.getBarcode());
 		i.setName(o.getName());
-		return i;
+		return DataConversionUtil.convert(dao.select(id));
 	}
 
 	@Transactional
-	public List<inventoryPojo> getAll() throws Exception {
+	public List<inventoryForm> getAll() throws Exception {
 	    List<inventoryPojo> i=dao.selectAll();
+		List<inventoryForm> list2 = new ArrayList<inventoryForm>();
 		for(inventoryPojo d:i){
           productPojo p=pdao.select(d.getId());
 		  d.setName(p.getName());
 		  d.setBarcode(p.getBarcode());
+			list2.add(DataConversionUtil.convert(d));
 		}
-		return i;
+		return list2;
 	}
 	
 	public List<productPojo> getid() throws Exception {
@@ -57,7 +63,8 @@ public class InventoryService {
 	}
 
 	@Transactional(rollbackOn  = ApiException.class)
-	public void update(int id, inventoryPojo p) throws ApiException {
+	public void update(int id, inventoryForm f) throws ApiException {
+		inventoryPojo p = DataConversionUtil.convert(f);
 		inventoryPojo i=getCheck(id);
 		i.setQuantity(p.getQuantity());
 		dao.update(i);
@@ -85,7 +92,7 @@ public class InventoryService {
 	public productPojo ProductCheck(int id) throws ApiException {
 		productPojo pr=dao.findid(id);
 		  if (pr==null) {
-				throw new ApiException("Product with given Product ID does not exit, id: "+ id);
+				throw new ApiException("Product with given barcode does not exit, id: "+ id);
 			}
 			return pr;
 		}	

@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.increff.employee.model.InfoData;
-import com.increff.employee.model.LoginForm;
+import com.increff.employee.model.Data.InfoData;
+import com.increff.employee.model.Form.LoginForm;
 import com.increff.employee.pojo.UserPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.UserService;
@@ -39,9 +39,13 @@ public class LoginController {
 	@RequestMapping(path = "/session/login", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ModelAndView login(HttpServletRequest req, LoginForm f) throws ApiException {
 		UserPojo p = service.get(f.getEmail());
-		boolean authenticated = (p != null && Objects.equals(p.getPassword(), f.getPassword()));
-		if (!authenticated) {
-			info.setMessage("Invalid username or password");
+		boolean authenticated2 = (p!=null && Objects.equals(p.getPassword(), f.getPassword()));
+		if (p==null) {
+			info.setMessage("Account with username does not exist Please try to Sign up");
+			return new ModelAndView("redirect:/site/sign-up");
+		}
+		if (!authenticated2) {
+			info.setMessage("Password does not match");
 			return new ModelAndView("redirect:/site/login");
 		}
 

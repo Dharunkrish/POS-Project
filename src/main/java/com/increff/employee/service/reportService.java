@@ -19,13 +19,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.increff.employee.dao.brandDao;
+import com.increff.employee.dao.inventoryDao;
 import com.increff.employee.dao.reportDao;
-import com.increff.employee.model.daySalesReportForm;
-import com.increff.employee.model.daysalesData;
-import com.increff.employee.model.reportForm;
+import com.increff.employee.model.Data.daysalesData;
+import com.increff.employee.model.Data.reportData;
+import com.increff.employee.model.Form.daySalesReportForm;
+import com.increff.employee.model.Form.reportForm;
 import com.increff.employee.pojo.daySalesReportPojo;
 import com.increff.employee.pojo.inventoryPojo;
 import com.increff.employee.pojo.orderitemPojo;
+import com.increff.employee.util.DataConversionUtil;
 
 @Service
 public class reportService {
@@ -37,7 +40,7 @@ public class reportService {
 	private brandDao bdao;
 	
 	@Autowired
-	private InventoryService s;
+	private inventoryDao s;
 	 
 	private Logger logger = Logger.getLogger(reportDao.class);
 
@@ -56,9 +59,14 @@ public class reportService {
 	}
 	
 	@Transactional(rollbackOn = ApiException.class)
-	public List<daySalesReportPojo> get(reportForm s) throws ApiException {
+	public List<reportData> get(reportForm s) throws ApiException {
 		CheckDateRange(s);
-		return dao.get(s);
+		List<reportData> p=new ArrayList<>();
+		List<daySalesReportPojo> d=dao.get(s);
+		for (daySalesReportPojo s1:d) {
+			p.add(DataConversionUtil.convert(s1));
+		}
+		return p;
 	}
 	
 	public Map<String,orderitemPojo> getorder(reportForm s) throws ApiException{
@@ -72,7 +80,7 @@ public class reportService {
 	}
 	
 	public Map<String,inventoryPojo> getinventory() throws Exception{
-		List<inventoryPojo> o= s.getAll();
+		List<inventoryPojo> o= s.selectAll();
 		Map<String ,inventoryPojo> m=new HashMap<String,inventoryPojo>();
 		for (inventoryPojo oi:o) {
 			m.put(oi.getBarcode(), oi);	
@@ -80,9 +88,8 @@ public class reportService {
        return m;
 	}
 	
-	public Map<Integer,List<Object>> getsales(reportForm s,Map<String,orderitemPojo> o) throws ApiException {
-		logger.info(o.size());
-		logger.info(s.getBrand()+s.getCategory()+s.getFrom()+s.getTo());
+	public List<daySalesReportForm> getsales(reportForm s) throws ApiException {
+		Map<String,orderitemPojo> o= getorder(s);
 		List<daysalesData> p=new ArrayList<>();
 		if ((s.getBrand()=="" && s.getCategory()=="") || (s.getBrand().equals("none") && s.getCategory().equals("none"))) {
 			p= dao.getsales();
@@ -124,11 +131,16 @@ public class reportService {
 			    m.put(d.getBrand_Category_id(), ds);
 		    }
 		}
-		return m;
+		List<daySalesReportForm> report=new ArrayList<>();
+		 for (int b:m.keySet()) {
+			 report.add(DataConversionUtil.convert2(m.get(b)));
+		 }
+		return report;
 	}
 	
-	public Map<Integer,List<Object>> getinventoryReport(Map<String,inventoryPojo> o) throws ApiException {
-		List<daysalesData> p=dao.getsales();
+	public List<daySalesReportForm> getinventoryReport() throws Exception {
+		 Map<String,inventoryPojo> o=getinventory();
+			List<daysalesData> p=dao.getsales();
 		Map<Integer,List<Object>> m=new HashMap<Integer,List<Object>>();
 		for (daysalesData d:p) {
 			if (!o.containsKey(d.getBarcode())) {
@@ -150,9 +162,11 @@ public class reportService {
 			    m.put(d.getBrand_Category_id(), ds);
 		    }
 		}
-		return m;
-
-		
+		List<daySalesReportForm> report=new ArrayList<>();
+		 for (int b:m.keySet()) {
+			 report.add(DataConversionUtil.convert1(m.get(b)));
+		 }
+		return report;	
 	}
 
 	protected static void CheckDateRange(reportForm s) throws ApiException{

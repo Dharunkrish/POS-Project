@@ -23,23 +23,27 @@ import java.time.temporal.ChronoUnit;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.increff.employee.pojo.inventoryPojo;
-import com.increff.employee.pojo.productPojo;
-import com.increff.employee.pojo.orderPojo;
-import com.increff.employee.pojo.orderitemPojo;
+import com.increff.employee.model.Form.inventoryForm;
+import com.increff.employee.model.Form.productForm;
+import com.increff.employee.model.Form.orderForm;
+import com.increff.employee.model.Form.orderitemForm;
 import com.increff.employee.dao.orderitemDao;
 import com.increff.employee.dao.reportDao;
-import com.increff.employee.model.DaySalesXml;
-import com.increff.employee.model.DaySalesXmlForm;
-import com.increff.employee.model.InventoryReportXml;
-import com.increff.employee.model.InventoryXmlForm;
-import com.increff.employee.model.SalesReportDataXml;
-import com.increff.employee.model.SalesXmlForm;
-import com.increff.employee.model.orderData;
-import com.increff.employee.model.orderxmlForm;
-import com.increff.employee.model.reportForm;
-import com.increff.employee.pojo.brandPojo;
-import com.increff.employee.pojo.daySalesReportPojo;
+import com.increff.employee.model.Form.reportForm;
+import com.increff.employee.model.Xml.DaySalesXml;
+import com.increff.employee.model.Xml.DaySalesXmlForm;
+import com.increff.employee.model.Xml.InventoryReportXml;
+import com.increff.employee.model.Xml.InventoryXmlForm;
+import com.increff.employee.model.Xml.SalesReportDataXml;
+import com.increff.employee.model.Xml.SalesXmlForm;
+import com.increff.employee.model.Xml.orderData;
+import com.increff.employee.model.Xml.orderxmlForm;
+import com.increff.employee.pojo.orderPojo;
+import com.increff.employee.pojo.orderitemPojo;
+import com.increff.employee.model.Data.productData;
+import com.increff.employee.model.Data.brandData;
+import com.increff.employee.model.Form.brandForm;
+import com.increff.employee.model.Form.daySalesReportForm;
 
 
 
@@ -80,47 +84,47 @@ public class InvoiceServiceTest extends AbstractUnitTest {
 	public ExpectedException exceptionRule = ExpectedException.none();
     
 
-		public brandPojo BrandInitialise1() throws ApiException {
-			brandPojo p = new brandPojo();
+		public brandData BrandInitialise1() throws ApiException {
+			brandForm p = new brandForm();
 			p.setBrand("nestle1");
 			p.setCategory("maggi1");
 			brandservice.add(p);
-			return p;
+			return brandservice.getAll().get(0);
 		}
 	
-		public brandPojo BrandInitialise2() throws ApiException {
-			brandPojo p1 = new brandPojo();
+		public brandData BrandInitialise2() throws ApiException {
+			brandForm p1 = new brandForm();
 			p1.setBrand("bru1");
 			p1.setCategory("coffee1");
 			brandservice.add(p1);
-			return p1;
+			return brandservice.getAll().get(1);
 		}
 
-	public productPojo prodInitialise1() throws ApiException{ 
-		brandPojo brand=BrandInitialise1();
-		productPojo p = new productPojo();
+	public productData prodInitialise1() throws Exception{ 
+		brandData brand=BrandInitialise1();
+		productForm p = new productForm();
         p.setName("150 g");
 		p.setBarcode("1");
 		p.setMrp(1000.0);
 		p.setBrand_Category_id(brand.getId());
 		prodservice.add(p);
-		return p;
+		return prodservice.getAll().get(0);
 	}
 
-	public  productPojo prodInitialise2()  throws ApiException {
-		brandPojo brand=BrandInitialise2();
-		productPojo p = new productPojo();
+	public  productData prodInitialise2()  throws Exception {
+		brandData brand=BrandInitialise2();
+		productForm p = new productForm();
         p.setName("1 Liter");
 		p.setBarcode("12");
 		p.setMrp(2000.0);
 		p.setBrand_Category_id(brand.getId());
 		prodservice.add(p);
-		return p;
+		return prodservice.getAll().get(1);
 	}
 
-	public inventoryPojo InvInitialise1()  throws ApiException {
-		productPojo p=prodInitialise1();
-		inventoryPojo i = new inventoryPojo();
+	public inventoryForm InvInitialise1()  throws Exception {
+		productData p=prodInitialise1();
+		inventoryForm i = new inventoryForm();
 		i.setId(p.getProduct_id());
         i.setName("150 g");
 		i.setBarcode("1");
@@ -129,9 +133,9 @@ public class InvoiceServiceTest extends AbstractUnitTest {
 		return i;
 	}
 
-	public inventoryPojo InvInitialise2()  throws ApiException {
-	    productPojo p=prodInitialise2();
-		inventoryPojo i = new inventoryPojo();
+	public inventoryForm InvInitialise2()  throws Exception {
+	    productData p=prodInitialise2();
+		inventoryForm i = new inventoryForm();
         i.setId(p.getProduct_id());
         i.setName("1 Liter");
 		i.setBarcode("12");
@@ -140,9 +144,9 @@ public class InvoiceServiceTest extends AbstractUnitTest {
 		return i;
 	}
 
-	public orderitemPojo OrderItemInitialise1() throws ApiException{
-		inventoryPojo i1= InvInitialise1();
-		orderitemPojo oi=new orderitemPojo();
+	public orderitemForm OrderItemInitialise1() throws Exception{
+		inventoryForm i1= InvInitialise1();
+		orderitemForm oi=new orderitemForm();
 		oi.setName(i1.getName());
 		oi.setBarcode(i1.getBarcode());
 		oi.setQuantity(10);
@@ -150,9 +154,9 @@ public class InvoiceServiceTest extends AbstractUnitTest {
 		return oi;
 	}
 
-	public orderitemPojo OrderItemInitialise2() throws ApiException{
-		inventoryPojo i1= InvInitialise2();
-		orderitemPojo oi=new orderitemPojo();
+	public orderitemForm OrderItemInitialise2() throws Exception{
+		inventoryForm i1= InvInitialise2();
+		orderitemForm oi=new orderitemForm();
 		oi.setName(i1.getName());
 		oi.setBarcode(i1.getBarcode());
 		oi.setQuantity(5);
@@ -161,35 +165,47 @@ public class InvoiceServiceTest extends AbstractUnitTest {
 	}
 
 
-	public orderPojo Initialise1()  throws ApiException {
-		orderPojo order =new orderPojo();
-		order.setT(ZonedDateTime.now().minus(Period.ofDays(1)));
-		order.setInvoiceGenerated(false);
-		order=dao.create(order);
-		orderitemPojo oi1=OrderItemInitialise1();
-		orderitemPojo oi2=OrderItemInitialise2();
-		orderservice.AddSingleItem(oi1,order.getId());
-		orderservice.AddSingleItem(oi2,order.getId());
-		return order;
+	public orderForm Initialise1()  throws Exception {
+		orderitemForm oi1=OrderItemInitialise1();
+		orderitemForm oi2=OrderItemInitialise2();
+		List<orderitemForm> o=new ArrayList<orderitemForm> ();
+		o.add(oi1);
+		o.add(oi2);
+		orderservice.AddItems(o);
+		orderForm of=orderservice.getAll().get(0);
+		orderPojo o1=new orderPojo();
+		o1.setId(of.getId());
+		System.err.print(of.isInvoiceGenerated());
+		o1.setInvoiceGenerated(of.isInvoiceGenerated());
+        o1.setT(ZonedDateTime.now().minus(Period.ofDays(1)));
+		dao.update(o1);
+		System.err.print(o1.isInvoiceGenerated());
+		return orderservice.getAll().get(0);
 	}
 
-	public orderPojo Initialise2()  throws ApiException {
+	public orderForm Initialise2()  throws Exception {
 		orderPojo order =new orderPojo();
-		order.setT(ZonedDateTime.now().minus(Period.ofDays(1)));
 		order.setInvoiceGenerated(false);
 		order=dao.create(order);
-		orderitemPojo oi1=OrderItemInitialise1();
-		orderitemPojo oi2=OrderItemInitialise2();
+		orderitemForm oi1=OrderItemInitialise1();
+		orderitemForm oi2=OrderItemInitialise2();
 		oi1.setQuantity(oi1.getQuantity()-2);
 		oi2.setQuantity(oi2.getQuantity()-4);
-		orderservice.AddSingleItem(oi1,order.getId());
-		orderservice.AddSingleItem(oi2,order.getId());
-		return order;
+		List<orderitemForm> o=new ArrayList<orderitemForm> ();
+		o.add(oi1);
+		o.add(oi2);
+		orderservice.AddItems(o);
+		orderForm of=orderservice.getAll().get(0);
+		orderPojo o1=new orderPojo();
+		o1.setId(of.getId());
+		o1.setInvoiceGenerated(of.isInvoiceGenerated());
+		orderservice.update(o1.getId(), o1);
+		return orderservice.getAll().get(0);
 	}
 
 	@Test
 	public void TestGenerateInvoiceXMLList() throws Exception{
-		   orderPojo o=Initialise1();
+		   orderForm o=Initialise1();
 		   orderxmlForm xmlList=new orderxmlForm();
 		   xmlList.setOrder_id(o.getId());
 		   List<orderData> od=new ArrayList<orderData>();
@@ -204,16 +220,17 @@ public class InvoiceServiceTest extends AbstractUnitTest {
 		   xmlList.setOrderInvoiceData(od);
 		   assertEquals(false, o.isInvoiceGenerated());
 		   xmlList=service.generateInvoiceList(xmlList);
-		   o=orderservice.getorder(o.getId());
+		   orderPojo o1=new orderPojo();
+		   o1=orderservice.getorder(o.getId());
 		   assertEquals((Integer)o.getId(), xmlList.getOrder_id());
-		   assertEquals(o.getT().format(formatter), xmlList.getDatetime());
+		   assertEquals(o1.getT().format(formatter), xmlList.getDatetime());
 		   assertEquals(2000, xmlList.getTotal(),0.01);
-		   assertEquals(true, o.isInvoiceGenerated());
+		   assertEquals(true, o1.isInvoiceGenerated());
 	}
 
 	@Test
 	public void TestcalculateTotal() throws Exception{
-		orderPojo o=Initialise1();
+		orderForm o=Initialise1();
 		orderxmlForm xmlList=new orderxmlForm();
 		xmlList.setOrder_id(o.getId());
 		List<orderData> od=new ArrayList<orderData>();
@@ -234,6 +251,7 @@ public class InvoiceServiceTest extends AbstractUnitTest {
 	public void TestGenerateDaySalesXMLList() throws Exception{
 		Initialise1();
 		repservice.add();
+		System.err.print(orderservice.getAll().get(0).getTime());
 		reportForm s=new reportForm();
 		s.setFrom(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()).minus(Period.ofDays(2)));
 		s.setTo(LocalDate.now().atTime(LocalTime.MIN) .atZone(ZoneId.systemDefault()));

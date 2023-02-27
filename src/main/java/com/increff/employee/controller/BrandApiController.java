@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.increff.employee.model.brandData;
-import com.increff.employee.model.brandForm;
+import com.increff.employee.model.Data.brandData;
+import com.increff.employee.model.Form.brandForm;
 import com.increff.employee.pojo.brandPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.brandService;
@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiOperation;
 
 @Api
 @RestController
+@RequestMapping(path = "/api/brand")
 public class BrandApiController {
 
 	@Autowired
@@ -31,49 +32,36 @@ public class BrandApiController {
 	private Logger logger = Logger.getLogger(BrandApiController.class);
 
 	@ApiOperation(value = "Adds an product")
-	@RequestMapping(path = "/api/brand/supervisor", method = RequestMethod.POST)
+	@RequestMapping(path = "/supervisor", method = RequestMethod.POST)
 	public void add(@RequestBody brandForm form) throws ApiException {
-		brandPojo p = DataConversionUtil.convert(form);
-		service.add(p);
+		service.add(form);
 	}
 	
-	@ApiOperation(value = "Adds an product")
-	@RequestMapping(path = "/api/brand", method = RequestMethod.POST)
+	@ApiOperation(value = "Gets brandList")
+	@RequestMapping(method = RequestMethod.POST)
 	public List<brandData> get(@RequestBody brandForm form) throws ApiException {
-		brandPojo p = DataConversionUtil.convert(form);
-		List<brandPojo> list =service.getbrand(p);
-		List<brandData> list2 = new ArrayList<brandData>();
-		for (brandPojo b : list) {
-			list2.add(DataConversionUtil.convert(b));
-		}
-		return list2;
+		return service.getbrand(form);
+		
 	}
 
 
 	@ApiOperation(value = "Gets an brand by ID")
-	@RequestMapping(path = "/api/brand/{id}", method = RequestMethod.GET)
+	@RequestMapping(path="/{id}", method = RequestMethod.GET)
 	public brandData get(@PathVariable int id) throws ApiException {
-		brandPojo p = service.get(id);
-		return DataConversionUtil.convert(p);
+		return service.get(id);
 	}
 	
 
 	
 	@ApiOperation(value = "Gets list of all brands")
-	@RequestMapping(path = "/api/brand", method = RequestMethod.GET)
+	@RequestMapping(method = RequestMethod.GET)
 	public List<brandData> getAll() {
-		List<brandPojo> list = service.getAll();
-		List<brandData> list2 = new ArrayList<brandData>();
-		for (brandPojo p : list) {
-			list2.add(DataConversionUtil.convert(p));
-		}
-		return list2;
+		return service.getAll();
 	}
 
 	@ApiOperation(value = "Updates an brand")
-	@RequestMapping(path = "/api/brand/supervisor/{id}", method = RequestMethod.PUT)
+	@RequestMapping(path = "/supervisor/{id}", method = RequestMethod.PUT)
 	public void update(@PathVariable int id, @RequestBody brandForm f) throws ApiException {
-		brandPojo p = DataConversionUtil.convert(f);
-		service.update(id, p);
+		service.update(id, f);
 	}
 }

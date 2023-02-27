@@ -179,7 +179,7 @@ function uploadRows(){
 	   		uploadRows();  
 	   },
 	   error: function(response){
-	   		row.error=response.responseText
+	   		row.error=response.responseJSON.message
 	   		errorData.push(row);
 	   		uploadRows();
 	   }
@@ -216,20 +216,20 @@ function displayinventoryList(data){
     {
         className: 'dt-center'
     },                 { 'visible': false, 'targets': [3] }
-],pageLength : 7,
+],
         autoWidth: true,
-    lengthMenu: [[7, 10, 20, -1], [7, 10, 20, 'All']] } );
+    lengthMenu: [[10, 20, -1], [10, 20, 'All']] } );
 }
 else{
 	var ta=$('#inventory-table').DataTable({
-		pageLength : 7,
         autoWidth: true,
-    lengthMenu: [[7, 10, 20, -1], [7, 10, 20, 'All']]
+    lengthMenu: [[10, 10, 20, -1], [10, 10, 20, 'All']]
 	});
 }
     new $.fn.dataTable.FixedHeader(ta);
 
 }
+
 
 function displaydropdown(data){
 	$('#idvalue').empty();
@@ -240,9 +240,8 @@ function displaydropdown(data){
 
 	for(var i in data){
 		var e = data[i];
-		var row = e.barcode;
 		var p=$("<option />");
-        p.html(row);
+        p.html(e.product_id);
         p.val(e.product_id);
       $("#idvalue").append(p);
 }
@@ -287,6 +286,14 @@ function updateFileName(){
 	var $file = $('#inventoryFile');
 	var fileName = $file.val();
     var f=fileName.split("\\");
+    l=f[f.length-1];
+	console.log(l.slice(-3))
+	if (l.slice(-3)!=="tsv"){
+		toastr.options.timeOut = 10000;
+	   		toastr.error("Upload only TSV files");
+	   		$("#brandFile").val("");
+	   		return;
+	   	}
 	$('#inventoryFileName').html(f[f.length-1]);
 }
 
@@ -297,7 +304,7 @@ function displayUploadData(){
 
 function displayinventory(data){
 	$("#barcodeedit").attr("disabled","true");
-	$("#barcodeedit").val(data.barcode);
+	$("#barcodeedit").val(data.id);
 	$("#inventory-edit-form input[name=productid]").val(data.id);
     $("#inventory-edit-form input[name=quantity]").val(data.quantity);	
 	$('#edit-inventory-modal').modal('toggle');
@@ -330,6 +337,8 @@ function init(){
     	$("#add-inv").css("display","none");
     	$("#upload-data").css("display","none");
     }
+    setInterval(getinventoryList,5000);
+
 }
 
 $(document).ready(init);

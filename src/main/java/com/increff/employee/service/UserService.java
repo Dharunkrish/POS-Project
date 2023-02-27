@@ -1,5 +1,6 @@
 package com.increff.employee.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -8,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.increff.employee.dao.UserDao;
+import com.increff.employee.model.Data.UserData;
+import com.increff.employee.model.Form.UserForm;
 import com.increff.employee.pojo.UserPojo;
+import com.increff.employee.util.DataConversionUtil;
 
 @Service
 public class UserService {
@@ -17,7 +21,8 @@ public class UserService {
 	private UserDao dao;
 
 	@Transactional
-	public void add(UserPojo p) throws ApiException {
+	public void add(UserForm f) throws ApiException {
+		UserPojo p=DataConversionUtil.convert(f);
 		normalize(p);
 		UserPojo existing = dao.select(p.getEmail());
 		if (existing != null) {
@@ -35,8 +40,12 @@ public class UserService {
 	}
 
 	@Transactional
-	public List<UserPojo> getAll() {
-		return dao.selectAll();
+	public List<UserData> getAll() {
+		List<UserData> list2 = new ArrayList<UserData>();
+		for (UserPojo p : dao.selectAll()) {
+			list2.add(DataConversionUtil.convert(p));
+		}
+		return list2;
 	}
 
 	@Transactional
@@ -45,7 +54,8 @@ public class UserService {
 	}
 	
 	@Transactional
-	public void update(UserPojo u,int id) throws ApiException {
+	public void update(UserForm form,int id) throws ApiException {
+		UserPojo u = DataConversionUtil.convert(form);
 		if (u.getRole()!="supervisor" && u.getRole()!="operator"){
 			throw new ApiException("Role must be Supervisor or Operator");
 		}

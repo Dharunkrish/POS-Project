@@ -155,7 +155,7 @@ function downloadPDF() {
         link.click();
        },
        error: function(response){
-         toastr.options.timeOut = 0;
+         toastr.options.timeOut = 10000;
     toastr.error("Brand "+brand+" and Category "+category+" combination does not exist");    
        }
     });
@@ -178,8 +178,12 @@ function init() {
 
     $('#toDate').val(today);
     $('#fromDate').val(last);
-    document.getElementById("fromDate").max=(today);
-    $('#fromDate').on("change",function(){document.getElementById("toDate").min=$('#fromDate').val()
+
+    document.getElementById("fromDate").max=today;
+    document.getElementById("toDate").max=today;
+    console.log(today,$("#toDate").val());
+    $('#fromDate').on("input",function(){
+      document.getElementById("toDate").min=$('#fromDate').val();
 })
     $('#salesbutton').click(salesReport);
     $("#download").click(downloadPDF);

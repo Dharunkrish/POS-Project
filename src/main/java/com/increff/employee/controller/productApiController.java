@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.increff.employee.model.productData;
-import com.increff.employee.model.productForm;
+import com.increff.employee.model.Data.productData;
+import com.increff.employee.model.Form.productForm;
 import com.increff.employee.pojo.productPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.brandService;
@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiOperation;
 
 @Api
 @RestController
+@RequestMapping(path = "/api/product")
 public class productApiController {
 
 	@Autowired
@@ -32,57 +33,33 @@ public class productApiController {
 	private Logger logger = Logger.getLogger(productApiController.class);
 
 	@ApiOperation(value = "Adds an product")
-	@RequestMapping(path = "/api/product/supervisor", method = RequestMethod.POST)
+	@RequestMapping(path = "/supervisor", method = RequestMethod.POST)
 	public void add(@RequestBody productForm form) throws ApiException {
-		productPojo p = convert(form);
-		service.add(p);
+		service.add(form);
 	}
 
 	
 
 	@ApiOperation(value = "Gets an brand by ID")
-	@RequestMapping(path = "/api/product/{id}", method = RequestMethod.GET)
+	@RequestMapping(path = "/{id}", method = RequestMethod.GET)
 	public productData get(@PathVariable int id) throws ApiException {
-		productPojo p = service.get(id);
-		return convert(p);
+		return service.get(id);
 	}
 
 	@ApiOperation(value = "Gets list of all brands")
-	@RequestMapping(path = "/api/product", method = RequestMethod.GET)
+	@RequestMapping(method = RequestMethod.GET)
 	public List<productData> getAll() throws Exception {
-		 List<productPojo> list=service.getAll();
-		List<productData> list2 = new ArrayList<productData>();
-		for (productPojo p : list) {
-			list2.add(convert(p));
-		}
-		return list2;
+		 return service.getAll();
+		
 	}
 
 	@ApiOperation(value = "Updates an brand")
-	@RequestMapping(path = "/api/product/supervisor/{id}", method = RequestMethod.PUT)
+	@RequestMapping(path = "/supervisor/{id}", method = RequestMethod.PUT)
 	public void update(@PathVariable int id, @RequestBody productForm f) throws ApiException {
-		productPojo p = convert(f);
-		service.update(id, p);
+		service.update(id, f);
 	}
 	
 
-	private static productData convert(productPojo p) {
-		productData d = new productData();
-		d.setBrand_Category_id(p.getBrand_Category_id());
-		d.setName(p.getName());
-		d.setBarcode(p.getBarcode());
-		d.setMrp(p.getMrp());
-		d.setProduct_id(p.getProduct_id());
-		return d;
-	}
 
-	private productPojo convert(productForm f) throws ApiException {
-		productPojo p=new productPojo();
-		p.setName(f.getName());
-		p.setBarcode(f.getBarcode());
-		p.setMrp(f.getMrp());
-		p.setBrand_Category_id(f.getBrand_Category_id());
-		return p;
-	}
 	
 }

@@ -1,5 +1,7 @@
 var o_Id=0;
 var quantity_v=0;
+var ordeer=new Set();
+;
 function Url(){
 	var baseUrl = $("meta[name=baseUrl]").attr("content");
 	return baseUrl + "/api/orderitem";
@@ -24,25 +26,9 @@ function len(){
 function additems(){
 var $form = $("#order-form");
 var json = toJsonobject($form);
-console.log(json);
-if (isNaN(json.quantity)){
-		toastr.options.timeOut = 0;
-        toastr.error("Quantity must be a number");
-		return;
-}
-	if (json.quantity%1!=0){
-		toastr.options.timeOut = 0;
-        toastr.error("Quantity must be a whole number");
-		return;
-	}
-if (isNaN(json.price)){
-		toastr.options.timeOut = 0;
-        toastr.error("Selling Price must be a number");
-		return;
-}
+json.price=parseFloat(json.price).toFixed(2)
 json['id']=len();
 const items=JSON.parse(sessionStorage.getItem("itemlist"));
- document.getElementById("order-form").reset();    
 for (var i in items){
 	if (items[i].barcode==json.barcode.trim()){
 		toastr.error("Order for product already exist");
@@ -58,19 +44,11 @@ $.ajax({
        	'Content-Type': 'application/json'
        },	   
 	   success: function(data) {
-	   	if (data.is_p===2){
-			   			   	toastr.error("Inventory has less product than requested");
-
-	   }
-       else if (data.is_p===0){
-       	toastr.error("Product with given barcode does not exist");
-	   	}
-	   	else{
 	   		json["name"]=data.name;
 	   		items.push(json);
             sessionStorage.setItem("itemlist",JSON.stringify(items));
+            document.getElementById("order-form").reset();    
             showtable();
-	   	}
 	   },
 	   error: handleAjaxError
 	});
@@ -143,24 +121,6 @@ function edititem(){
 var $form = $("#edit-form");
 var url=Url()+ '/supervisor/check';
 var json = toJson($form);
-var quantity = $("#edit-form input[name=quantity]").val();
-var price = $("#edit-form input[name=price]").val();
-console.log(price,quantity)
-if (isNaN(quantity)){
-		toastr.options.timeOut = 0;
-        toastr.error("Quantity must be a number");
-		return;
-}
-	if (quantity%1!=0){
-		toastr.options.timeOut = 0;
-        toastr.error("Quantity must be a whole number");
-		return;
-	}
-if (isNaN(price)){
-		toastr.options.timeOut = 0;
-        toastr.error("Selling Price must be a number");
-		return;
-}
 $.ajax({
 	   url: url,
 	   type: 'POST',
@@ -169,29 +129,13 @@ $.ajax({
        	'Content-Type': 'application/json'
        },	   
 	   success: function(data) {
-		   	if (data.is_p===2){
-		   	toastr.error("Inventory has less product than requested");
-		   	return;
-	   }
-       else if (data.is_p===0){
-		   	toastr.error("Product with given barcode does not exist");
-		   	return;
-	   	}
-	   	else{
-	   		const items=JSON.parse(sessionStorage.getItem("itemlist"));
 			var d=JSON.parse(json);
 			d["name"]=data.name;
+		    var items=JSON.parse(sessionStorage.getItem("itemlist"));
 			items[parseInt(d.id)]=(d);
 			sessionStorage.setItem("itemlist",JSON.stringify(items));
-			$("#edit-modal").modal("toggle");
+			edittoadditems();
 			showtable();
-				 $('#add-div').css("display", "block");
- $('#beditdiv').css("display", "none");
-   $('#addfooter').css("display", "block");
-  $('#editfooter').css("display", "none");
-   		$('#add-inventory-modal').find('.modal-title').text("Add Order")
-
-	   	}
 	   },
 	   error: handleAjaxError
 	});
@@ -200,21 +144,6 @@ $.ajax({
 function updateitem(){
 var $form = $("#edit-view-form");
 var json = toJsonobject($form);
-if (isNaN(json.quantity)){
-		toastr.options.timeOut = 0;
-        toastr.error("Quantity must be a number");
-		return;
-}
-	if (json.quantity%1!=0){
-		toastr.options.timeOut = 0;
-        toastr.error("Quantity must be a whole number");
-		return;
-	}
-if (isNaN(json.price)){
-		toastr.options.timeOut = 0;
-        toastr.error("Selling Price must be a number");
-		return;
-}
 json['old_q']=quantity_v;
 json1=JSON.stringify(json);
 var id=$("#edit-view-form input[name=id]").val();
@@ -227,17 +156,7 @@ $.ajax({
        	'Content-Type': 'application/json'
        },	   
 	   success: function(data) {
-		if (data.is_p===2){
-		   	toastr.error("Insufficient inventory for the requested product");
-		   	return;
-	   }
-       else if (data.is_p===0){
-		   	toastr.error("Product with given barcode does not exist");
-		   	return;
-	   }
-	   else{
          getedititem(o_Id);
-	   	}
 	   },
 	   error: handleAjaxError
 	});
@@ -274,17 +193,10 @@ function addorder(){
 			'Content-Type':'application/json'
 		},
 		success: function(data){
-			if (data.is_p===2){
-				toastr.error("Insufficient inventory for the requested product");
-				return;}
-			else{
+
 			getorder();
 			$('#add-inventory-modal').modal("toggle");
-			$('#add-success-alert').css('display', 'block'); 
-			$("#add-success-alert").fadeOut(3000);
-			    	clearstorage();
-
-		}
+			 clearstorage();
 		},
 	  error: handleAjaxError
 	});
@@ -309,6 +221,10 @@ function addedititem(){
 	var $form = $("#add-order-form");
     var items = toJson($form);
 	var url=orderurl()+"/supervisor/"+o_Id;
+	if (ordeer.has($("#add-order-form input[name=barcode").val())){
+		toastr.error("Order for product already exist")
+		return;
+	}
 	$.ajax({
 		url: url,
 		type: 'POST',
@@ -317,54 +233,35 @@ function addedititem(){
 			'Content-Type':'application/json'
 		},
 		success: function(data){
-			if (data.is_p===0){
-                 toastr.error("Product with given barcode does not exist")
-			}
-			if (data.is_p===2){
-				toastr.error("Insufficient inventory for the requested product");
-				return;}
-			else{
 			getedititem(o_Id);
 			 document.getElementById("add-order-form").reset();    
-
-		}
 		},
 	  error: handleAjaxError
 	});
 }
 
 function displayEdititem(i){
-var item=JSON.parse(sessionStorage.getItem("itemlist"));
-var data=(item[i]);
+ var item=JSON.parse(sessionStorage.getItem("itemlist"));
+ var data=(item[i]);
  $("#edit-form input[name=barcode]").val(data.barcode);
-  $("#edit-form input[name=quantity]").val(data.quantity);
+ $("#edit-form input[name=quantity]").val(data.quantity);
  $("#edit-form input[name=price]").val(data.price);
  $("#edit-form input[name=id]").val(i);
- 		$('#add-inventory-modal').find('.modal-title').text("Edit Order")
-
- $('#add-div').css("display", "none");
- $('#beditdiv').css("display", "block");
-   $('#addfooter').css("display", "none");
-  $('#editfooter').css("display", "block");
+ addtoedititems();
 }
 
 function displayEditorder(data){
  $("#edit-view-form input[name=barcode]").val(data.barcode);
-  $("#edit-view-form input[name=quantity]").val(data.quantity);
+ $("#edit-view-form input[name=quantity]").val(data.quantity);
  $("#edit-view-form input[name=price]").val(data.price);
  $("#edit-view-form input[name=id]").val(data.id);
- quantity_v=data.quantity;
-   $('#whole').css("display", "none");
-  $('#editdiv').css("display", "block"); 
-    $('#aftereditfooter').css("display", "block"); 
-
+ addtoeditorder();
 }
 
 function showtable(){
 	var data=JSON.parse(sessionStorage.getItem("itemlist"));
 	var $tbody = $('#item-table').find('tbody');
 	$tbody.empty();
-	var j=0;
 	for(var i in data){
 		var e = (data[i]);
 		var buttonHtml = ' <button button="button" class="btn-sm btn-outline-info" onclick="displayEdititem(' + i + ')"><i class="fa-solid fa-pen-to-square"></i></button>'
@@ -373,39 +270,35 @@ function showtable(){
 		+ '<td>' + e.name + '</td>'
 		+ '<td>' + e.barcode + '</td>'
 		+ '<td>' + e.quantity + '</td>'
-		+ '<td>' + e.price*e.quantity + '</td>'
+		+ '<td>' + (e.price*e.quantity).toFixed(2) + '</td>'
 		+ '<td>' + buttonHtml +'</td>';
         $tbody.append(row);
 	}
 }
 
 function displayOrder(data){
-	console.log("k");
 	$('#order-table').dataTable().fnClearTable();
     $('#order-table').dataTable().fnDestroy();
 	var $tbody = $('#order-table').find('tbody');
 	$tbody.empty();
-	//$('#from_date').val(data[0].time.slice(0,11))
 	for(var i in data){
 		var e = (data[i]);
 		e.time=e.time.replace('T',"   ");
+		var buttonHtml1 = ' <button type="button" class="btn btn-outline-info btn-sm" onclick="getitem(' + e.id +')">view</button>'
 		if (e.invoiceGenerated===true){
-            var buttonHtml3=' <button type="button" id="orderedit'+e.id+'" onclick="gm(' + e.id + ')" class="btn btn-primary btn-sm" disabled='+ e.invoiceGenerated +'><i class="fa-solid fa-pen-to-square"></i></button>'
-            var buttonHtml2=' <button type="button" class="btn btn-outline-info btn-sm" onclick="downloadPDF(' + e.id + ')">Download Invoice</button>'
-
+			var buttonHtml2=' <button type="button" class="btn btn-outline-info btn-sm" onclick="downloadPDF(' + e.id + ')">Download Invoice</button>'
+            var buttonHtml3=' <button type="button" id="orderedit'+e.id+'" onclick="gm(' + e.id + ')" class="btn btn-primary-outline-info btn-sm" disabled='+ e.invoiceGenerated +'><i class="fa-solid fa-pen-to-square"></i></button>'
 		}
 		else{
-			var buttonHtml3=' <button type="button" id="orderedit'+e.id+'" onclick="gm(' + e.id + ')" class="btn btn-primary btn-sm"><i class="fa-solid fa-pen-to-square"></i></button>'
-			var buttonHtml2=' <button type="button" class="btn btn-outline-info btn-sm" onclick="downloadPDF(' + e.id + ')">Invoice Generation</button>'
+			var buttonHtml2=' <button type="button" class="btn btn-outline-info btn-sm" onclick="downloadPDF(' + e.id + ')">Generate Invoice</button>'
+			var buttonHtml3=' <button type="button" id="orderedit'+e.id+'" onclick="gm(' + e.id + ')" class="btn btn-primary-outline-info btn-sm"><i class="fa-solid fa-pen-to-square"></i></button>'
 		}
-		var buttonHtml1 = ' <button type="button" class="btn btn-outline-info btn-sm" onclick="getitem(' + e.id +')">view</button>'
 		var row = '<tr>'
 		+ '<td>' + e.id + '</td>'
 		+ '<td>' + e.time + '</td>'
 		+ '<td>' + buttonHtml1 +'</td>'
 		+ '<td>' + buttonHtml3 +'</td>'
 		+ '<td>' + buttonHtml2 +'</td>';
-
         $tbody.append(row);
 	}
 	    if (getRole()==="operator"){
@@ -413,16 +306,14 @@ function displayOrder(data){
         { "targets": [2,3], "searchable": false },
                 { 'visible': false, 'targets': [3] }
     ],
-        pageLength : 6,
         autoWidth: true,
-    lengthMenu: [[6, 10, 20, -1], [6, 10, 20, 'All']]});
+    lengthMenu: [[10, 20, -1], [10, 20, 'All']]});
 	    }
 	    else{
  var ta=$('#order-table').DataTable({"columnDefs": [
         { "targets": [2,3], "searchable": false }    ],
-        pageLength : 6,
         autoWidth: true,
-    lengthMenu: [[6, 10, 20, -1], [6, 10, 20, 'All']]});
+    lengthMenu: [[10, 20, -1], [10, 20, 'All']]});
 	    }
 
     new $.fn.dataTable.FixedHeader(ta);
@@ -441,7 +332,7 @@ function displayOrderitem(data){
 		var row = '<tr>'
 		+ '<td>' + e.name + '</td>'
 		+ '<td>' + e.quantity + '</td>'
-		+ '<td>' + e.price*e.quantity + '</td>'
+		+ '<td>' + (e.price*e.quantity).toFixed(2) + '</td>'
         $tbody.append(row);
 	}
 }
@@ -450,21 +341,35 @@ function displayeditOrderitem(data){
     var $tbody = $('#edit-item-table').find('tbody');
 	$tbody.empty();
 	var j=0;
+	ordeer=new Set()
+	if (data.length===1){
+		var e = (data[0]);
+		ordeer.add(e.barcode)
+		var buttonHtml = ' <button button="button" class="btn-sm btn-outline-info" onclick="getitemid(' + data[0].id + ')"><i class="fa-solid fa-pen-to-square"></i></button>'
+		var row = '<tr>'
+		+ '<td>' + e.name + '</td>'
+		+ '<td>' + e.barcode + '</td>'
+		+ '<td>' + e.quantity + '</td>'
+		+ '<td>' + (e.price*e.quantity).toFixed(2) + '</td>'
+		+ '<td>' + buttonHtml + '</td>'
+        $tbody.append(row);
+	}
+	else{
 	for(var i in data){
 		var e = (data[i]);
+        ordeer.add(e.barcode)
 		var buttonHtml = ' <button button="button" class="btn-sm btn-outline-info" onclick="getitemid(' + data[i].id + ')"><i class="fa-solid fa-pen-to-square"></i></button>'
 		buttonHtml += ' <button button="button" class="btn-sm btn-outline-info" onclick="deleteitemid(' + data[i].id + ')"><i class="fa fa-trash" aria-hidden="true"></i></button>'
 		var row = '<tr>'
 		+ '<td>' + e.name + '</td>'
 		+ '<td>' + e.barcode + '</td>'
 		+ '<td>' + e.quantity + '</td>'
-		+ '<td>' + e.price*e.quantity + '</td>'
+		+ '<td>' + (e.price*e.quantity).toFixed(2) + '</td>'
 		+ '<td>' + buttonHtml + '</td>'
         $tbody.append(row);
 	}
-				  $('#editdiv').css("display", "none");
-				  $('#aftereditfooter').css("display", "none");
-               $('#whole').css("display", "block");
+}
+edittoaddorder();				 
 }
 
 function downloadPDF(id) {
@@ -489,7 +394,35 @@ function downloadPDF(id) {
 	});
 }
 
-function button(){
+function edittoadditems(){
+		 $('#add-div').css("display", "block");
+		 $('#beditdiv').css("display", "none");
+		 $('#addfooter').css("display", "block");
+		 $('#editfooter').css("display", "none");
+		 $('#add-inventory-modal').find('.modal-title').text("Add Order")
+}
+
+function addtoedititems(){
+		 $('#add-inventory-modal').find('.modal-title').text("Edit Order")
+		 $('#add-div').css("display", "none");
+		 $('#beditdiv').css("display", "block");
+		 $('#addfooter').css("display", "none");
+		 $('#editfooter').css("display", "block");
+}
+
+function addtoeditorder(){
+		 $('#whole').css("display", "none");
+	     $('#editdiv').css("display", "block"); 
+	     $('#aftereditfooter').css("display", "block"); 
+}
+
+function edittoaddorder(){
+	 $('#editdiv').css("display", "none");
+				  $('#aftereditfooter').css("display", "none");
+               $('#whole').css("display", "block");
+}
+
+function button_disabing(){
    $('#add-items').attr("disabled",(($('#order-form input[name=barcode]').val().trim()=="" || ($('#order-form input[name=quantity]').val().trim()=="") || ($('#order-form input[name=price]').val().trim()==""))));
    }
 
@@ -499,26 +432,20 @@ function clearstorage(){
 	sessionStorage.setItem("itemlist",JSON.stringify(items));
 }
 
-  $('#filter').on('click', function(e){
-    e.preventDefault();
+function filter(e){
     var startDate = $('#from_date').val();
      var endDate = $('#to_date').val();
-     console.log(startDate,endDate);
      $.fn.dataTableExt.afnFiltering.length = 0;
-    filterByDate(1, startDate, endDate); // We call our filter function
-    $('#order-table').dataTable().fnDraw(); // Manually redraw the table after filtering
-  });
+    filterByDate(1, startDate, endDate);
+    $('#order-table').dataTable().fnDraw();
+}
   
 var filterByDate = function(column, startDate, endDate) {
-  // Custom filter syntax requires pushing the new filter to the global filter array
    var start = normalizeDate(startDate);
     var end = normalizeDate(endDate);
-    console.log(start,end)
 		$.fn.dataTableExt.afnFiltering.push(
 		   	function( oSettings, aData, iDataIndex ) {
 		   	  var rowDate = aData[column].slice(0,10);
-		   	  console.log(aData,iDataIndex)
-          // If our date from the row is between the start and end
           if (start <= rowDate && rowDate <= end) {
             return true;
           } else if (rowDate >= start && end === '' && start !== ''){
@@ -532,7 +459,6 @@ var filterByDate = function(column, startDate, endDate) {
 		);
 	};
 
-// converts date strings to a Date object, then normalized into a YYYYMMMDD format (ex: 20131220). Makes comparing dates easier. ex: 20131220 > 20121220
 var normalizeDate = function(dateString) {
   var date = new Date(dateString);
   var normalized = date.getFullYear() + '-' + (("0" + (date.getMonth() + 1)).slice(-2)) + '-' + ("0" + date.getDate()).slice(-2);
@@ -542,52 +468,63 @@ var normalizeDate = function(dateString) {
 function gm(id){
 	$('#view-edit-modal').modal('toggle');
 	getedititem(id);
+}
 
+function refresh(){
+        $('#from_date').val("")
+        $('#to_date').val("")
+        $.fn.dataTableExt.afnFiltering.length = 0;
+        getorder();
+}
+
+function FilterInitialise(){
+	var date = new Date();
+    var today = new Date(new Date().setDate(date.getDate()));
+    var last = new Date(new Date().setDate(date.getDate() - 365));
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); 
+    var yyyy = today.getFullYear();
+    today = yyyy + "-" + mm + "-" + dd;
+
+    dd = String(last.getDate()).padStart(2, '0');
+    mm = String(last.getMonth() + 1).padStart(2, '0'); 
+    yyyy = last.getFullYear();
+    last = yyyy + "-" + mm + "-" + dd;
+       $('#to_date').val(today);
+    $('#from_date').val(last);
+    document.getElementById("from_date").min=last;
+    document.getElementById("from_date").max=today;
+    document.getElementById("to_date").max=today;
+    filter();
+    $('#from_date').on("input",function(){
+      document.getElementById("to_date").min=$('#from_date').val();
+    })
 }
 
 function init(){
 	clearstorage();
 	$("#add-ord").click(function(){
-		$('#add-div').css("display", "block");
-        $('#beditdiv').css("display", "none");
-        $('#addfooter').css("display", "block");
-        $('#editfooter').css("display", "none");
-		$('#add-inventory-modal').find('.modal-title').text("Add Order")
 		$('#add-inventory-modal').modal({backdrop: 'static', keyboard: false});
+		edittoadditems();
 		showtable();
 	});
-
-	 $("#order-table_wrapper").css("padding-left","0");
-	 $("#order-table_wrapper").css("margin-left","0");
-
+    FilterInitialise()
 	$("#add-items").click(additems);
-	$("#edit-button").click(function(){
-         updateitem();
-	});
-	$("#cancel").click(function(){
-			$('#add-div').css("display", "block");
-		    $('#beditdiv').css("display", "none");
-		    $('#addfooter').css("display", "block");
-		    $('#editfooter').css("display", "none");
-		    $('#add-inventory-modal').find('.modal-title').text("Add Order")
-	});
+	$("#edit-button").click(updateitem);
+	$("#cancel").click(edittoadditems	);
 	$("#editcancel").click(function(){
-		$('#whole').css("display", "block");
-        $('#editdiv').css("display", "none"); 
-        $('#aftereditfooter').css("display", "none"); 
-	})
+	$('#whole').css("display", "block");
+    $('#editdiv').css("display", "none"); 
+    $('#aftereditfooter').css("display", "none")})
     $("#add-edit-items").click(addedititem)
 	$("#edit-btn").click(edititem);
 	$('#add-items').attr("disabled",true);
-	$('#order-form').on('input change',button);
+	$('#order-form').on('input change',button_disabing);
     $('#submit').click(addorder)
     $("#clear").click(clearstorage);
     $("#closesign").click(clearstorage);
-     $("#refresh-data").click(function(){
-           $('#from_date').val("")
-       $('#to_date').val("")
-            $.fn.dataTableExt.afnFiltering.length = 0;
-       getorder();});
+    $('#filter').on('click', filter);
+    $("#refresh-data").click(refresh);
     if (getRole()==="operator"){
     	$("#add-ord").css("display","none");
     }

@@ -31,7 +31,7 @@
 						From:
 						<xsl:value-of select="from" />
 						<fo:leader leader-pattern="space"/>
-						Brand
+						Brand:
 						<xsl:value-of select="brand" />
 					</fo:block>
 										<fo:block font-size="16pt" font-family="Times New Roman"

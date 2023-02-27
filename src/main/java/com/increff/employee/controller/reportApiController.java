@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.increff.employee.model.daySalesReportForm;
-import com.increff.employee.model.reportData;
-import com.increff.employee.model.reportForm;
+import com.increff.employee.model.Data.reportData;
+import com.increff.employee.model.Form.daySalesReportForm;
+import com.increff.employee.model.Form.reportForm;
 import com.increff.employee.pojo.daySalesReportPojo;
 import com.increff.employee.pojo.inventoryPojo;
 import com.increff.employee.pojo.orderitemPojo;
@@ -26,6 +26,7 @@ import io.swagger.annotations.ApiOperation;
 
 @Api
 @RestController
+@RequestMapping(path = "/api/reports/")
 public class reportApiController {
 	private Logger logger = Logger.getLogger(reportApiController.class);
 
@@ -36,39 +37,21 @@ public class reportApiController {
 
 
 	@ApiOperation(value = "Gets the Sales report")
-	@RequestMapping(path = "/api/reports/daySalesReport", method = RequestMethod.POST)
+	@RequestMapping(path = "daySalesReport", method = RequestMethod.POST)
 	public List<reportData> get(@RequestBody reportForm r) throws Exception {
-		List<reportData> p=new ArrayList<>();
-		List<daySalesReportPojo> d= service.get(r);
-		for (daySalesReportPojo s:d) {
-			p.add(DataConversionUtil.convert(s));
-		}
-		return p;
+		return service.get(r);
 	}
 	
 	@ApiOperation(value = "Gets the Sales report")
-	@RequestMapping(path = "/api/reports/salesReport", method = RequestMethod.POST)
+	@RequestMapping(path = "salesReport", method = RequestMethod.POST)
 	public List<daySalesReportForm> getsales(@RequestBody reportForm r) throws Exception {
-		logger.info(r.getFrom());
-		 Map<String,orderitemPojo> o=service.getorder(r);
-		 Map<Integer,List<Object>> m=service.getsales(r,o);
-		 List<daySalesReportForm> report=new ArrayList<>();
-		 for (int b:m.keySet()) {
-			 report.add(DataConversionUtil.convert2(m.get(b)));
-		 }
-		 return report;
+		 return service.getsales(r);
 	}
 	
 	@ApiOperation(value = "Gets the Sales report")
-	@RequestMapping(path = "/api/reports/inventoryReport", method = RequestMethod.GET)
+	@RequestMapping(path = "inventoryReport", method = RequestMethod.GET)
 	public List<daySalesReportForm> getinventory() throws Exception {
-		 Map<String,inventoryPojo> i=service.getinventory();
-		 Map<Integer,List<Object>> m=service.getinventoryReport(i);
-		 List<daySalesReportForm> report=new ArrayList<>();
-		 for (int b:m.keySet()) {
-			 report.add(DataConversionUtil.convert1(m.get(b)));
-		 }
-		 return report;
+		 return service.getinventoryReport();
 	}
 	
 }

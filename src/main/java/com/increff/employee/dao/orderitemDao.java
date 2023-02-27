@@ -34,7 +34,7 @@ import com.increff.employee.service.ApiException;
 		private static String update_order = "update orderPojo pc set pc.isInvoiceGenerated=:i where id=:id";
 		private static String delete_order_item = "delete orderitemPojo pc where pc.id=:id";
 		private static String select_orderitemid="select i from orderitemPojo i where id=:id";
-
+		private static String select_orderitemidbar="select i from orderitemPojo i where order_id=:id and barcode=:barcode";
 
 
 
@@ -96,6 +96,8 @@ import com.increff.employee.service.ApiException;
 			return query.getSingleResult();
 
 		}
+		
+		
 		
 		public void update(orderPojo o) throws ApiException{
 			}

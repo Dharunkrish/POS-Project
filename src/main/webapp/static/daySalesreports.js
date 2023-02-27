@@ -180,7 +180,7 @@ function init() {
     $('#salesReportBtn').click(function(){salesReport(); });
     $('#idbrand').click(showcategorydd);
     var date = new Date();
-    var today = new Date(new Date().setDate(date.getDate() + 1));
+    var today = new Date(new Date().setDate(date.getDate()));
     var last = new Date(new Date().setDate(date.getDate() - 30));
     var dd = String(today.getDate()).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
@@ -193,6 +193,12 @@ function init() {
     last = yyyy + "-" + mm + "-" + dd;
     $('#toDate').val(today);
     $('#fromDate').val(last);
+     document.getElementById("fromDate").max=today;
+    document.getElementById("toDate").max=today;
+    console.log(today,$("#toDate").val());
+    $('#fromDate').on("input",function(){
+      document.getElementById("toDate").min=$('#fromDate').val();
+})
     $("#download").click(downloadPDF);
 }
 

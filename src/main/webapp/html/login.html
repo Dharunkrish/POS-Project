@@ -3,9 +3,11 @@
 <html lang="en">
 
 <head th:replace="snippets.html :: name_head"></head>
+<link rel="stylesheet" th:href="@{/static/login.css}">
+
 
 <body>
-
+ 
 <nav class="navbar navbar-expand-lg navbar-light bg-light mb-1">
 		  <a class="navbar-brand" th:href="@{/}">
     <img th:src="@{/static/logo.png}" class="d-inline-block align-top" alt="" style="width: 48%">
@@ -36,23 +38,25 @@
     	Login
   	</div>
   	<div class="card-body">
-		<form class="form" id="login-form" method="POST" th:action="@{/session/login}">
-			<div class="form-group">
-				<label for="email" class="col-sm-10 col-form-label">Email</label>
-			    <div class="col-sm-10">
-			      <input type="email" class="form-control" name="email" id="email" placeholder="enter email">
-			    </div>
-			</div>
-			<div class="form-group">
-			    <label for="password" class="col-sm-10 col-form-label">Password</label>
-			    <div class="col-sm-10">
-			      <input type="password" class="form-control" name="password" id="password" placeholder="password">
-			    </div>
-			</div>
-			<div class="text-center">
-			<button type="submit" class="btn btn-primary" id="loginbtn" style="margin-right: 10px">Login</button>
-		</div>
-		</form>
+ <form class="form" id="login-form" method="POST" th:action="@{/session/login}">
+    <div class="form-group">
+        <label for="email" class="col-sm-10 col-form-label">Email</label>
+          <div class="col-sm-10" id="em">
+            <input type="text" class="form-control" name="email" id="email" maxlength="500" placeholder="enter email">
+            <i class='bx bx-envelope position-absolute'></i>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 120px;">
+          <label for="password" class="col-sm-10 col-form-label" style="top: 50px;">Password</label>
+          <div class="col-sm-10" id="pd" style="top: 50px;">
+            <input type="password" class="form-control" name="password" id="password" maxlength="500" placeholder="password">
+                        <i class="bx bx-hide show-hide position-absolute"></i>
+          </div>
+        </div>
+      <div class="text-center">
+      <button type="submit" class="btn btn-primary" id="loginbtn" style="margin-right: 10px">Login</button>
+    </div>
+    </form>
 	</div>
 	<div class="card-footer text-danger">
 		[[${info.getMessage()}]]
@@ -72,15 +76,10 @@
 </body>
 
 <script type="text/javascript">
-	$(document).ready(function(){
-document.getElementById("login-form").reset();
-$('#login-form').on("input change",button);
-button();
-})
 
-function button(){
-   $('#loginbtn').attr("disabled",(($('#login-form input[name=email]').val().trim()=="") || ($('#login-form input[name=password]').val().trim()=="")));
-   }
+
 </script>
+
+<script th:src="@{/static/login.js}"/></script>
 
 </html>

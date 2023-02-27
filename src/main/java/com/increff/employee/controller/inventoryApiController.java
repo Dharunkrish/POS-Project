@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.increff.employee.model.inventoryForm;
+import com.increff.employee.model.Form.inventoryForm;
 import com.increff.employee.pojo.inventoryPojo;
 import com.increff.employee.pojo.productPojo;
 import com.increff.employee.service.ApiException;
@@ -23,52 +23,44 @@ import io.swagger.annotations.ApiOperation;
 
 @Api
 @RestController
+@RequestMapping(path = "/api/inventory")
 public class inventoryApiController {
 	private Logger logger = Logger.getLogger(inventoryApiController.class);
 
 	@Autowired
 	private InventoryService service;
 
-	@ApiOperation(value = "Adds an product")
-	@RequestMapping(path = "/api/inventory/supervisor", method = RequestMethod.POST)
+	@ApiOperation(value = "Adds an inventory")
+	@RequestMapping(path = "/supervisor", method = RequestMethod.POST)
 	public void add(@RequestBody inventoryForm form) throws ApiException {
-		inventoryPojo p = DataConversionUtil.convert(form);
-		service.add(p);
+		service.add(form);
 	}
 
 	
 	
 
 	@ApiOperation(value = "Gets an inventory by ID")
-	@RequestMapping(path = "/api/inventory/{id}", method = RequestMethod.GET)
+	@RequestMapping(path = "/{id}", method = RequestMethod.GET)
 	public inventoryForm get(@PathVariable int id) throws ApiException {
-		inventoryPojo p = service.get(id);
-		return DataConversionUtil.convert(p);
+		return service.get(id);
 	}
 	
-	@ApiOperation(value = "Gets an inventory by ID")
-	@RequestMapping(path = "/api/inventory/id", method = RequestMethod.GET)
+	@ApiOperation(value = "Gets list of products")
+	@RequestMapping(path = "/id", method = RequestMethod.GET)
 	public List<productPojo> getid() throws Exception {
-		List<productPojo> list = service.getid();
-		return list;
+		return service.getid();
 	}
 
 	@ApiOperation(value = "Gets list of all inventorys")
-	@RequestMapping(path = "/api/inventory", method = RequestMethod.GET)
+	@RequestMapping(method = RequestMethod.GET)
 	public List<inventoryForm> getAll() throws Exception {
-		List<inventoryPojo> list = service.getAll();
-		List<inventoryForm> list2 = new ArrayList<inventoryForm>();
-		for (inventoryPojo p : list) {
-			list2.add(DataConversionUtil.convert(p));
-		}
-		return list2;
+		return service.getAll();
 	}
 
 	@ApiOperation(value = "Updates an inventory")
-	@RequestMapping(path = "/api/inventory/supervisor/{id}", method = RequestMethod.PUT)
+	@RequestMapping(path = "/supervisor/{id}", method = RequestMethod.PUT)
 	public void update(@PathVariable int id, @RequestBody inventoryForm f) throws ApiException {
-		inventoryPojo p = DataConversionUtil.convert(f);
-		service.update(id, p);
+		service.update(id, f);
 	}
 	
 }

@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.increff.employee.model.AboutAppData;
+import com.increff.employee.model.Data.AboutAppData;
 import com.increff.employee.service.AboutAppService;
 
 import io.swagger.annotations.Api;

@@ -18,8 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.increff.employee.model.InfoData;
-import com.increff.employee.model.SignUpForm;
+import com.increff.employee.model.Form.UserForm;
+import com.increff.employee.model.Data.InfoData;
+import com.increff.employee.model.Form.SignUpForm;
 import com.increff.employee.pojo.UserPojo;
 import com.increff.employee.service.ApiException;
 import com.increff.employee.service.UserService;
@@ -50,10 +51,11 @@ public class SignUpController {
 			info.setMessage("User Already Present. Redirecting to the login page");
     		return new ModelAndView("redirect:/site/login");
         }
-		UserPojo user=convert(f);
+		UserForm user=convert(f);
 		service.add(user);
+		UserPojo u=service.get(f.getEmail());
 		// Create authentication object
-		Authentication authentication = convert(user);
+		Authentication authentication = convert(u);
 		// Create new session
 		HttpSession session = req.getSession(true);
 		// Attach Spring SecurityContext to this new session
@@ -63,9 +65,9 @@ public class SignUpController {
 		return new ModelAndView("redirect:/ui/home");
 	}
 	
-	 private UserPojo convert(SignUpForm signupForm) throws ApiException {
+	 private UserForm convert(SignUpForm signupForm) throws ApiException {
 	        //set the role
-		    UserPojo user = new UserPojo();
+		    UserForm user = new UserForm();
 	        user.setEmail(signupForm.getEmail());
 	        user.setPassword(signupForm.getPassword());
 	        user.setRole("operator");
